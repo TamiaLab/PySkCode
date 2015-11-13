@@ -1,0 +1,9 @@
+# .coverage settings file
+[run]
+branch = True
+source = skcode
+
+[report]
+omit =
+    */tests/*
+    */tests.py
