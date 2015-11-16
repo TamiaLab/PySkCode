@@ -44,49 +44,56 @@ class AlertBoxTagOptions(TagOptions):
         <h3 class="panel-title"><i class="fa fa-exclamation-circle"></i> %(title)s</h3>
     </div>
     <div class="panel-body">%(inner_html)s</div>
-</div>""",
+</div>
+""",
 
         ALERT_TYPE_DANGER: """<div class="panel panel-danger">
     <div class="panel-heading">
         <h3 class="panel-title"><i class="fa fa-heartbeat"></i> %(title)s</h3>
     </div>
     <div class="panel-body">%(inner_html)s</div>
-</div>""",
+</div>
+""",
 
         ALERT_TYPE_WARNING: """<div class="panel panel-warning">
     <div class="panel-heading">
         <h3 class="panel-title"><i class="fa fa-exclamation-triangle"></i> %(title)s</h3>
     </div>
     <div class="panel-body">%(inner_html)s</div>
-</div>""",
+</div>
+""",
 
         ALERT_TYPE_INFO: """<div class="panel panel-info">
     <div class="panel-heading">
         <h3 class="panel-title"><i class="fa fa-info-circle"></i> %(title)s</h3>
     </div>
     <div class="panel-body">%(inner_html)s</div>
-</div>""",
+</div>
+""",
 
         ALERT_TYPE_SUCCESS: """<div class="panel panel-success">
     <div class="panel-heading">
         <h3 class="panel-title"><i class="fa fa-check-square-o"></i> %(title)s</h3>
     </div>
     <div class="panel-body">%(inner_html)s</div>
-</div>""",
+</div>
+""",
 
         ALERT_TYPE_NOTE: """<div class="panel panel-primary">
     <div class="panel-heading">
         <h3 class="panel-title"><i class="fa fa-pencil-square-o"></i> %(title)s</h3>
     </div>
     <div class="panel-body">%(inner_html)s</div>
-</div>""",
+</div>
+""",
 
         ALERT_TYPE_QUESTION: """<div class="panel panel-primary">
     <div class="panel-heading">
         <h3 class="panel-title"><i class="fa fa-question-circle"></i> %(title)s</h3>
     </div>
     <div class="panel-body">%(inner_html)s</div>
-</div>"""
+</div>
+"""
     }
 
     # Text templates for the title of all alert types
