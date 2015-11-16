@@ -114,28 +114,28 @@ class AcronymsTagtestCase(unittest.TestCase):
         self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering(self):
-        """ Test text rendering. """
+        """ Test SkCode rendering. """
         document_tree = parse_skcode('Run this test [acronym title="As Soon As Possible"]ASAP[/acronym].')
         rendered_output = render_to_skcode(document_tree)
         expected_output = 'Run this test [acronym title="As Soon As Possible"]ASAP[/acronym].'
         self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering_alias(self):
-        """ Test text rendering using alias. """
+        """ Test SkCode rendering using alias. """
         document_tree = parse_skcode('Run this test [abbr title="As Soon As Possible"]ASAP[/abbr].')
         rendered_output = render_to_skcode(document_tree)
         expected_output = 'Run this test [abbr title="As Soon As Possible"]ASAP[/abbr].'
         self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering_without_title(self):
-        """ Test text rendering without title. """
+        """ Test SkCode rendering without title. """
         document_tree = parse_skcode('Run this test [acronym]ASAP[/acronym].')
         rendered_output = render_to_skcode(document_tree)
         expected_output = 'Run this test [acronym title=""]ASAP[/acronym].'
         self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering_with_html_entities_in_title(self):
-        """ Test text rendering with HTML entities in title. """
+        """ Test SkCode rendering with HTML entities in title. """
         document_tree = parse_skcode('Run this test [acronym title="<As Soon As Possible>"]ASAP[/acronym].')
         rendered_output = render_to_skcode(document_tree)
         expected_output = 'Run this test [acronym title="<As Soon As Possible>"]ASAP[/acronym].'
