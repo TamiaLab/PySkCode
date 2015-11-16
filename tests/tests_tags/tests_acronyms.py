@@ -17,7 +17,7 @@ class AcronymsTagtestCase(unittest.TestCase):
     """ Tests suite for the acronyms tag module. """
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
-        """ Test the presence of the tag and aliases in the dictionnay of default recognized tags. """
+        """ Test the presence of the tag and aliases in the dictionary of default recognized tags. """
         self.assertIn('abbr', DEFAULT_RECOGNIZED_TAGS)
         self.assertIsInstance(DEFAULT_RECOGNIZED_TAGS['abbr'], AcronymTagOptions)
         self.assertIn('acronym', DEFAULT_RECOGNIZED_TAGS)
