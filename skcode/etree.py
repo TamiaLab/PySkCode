@@ -69,6 +69,7 @@ class TreeNode(object):
         Unwrap this node and dump his raw source code as erroneous text.
         :param erroneous_text_node_opts: Options to be used when creating the new erroneous text node.
         """
+        assert erroneous_text_node_opts, "Erroneous text node options is mandatory."
 
         # Get the current node index in the parent children list
         my_parent = self.parent
