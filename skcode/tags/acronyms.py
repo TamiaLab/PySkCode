@@ -30,7 +30,7 @@ class AcronymTagOptions(TagOptions):
         abbr_title = tree_node.attrs.get(tree_node.name, '')
         if not abbr_title:
             abbr_title = tree_node.attrs.get(self.acronym_title_attr_name, '')
-        return abbr_title
+        return unescape_html_entities(abbr_title)
 
     def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
         """
@@ -44,9 +44,7 @@ class AcronymTagOptions(TagOptions):
         if not abbr_title:
             return inner_html
         else:
-            abbr_title = unescape_html_entities(abbr_title)
-            abbr_title = escape_html(abbr_title)
-            return '<abbr title="%s">%s</abbr>' % (abbr_title, inner_html)
+            return '<abbr title="%s">%s</abbr>' % (escape_html(abbr_title), inner_html)
 
     def render_text(self, tree_node, inner_text):
         """
@@ -59,7 +57,6 @@ class AcronymTagOptions(TagOptions):
         if not abbr_title:
             return inner_text
         else:
-            abbr_title = unescape_html_entities(abbr_title)
             return '%s (%s)' % (inner_text, abbr_title)
 
     def render_skcode(self, tree_node, inner_skcode):
