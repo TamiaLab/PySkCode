@@ -139,24 +139,25 @@ class RootTreeNode(TreeNode):
         raise NotImplementedError('Root tree node cannot be deleted.')
 
 
-def debug_print_ast(tree_node, ident_level=0, expected_parent=None):
+def debug_print_ast(tree_node, ident_level=0, expected_parent=None, print_fnct=print):
     """
     Print the given AST tree to stdout for debugging purposes.
     :param tree_node: The tree node to be printed to stdout.
     :param ident_level: The current indentation level (default to 0).
     :param expected_parent: The excepted parent instance (for fast error detection during debug).
+    :param print_fnct: Function to use for printing to stdout (default to ``print``).
     """
 
     # Print info about the current tree node
-    print('%sTreeNode(name=%s, attrs=%s, content=%s,'
-          ' len(children)=%d, opts=%s)' % ('    ' * ident_level,
-                                           tree_node.name,
-                                           tree_node.attrs,
-                                           repr(tree_node.content),
-                                           len(tree_node.children),
-                                           tree_node.opts.__class__.__name__),
-          '!! Parent mismatch !!' if expected_parent is not None and tree_node.parent != expected_parent else '')
+    print_fnct('%sTreeNode(name=%s, attrs=%s, content=%s,'
+               ' len(children)=%d, opts=%s)' % ('    ' * ident_level,
+                                                tree_node.name,
+                                                tree_node.attrs,
+                                                repr(tree_node.content),
+                                                len(tree_node.children),
+                                                tree_node.opts.__class__.__name__),
+               '!! Parent mismatch !!' if expected_parent is not None and tree_node.parent != expected_parent else '')
 
     # Process all children
     for child_node in tree_node.children:
-        debug_print_ast(child_node, ident_level + 1, tree_node)
+        debug_print_ast(child_node, ident_level + 1, tree_node, print_fnct)
