@@ -142,13 +142,13 @@ class AlertBoxTagOptions(TagOptions):
         set to False to get an empty string (default to True).
         :return The alert title if set, or a default title string, or an empty string if use_defaults is False.
         """
-        user_alert_title = tree_node.attrs.get(tree_node.name, '')
-        if not user_alert_title:
-            user_alert_title = tree_node.attrs.get(self.alert_title_attr_name, '')
-        if not user_alert_title and use_defaults:
+        alert_title = tree_node.attrs.get(tree_node.name, '')
+        if not alert_title:
+            alert_title = tree_node.attrs.get(self.alert_title_attr_name, '')
+        if not alert_title and use_defaults:
             return self.default_titles[alert_type]
         else:
-            return user_alert_title
+            return unescape_html_entities(alert_title)
 
     def get_alert_html_template(self, tree_node, alert_type, alert_title):
         """
@@ -184,13 +184,10 @@ class AlertBoxTagOptions(TagOptions):
         alert_title = self.get_alert_title(tree_node, alert_type)
         alert_html_template = self.get_alert_html_template(tree_node, alert_type, alert_title)
 
-        # Handle HTML in title
-        alert_title = escape_html(unescape_html_entities(alert_title))
-
         # Render the alert
         context = {
             'type': alert_type,
-            'title': alert_title,
+            'title': escape_html(alert_title),
             'inner_html': inner_html,
         }
         return alert_html_template % context
@@ -208,9 +205,6 @@ class AlertBoxTagOptions(TagOptions):
         alert_title = self.get_alert_title(tree_node, alert_type)
         alert_text_title_line_template = self.get_alert_text_title_line_template(
             tree_node, alert_type, alert_title)
-
-        # Handle HTML in title
-        alert_title = unescape_html_entities(alert_title)
 
         # Render the alert title line
         lines = ['*** ' + (alert_text_title_line_template % alert_title)]
