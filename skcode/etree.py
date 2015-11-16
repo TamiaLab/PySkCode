@@ -39,6 +39,10 @@ class TreeNode(object):
         self.source_open_tag = source_open_tag
         self.source_close_tag = source_close_tag
 
+        # Rebase children parent
+        for child in self.children:
+            child.parent = self
+
     def new_child(self, *args, **kwargs):
         """
         Create a new child node from the given arguments.
