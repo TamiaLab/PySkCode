@@ -88,7 +88,9 @@ class CodeBlockTagOptions(TagOptions):
             if not line_num:
                 continue
             try:
-                line_nums.append(int(line_num))
+                line_num = int(line_num)
+                if line_num >= 0:
+                    line_nums.append(line_num)
             except ValueError:
                 continue
 
@@ -111,7 +113,11 @@ class CodeBlockTagOptions(TagOptions):
 
         # Return the line number as int
         try:
-            return int(first_line_number)
+            line_num = int(first_line_number)
+            if line_num >= 0:
+                return line_num
+            else:
+                return 1
 
         except ValueError:
             # Handle error
