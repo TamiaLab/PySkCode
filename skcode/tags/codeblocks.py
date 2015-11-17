@@ -140,13 +140,11 @@ class CodeBlockTagOptions(TagOptions):
         # Render the source code
         try:
             lexer = get_lexer_by_name(self.get_language_name(tree_node),
-                                      stripall=True,
                                       tabsize=self.tab_size)
         except ClassNotFound:
 
             # Handle unknown language name
             lexer = get_lexer_by_name(self.default_language_name,
-                                      stripall=True,
                                       tabsize=self.tab_size)
         style = get_style_by_name(self.pygments_css_style_name)
         formatter = HtmlFormatter(style=style,
