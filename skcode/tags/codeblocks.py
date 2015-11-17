@@ -156,8 +156,6 @@ class CodeBlockTagOptions(TagOptions):
 
         # Get extra filename and source link
         src_filename = self.get_filename(tree_node)
-        src_filename = escape_html(src_filename)
-
         src_link_url = self.get_source_link_url(tree_node)
 
         # Render the HTML block
@@ -165,7 +163,7 @@ class CodeBlockTagOptions(TagOptions):
 
             # Source code with caption
             if src_filename:
-                caption = src_filename
+                caption = escape_html(src_filename)
             else:
                 caption = 'Source : %s' % src_link_url
 
@@ -175,6 +173,7 @@ class CodeBlockTagOptions(TagOptions):
                 caption = '<a href="%s"%s target="_blank">%s ' \
                           '<i class="fa fa-link"></i></a>' % (src_link_url, extra_args, caption)
 
+            # Return the final HTML
             return """<figure>
     <figcaption>%s</figcaption>
 %s
