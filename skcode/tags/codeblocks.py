@@ -13,7 +13,8 @@ from pygments.util import ClassNotFound
 
 from .base import TagOptions
 from ..tools import (sanitize_url,
-                     escape_attrvalue)
+                     escape_attrvalue,
+                     slugify)
 
 
 class CodeBlockTagOptions(TagOptions):
@@ -48,6 +49,9 @@ class CodeBlockTagOptions(TagOptions):
 
     # Source link attribute name
     source_link_attr_name = 'src'
+
+    # Figure ID attribute name
+    figure_id_attr_name = 'id'
 
     def get_language_name(self, tree_node):
         """
@@ -128,6 +132,15 @@ class CodeBlockTagOptions(TagOptions):
         src_link_url = tree_node.attrs.get(self.source_link_attr_name, '')
         return sanitize_url(src_link_url)
 
+    def get_figure_id(self, tree_node):
+        """
+        Return the figure ID for this code block.
+        :param tree_node: The current tree node instance.
+        :return: The figure ID for this code block, or an empty string.
+        """
+        figure_id = tree_node.attrs.get(self.figure_id_attr_name, '')
+        return slugify(figure_id)
+
     def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
         """
         Callback function for rendering HTML.
@@ -136,6 +149,17 @@ class CodeBlockTagOptions(TagOptions):
         :param inner_html: Inner HTML of this tree node.
         :return Rendered HTML of this node.
         """
+
+        # Get figure ID
+        figure_id = self.get_figure_id(tree_node)
+
+        # Handle line anchors
+        if figure_id:
+            lineanchors = figure_id
+            anchorlinenos = True
+        else:
+            lineanchors = ''
+            anchorlinenos = False
 
         # Render the source code
         try:
@@ -151,7 +175,9 @@ class CodeBlockTagOptions(TagOptions):
                                   linenos='table' if self.display_line_numbers else False,
                                   hl_lines=self.get_highlight_lines(tree_node),
                                   linenostart=self.get_start_line_number(tree_node),
-                                  noclasses=True)
+                                  noclasses=True,
+                                  lineanchors=lineanchors,
+                                  anchorlinenos=anchorlinenos)
         source_code = highlight(tree_node.content, lexer, formatter)
 
         # Get extra filename and source link
@@ -174,14 +200,16 @@ class CodeBlockTagOptions(TagOptions):
                           '<i class="fa fa-link"></i></a>' % (src_link_url, extra_args, caption)
 
             # Return the final HTML
-            return """<figure>
-    <figcaption>%s</figcaption>
+            figure_extra = ' id="%s"' % figure_id if figure_id else ''
+            return """<figure%s>
 %s
-</figure>""" % (caption, source_code)
+<figcaption>%s</figcaption>
+</figure>""" % (figure_extra, source_code, caption)
 
         else:
             # Source code only
-            return '%s\n' % source_code
+            figure_extra = '<a id="%s"></a>\n' % figure_id if figure_id else ''
+            return '%s%s\n' % (figure_extra, source_code)
 
     def render_text(self, tree_node, inner_text):
         """
