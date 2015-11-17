@@ -277,7 +277,7 @@ class CodeBlockTagOptions(TagOptions):
         hl_lines = self.get_highlight_lines(tree_node)
         if hl_lines:
             extra_attrs += ' %s=%s' % (self.hl_lines_attr_name,
-                                       escape_attrvalue(','.join(hl_lines)))
+                                       escape_attrvalue(','.join(str(line) for line in hl_lines)))
 
         linenostart = self.get_start_line_number(tree_node)
         if linenostart != 1:
