@@ -209,7 +209,7 @@ class AlertBoxTagOptions(TagOptions):
         context = {
             'type': alert_type,
             'title': escape_html(alert_title),
-            'inner_html': inner_html,
+            'inner_html': inner_html.strip(),
         }
         return alert_html_template % context
 
@@ -231,7 +231,7 @@ class AlertBoxTagOptions(TagOptions):
         lines = ['*** ' + (alert_text_title_line_template % alert_title)]
 
         # Render all inner lines
-        for line in inner_text.splitlines():
+        for line in inner_text.strip().splitlines():
             lines.append('* ' + line)
         lines.append('***')
         lines.append('')
