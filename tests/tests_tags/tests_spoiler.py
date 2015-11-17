@@ -16,6 +16,8 @@ class HorizontalLineTagTestCase(unittest.TestCase):
         """ Test the presence of the tag and aliases in the dictionary of default recognized tags. """
         self.assertIn('spoiler', DEFAULT_RECOGNIZED_TAGS)
         self.assertIsInstance(DEFAULT_RECOGNIZED_TAGS['spoiler'], SpoilerTagOptions)
+        self.assertIn('hide', DEFAULT_RECOGNIZED_TAGS)
+        self.assertIsInstance(DEFAULT_RECOGNIZED_TAGS['hide'], SpoilerTagOptions)
 
     def test_tag_constant_values(self):
         """ Test tag constants. """
