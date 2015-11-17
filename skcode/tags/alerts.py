@@ -43,7 +43,9 @@ class AlertBoxTagOptions(TagOptions):
     <div class="panel-heading">
         <h3 class="panel-title"><i class="fa fa-exclamation-circle"></i> %(title)s</h3>
     </div>
-    <div class="panel-body">%(inner_html)s</div>
+    <div class="panel-body">
+        %(inner_html)s
+    </div>
 </div>
 """,
 
@@ -51,7 +53,9 @@ class AlertBoxTagOptions(TagOptions):
     <div class="panel-heading">
         <h3 class="panel-title"><i class="fa fa-heartbeat"></i> %(title)s</h3>
     </div>
-    <div class="panel-body">%(inner_html)s</div>
+    <div class="panel-body">
+        %(inner_html)s
+    </div>
 </div>
 """,
 
@@ -59,7 +63,9 @@ class AlertBoxTagOptions(TagOptions):
     <div class="panel-heading">
         <h3 class="panel-title"><i class="fa fa-exclamation-triangle"></i> %(title)s</h3>
     </div>
-    <div class="panel-body">%(inner_html)s</div>
+    <div class="panel-body">
+        %(inner_html)s
+    </div>
 </div>
 """,
 
@@ -67,7 +73,9 @@ class AlertBoxTagOptions(TagOptions):
     <div class="panel-heading">
         <h3 class="panel-title"><i class="fa fa-info-circle"></i> %(title)s</h3>
     </div>
-    <div class="panel-body">%(inner_html)s</div>
+    <div class="panel-body">
+        %(inner_html)s
+    </div>
 </div>
 """,
 
@@ -75,7 +83,9 @@ class AlertBoxTagOptions(TagOptions):
     <div class="panel-heading">
         <h3 class="panel-title"><i class="fa fa-check-square-o"></i> %(title)s</h3>
     </div>
-    <div class="panel-body">%(inner_html)s</div>
+    <div class="panel-body">
+        %(inner_html)s
+    </div>
 </div>
 """,
 
@@ -83,7 +93,9 @@ class AlertBoxTagOptions(TagOptions):
     <div class="panel-heading">
         <h3 class="panel-title"><i class="fa fa-pencil-square-o"></i> %(title)s</h3>
     </div>
-    <div class="panel-body">%(inner_html)s</div>
+    <div class="panel-body">
+        %(inner_html)s
+    </div>
 </div>
 """,
 
@@ -91,7 +103,9 @@ class AlertBoxTagOptions(TagOptions):
     <div class="panel-heading">
         <h3 class="panel-title"><i class="fa fa-question-circle"></i> %(title)s</h3>
     </div>
-    <div class="panel-body">%(inner_html)s</div>
+    <div class="panel-body">
+        %(inner_html)s
+    </div>
 </div>
 """
     }
