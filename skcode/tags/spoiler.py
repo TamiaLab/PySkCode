@@ -31,6 +31,7 @@ class SpoilerTagOptions(TagOptions):
         for line in inner_text.splitlines():
             lines.append('! ' + line)
         lines.append('!!!')
+        lines.append('')
         return '\n'.join(lines)
 
     def render_skcode(self, tree_node, inner_skcode):
