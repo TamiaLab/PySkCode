@@ -285,6 +285,11 @@ class CodeBlockTagOptions(TagOptions):
             extra_attrs += ' %s=%s' % (self.source_link_attr_name,
                                        escape_attrvalue(src_link_url))
 
+        figure_id = self.get_figure_id(tree_node)
+        if figure_id:
+            extra_attrs += ' %s=%s' % (self.figure_id_attr_name,
+                                       escape_attrvalue(figure_id))
+
         # Render the skcode
         node_name = tree_node.name
         return '[%s%s]%s[/%s]' % (node_name, extra_attrs,
@@ -341,6 +346,11 @@ class FixedCodeBlockTagOptions(CodeBlockTagOptions):
         if src_link_url:
             extra_attrs += ' %s=%s' % (self.source_link_attr_name,
                                        escape_attrvalue(src_link_url))
+
+        figure_id = self.get_figure_id(tree_node)
+        if figure_id:
+            extra_attrs += ' %s=%s' % (self.figure_id_attr_name,
+                                       escape_attrvalue(figure_id))
 
         # Render the skcode
         node_name = tree_node.name
