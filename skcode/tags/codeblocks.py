@@ -84,6 +84,9 @@ class CodeBlockTagOptions(TagOptions):
 
         # Turn all line number into int
         for line_num in highlight_lines.split(','):
+            line_num = line_num.strip()
+            if not line_num:
+                continue
             try:
                 line_nums.append(int(line_num))
             except ValueError:
