@@ -128,6 +128,8 @@ class WrappingTagOptions(TagOptions):
         Init class with the given wrapping format (use %s for content placeholder).
         :param wrapping_format: The format string to be used for wrapping the content of this node.
         """
+        assert wrapping_format, "Wrapping format string is mandatory."
+        assert '%s' in wrapping_format, "wrapping format string must contain %s for inner content place holding."
         super(WrappingTagOptions, self).__init__(**kwargs)
         self.wrapping_format = wrapping_format
 
