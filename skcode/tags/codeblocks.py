@@ -249,17 +249,17 @@ class CodeBlockTagOptions(TagOptions):
         lines.append('')
         return '\n'.join(lines)
 
-    def render_skcode(self, tree_node, inner_skcode):
+    def get_extra_attrs_for_render_skcode(self, tree_node, include_language_attr=True):
         """
-        Callback function for rendering SkCode.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
+        Return all extra attributes for SkCode rendering (avoid code duplication).
+        :param tree_node: The current tree node instance.
+        :param include_language_attr: Set to True (default) to include the language attribute, False to exclude it.
+        :return: A string with all extra attributes ready for SkCode rendering.
         """
 
         # Get all attributes
         language_name = self.get_language_name(tree_node)
-        if language_name != self.default_language_name:
+        if language_name != self.default_language_name and include_language_attr:
             extra_attrs = ' %s=%s' % (self.language_attr_name,
                                       escape_attrvalue(language_name))
         else:
@@ -289,6 +289,19 @@ class CodeBlockTagOptions(TagOptions):
         if figure_id:
             extra_attrs += ' %s=%s' % (self.figure_id_attr_name,
                                        escape_attrvalue(figure_id))
+
+        return extra_attrs
+
+    def render_skcode(self, tree_node, inner_skcode):
+        """
+        Callback function for rendering SkCode.
+        :param tree_node: Current tree node to be rendered.
+        :param inner_skcode: Inner SkCode of this tree node.
+        :return Rendered SkCode of this node.
+        """
+
+        # Get all attributes
+        extra_attrs = self.get_extra_attrs_for_render_skcode(tree_node)
 
         # Render the skcode
         node_name = tree_node.name
@@ -325,32 +338,7 @@ class FixedCodeBlockTagOptions(CodeBlockTagOptions):
         """
 
         # Get all attributes
-        hl_lines = self.get_highlight_lines(tree_node)
-        if hl_lines:
-            extra_attrs = ' %s=%s' % (self.hl_lines_attr_name,
-                                      escape_attrvalue(','.join(hl_lines)))
-        else:
-            extra_attrs = ''
-
-        linenostart = self.get_start_line_number(tree_node)
-        if linenostart != 1:
-            extra_attrs += ' %s="%d"' % (self.line_start_num_attr_name,
-                                         linenostart)
-
-        src_filename = self.get_filename(tree_node)
-        if src_filename:
-            extra_attrs += ' %s=%s' % (self.filename_attr_name,
-                                       escape_attrvalue(src_filename))
-
-        src_link_url = self.get_source_link_url(tree_node)
-        if src_link_url:
-            extra_attrs += ' %s=%s' % (self.source_link_attr_name,
-                                       escape_attrvalue(src_link_url))
-
-        figure_id = self.get_figure_id(tree_node)
-        if figure_id:
-            extra_attrs += ' %s=%s' % (self.figure_id_attr_name,
-                                       escape_attrvalue(figure_id))
+        extra_attrs = self.get_extra_attrs_for_render_skcode(tree_node, include_language_attr=False)
 
         # Render the skcode
         node_name = tree_node.name
