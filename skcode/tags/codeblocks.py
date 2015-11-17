@@ -232,23 +232,28 @@ class CodeBlockTagOptions(TagOptions):
         figure_id = self.get_figure_id(tree_node)
         src_filename = self.get_filename(tree_node)
         src_link_url = self.get_source_link_url(tree_node)
+        get_start_line_number = self.get_start_line_number(tree_node)
+        hl_lines = self.get_highlight_lines(tree_node)
 
         # Render the code block
         lines = []
-        for num, line in enumerate(tree_node.content.splitlines(), start=1):
+        for num, line in enumerate(tree_node.content.splitlines(), start=get_start_line_number):
             if not line:
                 continue
             line = line.replace('\t', ' ' * self.tab_size)
-            line_prefix = '%d.' % num
+            if num in hl_lines:
+                line_prefix = '%d>' % num
+            else:
+                line_prefix = '%d.' % num
             lines.append('%s %s' % (line_prefix.ljust(4), line))
 
         # Add the caption
         figure_extra = ' [#%s]' % figure_id if figure_id else ''
         if src_filename and src_link_url:
-            caption = '%s (%s)%s' % (src_filename, src_link_url, figure_extra)
+            caption = 'Source : %s (%s)%s' % (src_filename, src_link_url, figure_extra)
             lines.append(caption)
         elif src_filename:
-            caption = '%s%s' % (src_filename, figure_extra)
+            caption = 'Source : %s%s' % (src_filename, figure_extra)
             lines.append(caption)
         elif src_link_url:
             caption = 'Source : %s%s' % (src_link_url, figure_extra)
