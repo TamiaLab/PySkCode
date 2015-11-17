@@ -13,7 +13,7 @@ from skcode.tags import (AcronymTagOptions,
                          DEFAULT_RECOGNIZED_TAGS)
 
 
-class AcronymsTagtestCase(unittest.TestCase):
+class AcronymsTagTestCase(unittest.TestCase):
     """ Tests suite for the acronyms tag module. """
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
