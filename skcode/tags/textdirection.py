@@ -96,7 +96,8 @@ class DirectionTextTagOptions(TagOptions):
         text_direction = self.get_text_direction(tree_node)
         text_direction = self.reverse_text_direction_map[text_direction]
         node_name = tree_node.name
-        return '[%s=%s]%s[/%s]' % (node_name, escape_attrvalue(text_direction), inner_skcode, node_name)
+        return '[%s %s=%s]%s[/%s]' % (node_name, self.text_direction_attr_name,
+                                      escape_attrvalue(text_direction), inner_skcode, node_name)
 
 
 class FixedDirectionTextTagOptions(DirectionTextTagOptions):
