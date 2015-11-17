@@ -125,7 +125,8 @@ class CodeBlockTagOptions(TagOptions):
         :param tree_node: The current tree node instance.
         :return: The source URL of the current code block, or an empty string.
         """
-        return tree_node.attrs.get(self.source_link_attr_name, '')
+        src_link_url = tree_node.attrs.get(self.source_link_attr_name, '')
+        return sanitize_url(src_link_url)
 
     def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
         """
@@ -160,7 +161,6 @@ class CodeBlockTagOptions(TagOptions):
         src_filename = escape_html(src_filename)
 
         src_link_url = self.get_source_link_url(tree_node)
-        src_link_url = sanitize_url(src_link_url)
 
         # Render the HTML block
         if src_filename or src_link_url:
@@ -233,7 +233,6 @@ class CodeBlockTagOptions(TagOptions):
                                        escape_attrvalue(src_filename))
 
         src_link_url = self.get_source_link_url(tree_node)
-        src_link_url = sanitize_url(src_link_url)
         if src_link_url:
             extra_attrs += ' %s=%s' % (self.source_link_attr_name,
                                        escape_attrvalue(src_link_url))
@@ -291,7 +290,6 @@ class FixedCodeBlockTagOptions(CodeBlockTagOptions):
                                        escape_attrvalue(src_filename))
 
         src_link_url = self.get_source_link_url(tree_node)
-        src_link_url = sanitize_url(src_link_url)
         if src_link_url:
             extra_attrs += ' %s=%s' % (self.source_link_attr_name,
                                        escape_attrvalue(src_link_url))
