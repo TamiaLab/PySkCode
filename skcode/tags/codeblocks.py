@@ -61,7 +61,7 @@ class CodeBlockTagOptions(TagOptions):
         language_name = tree_node.attrs.get(tree_node.name, '')
         if not language_name:
             language_name = tree_node.attrs.get(self.language_attr_name, self.default_language_name)
-        return language_name
+        return unescape_html_entities(language_name)
 
     def get_highlight_lines(self, tree_node):
         """
