@@ -145,6 +145,18 @@ class AlertsTagtestCase(unittest.TestCase):
             }
             self.assertEqual(expected_output, rendered_output)
 
+    def test_html_rendering_with_trailing_newline(self):
+        """ Test HTML rendering with trailing newline. """
+        for alert_type in AlertBoxTagOptions.accepted_types:
+            document_tree = parse_skcode('[alert title="Test alert" type="%s"]\n\nHello world!\n[/alert]' % alert_type)
+            rendered_output = render_to_html(document_tree)
+            expected_output = AlertBoxTagOptions.html_template[alert_type] % {
+                'type': alert_type,
+                'title': 'Test alert',
+                'inner_html': 'Hello world!',
+            }
+            self.assertEqual(expected_output, rendered_output)
+
     def test_html_rendering_without_title(self):
         """ Test HTML rendering without title. """
         for alert_type in AlertBoxTagOptions.accepted_types:
@@ -173,6 +185,17 @@ class AlertsTagtestCase(unittest.TestCase):
         """ Test text rendering. """
         for alert_type in AlertBoxTagOptions.accepted_types:
             document_tree = parse_skcode('[alert title="Test alert" type="%s"]Hello world![/alert]' % alert_type)
+            rendered_output = render_to_text(document_tree)
+            expected_output = """*** %s
+* Hello world!
+***
+""" % (AlertBoxTagOptions.text_title_line_template[alert_type] % 'Test alert')
+            self.assertEqual(expected_output, rendered_output)
+
+    def test_text_rendering_with_trailing_newline(self):
+        """ Test text rendering with trailing newline. """
+        for alert_type in AlertBoxTagOptions.accepted_types:
+            document_tree = parse_skcode('[alert title="Test alert" type="%s"]\n\nHello world!\n[/alert]' % alert_type)
             rendered_output = render_to_text(document_tree)
             expected_output = """*** %s
 * Hello world!
