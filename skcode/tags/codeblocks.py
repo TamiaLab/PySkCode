@@ -116,7 +116,8 @@ class CodeBlockTagOptions(TagOptions):
         :param tree_node: The current tree node instance.
         :return: The filename associated with the current code block, or an empty string.
         """
-        return tree_node.attrs.get(self.filename_attr_name, '')
+        filename = tree_node.attrs.get(self.filename_attr_name, '')
+        return unescape_html_entities(filename)
 
     def get_source_link_url(self, tree_node):
         """
@@ -156,7 +157,6 @@ class CodeBlockTagOptions(TagOptions):
 
         # Get extra filename and source link
         src_filename = self.get_filename(tree_node)
-        src_filename = unescape_html_entities(src_filename)
         src_filename = escape_html(src_filename)
 
         src_link_url = self.get_source_link_url(tree_node)
@@ -228,7 +228,6 @@ class CodeBlockTagOptions(TagOptions):
                                          linenostart)
 
         src_filename = self.get_filename(tree_node)
-        src_filename = unescape_html_entities(src_filename)
         if src_filename:
             extra_attrs += ' %s=%s' % (self.filename_attr_name,
                                        escape_attrvalue(src_filename))
@@ -287,7 +286,6 @@ class FixedCodeBlockTagOptions(CodeBlockTagOptions):
                                          linenostart)
 
         src_filename = self.get_filename(tree_node)
-        src_filename = unescape_html_entities(src_filename)
         if src_filename:
             extra_attrs += ' %s=%s' % (self.filename_attr_name,
                                        escape_attrvalue(src_filename))
