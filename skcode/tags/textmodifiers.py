@@ -58,21 +58,21 @@ class TextModifierBaseTagOptions(TagOptions):
 
 
 class LowerCaseTextTagOptions(TextModifierBaseTagOptions):
-    """  align text tag options container class. """
+    """ Lowercase text modifier tag options container class. """
 
     def __init__(self, **kwargs):
         super(LowerCaseTextTagOptions, self).__init__('lowercase', **kwargs)
 
 
 class UpperCaseTextTagOptions(TextModifierBaseTagOptions):
-    """  align text tag options container class. """
+    """ Uppercase text modifier tag options container class. """
 
     def __init__(self, **kwargs):
         super(UpperCaseTextTagOptions, self).__init__('uppercase', **kwargs)
 
 
 class CapitalizeTextTagOptions(TextModifierBaseTagOptions):
-    """  align text tag options container class. """
+    """ Capitalize text modifier tag options container class. """
 
     def __init__(self, **kwargs):
         super(CapitalizeTextTagOptions, self).__init__('capitalize', **kwargs)
