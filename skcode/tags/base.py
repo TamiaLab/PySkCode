@@ -86,10 +86,10 @@ class TagOptions(object):
         leaf node.
         :param root_tree_node: The root tree node instance, can be used to store information at the document level.
         :param tree_node: The tree node being post processed.
-        :return A bool True to disallow post processing of children nodes, a bool False (default implementation)
+        :return A bool False to disallow post processing of children nodes, a bool True (default implementation)
         to allow post processing of children nodes.
         """
-        return False
+        return True
 
     def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
         """
