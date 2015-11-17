@@ -36,9 +36,9 @@ class ColorTextTagOptions(TagOptions):
         """
 
         # Get the color string
-        user_color_value = tree_node.attrs.get(tree_node.name, None)
+        user_color_value = tree_node.attrs.get(tree_node.name, '')
         if not user_color_value:
-            return None
+            return ''
 
         # Accept RGB hex value or color name
         if RGB_COLOR_RE.match(user_color_value):
@@ -46,7 +46,7 @@ class ColorTextTagOptions(TagOptions):
         elif user_color_value in self.known_colors:
             return user_color_value
         else:
-            return None
+            return ''
 
     def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
         """
