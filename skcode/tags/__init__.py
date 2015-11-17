@@ -174,9 +174,8 @@ DEFAULT_RECOGNIZED_TAGS = {
     'spoiler': SpoilerTagOptions(),
 
     # --- Figure and caption
-    # figure': FigureDeclarationTagOptions(),  # TODO text version
-    # figcaption': FigureCaptionTagOptions(),  # TODO
-    # figref': FigureReferenceTagOptions(),  # TODO
+    # 'figure': FigureDeclarationTagOptions(),  # TODO text version
+    # 'figcaption': FigureCaptionTagOptions(),  # TODO
 
     # --- Lists
     'list': ListTagOptions(),  # TODO better text version
@@ -207,8 +206,9 @@ DEFAULT_RECOGNIZED_TAGS = {
     'quote': QuoteTagOptions(),
 
     # --- Footnotes
-    # footnote (id/footnote) # TODO
-    # fnref (id/fn, standalone) # TODO
+    # 'footnote' (id/footnote) # TODO
+    # 'fn' (id/fn) # TODO
+    # 'fnref' (id/fnref, standalone) # TODO
 
     # --- Acronymes
     'abbr': AcronymTagOptions(),
