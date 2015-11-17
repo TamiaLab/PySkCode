@@ -105,10 +105,10 @@ class CodeBlockTagOptions(TagOptions):
         """
 
         # Get the line number as string
-        first_line_number = tree_node.attrs.get(self.line_start_num_attr_name, None)
+        first_line_number = tree_node.attrs.get(self.line_start_num_attr_name, '')
 
         # Shortcut if no line number
-        if first_line_number is None:
+        if not first_line_number:
             return 1
 
         # Return the line number as int
