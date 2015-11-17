@@ -198,7 +198,7 @@ class CodeBlockTagOptions(TagOptions):
 
             # Source code with caption
             if src_filename:
-                caption = escape_html(src_filename)
+                caption = 'Source : %s' % escape_html(src_filename)
             else:
                 caption = 'Source : %s' % src_link_url
 
