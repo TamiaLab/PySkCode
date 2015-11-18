@@ -196,6 +196,10 @@ class YoutubeTagOptions(TagOptions):
         # Get the URL
         url = tree_node.get_raw_content().strip()
 
+        # Shortcut if no url
+        if not url:
+            return ''
+
         # Split the URL
         try:
             scheme, netloc, path, query, fragment = urlsplit(url)
