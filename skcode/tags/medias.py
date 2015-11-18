@@ -163,7 +163,7 @@ class ImageTagOptions(TagOptions):
 
         # Get the image height
         img_height = self.get_img_height(tree_node)
-        if img_width:
+        if img_height:
             extra_attrs += ' %s="%d"' % (self.height_attr_name, img_height)
 
         # Render the image
