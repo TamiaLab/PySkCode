@@ -71,6 +71,15 @@ def sanitize_url(url, default_scheme='http',
     if scheme and scheme not in allowed_schemes:
         return ''
 
+    # Detect and fix non local URL without // at begining (not supported by urlsplit)
+    if not netloc and path and not path.startswith('/'):
+        parts = path.split('/', 1)
+        if len(parts) == 2:
+            netloc, path = parts
+        else:
+            netloc = parts[0]
+            path = ''
+
     # Add http scheme to non-local URL if required
     if (not scheme and netloc) or force_default_scheme:
         scheme = default_scheme
