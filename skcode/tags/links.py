@@ -57,7 +57,7 @@ class UrlLinkTagOptions(TagOptions):
         # Render the link
         if target_url:
             if self.is_url_inside_tag_content(tree_node):
-                return '<a href="%s"%s>%s</a>' % (target_url, extra_attrs, escape_html(target_url))
+                return '<a href="%s"%s>%s</a>' % (target_url, extra_attrs, target_url)
             else:
                 return '<a href="%s"%s>%s</a>' % (target_url, extra_attrs, inner_html)
         else:
@@ -149,9 +149,9 @@ class EmailLinkTagOptions(TagOptions):
         # Render the email link
         if email_address:
             if self.is_email_inside_tag_content(tree_node):
-                return '<a href="mailto:%s">%s</a>' % (escape_html(email_address), escape_html(email_address))
+                return '<a href="mailto:%s">%s</a>' % (email_address, email_address)
             else:
-                return '<a href="mailto:%s">%s</a>' % (escape_html(email_address), inner_html)
+                return '<a href="mailto:%s">%s</a>' % (email_address, inner_html)
         else:
             return inner_html
 
