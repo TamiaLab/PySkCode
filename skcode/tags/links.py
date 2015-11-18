@@ -132,7 +132,8 @@ class EmailLinkTagOptions(TagOptions):
         # TODO remove mailto: scheme and (better) made a function sanitize_email_address()
         return sanitize_url(email_address,
                             default_scheme='mailto',
-                            allowed_schemes=('mailto', ))
+                            allowed_schemes=('mailto', ),
+                            force_remove_scheme=True)
 
     def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
         """
@@ -146,12 +147,18 @@ class EmailLinkTagOptions(TagOptions):
         # Get the email address
         email_address = self.get_email_address(tree_node)
 
+        # Handle nofollow
+        if force_rel_nofollow:
+            extra_html = ' rel="nofollow"'
+        else:
+            extra_html = ''
+
         # Render the email link
         if email_address:
             if self.is_email_inside_tag_content(tree_node):
-                return '<a href="mailto:%s">%s</a>' % (email_address, email_address)
+                return '<a href="mailto:%s"%s>%s</a>' % (email_address, extra_html, email_address)
             else:
-                return '<a href="mailto:%s">%s</a>' % (email_address, inner_html)
+                return '<a href="mailto:%s"%s>%s</a>' % (email_address, extra_html, inner_html)
         else:
             return inner_html
 
