@@ -6,6 +6,7 @@ import calendar
 from datetime import datetime
 
 from html import escape as escape_html
+from html import unescape as unescape_html_entities
 
 from .base import TagOptions
 from ..tools import escape_attrvalue, sanitize_url
@@ -43,7 +44,7 @@ class QuoteTagOptions(TagOptions):
         author_name = tree_node.attrs.get(tree_node.name, '')
         if not author_name:
             author_name = tree_node.attrs.get(self.author_attr_name, '')
-        return author_name
+        return unescape_html_entities(author_name)
 
     def get_quote_link(self, tree_node):
         """
@@ -51,7 +52,8 @@ class QuoteTagOptions(TagOptions):
         :param tree_node: The current tree node instance.
         :return The quote source link URL (not sanitized), or an empty string.
         """
-        return tree_node.attrs.get(self.link_attr_name, '')
+        quote_link = tree_node.attrs.get(self.link_attr_name, '')
+        return sanitize_url(quote_link)
 
     def get_quote_date(self, tree_node):
         """
@@ -76,7 +78,7 @@ class QuoteTagOptions(TagOptions):
 
     def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
         """
-        Callback function for rendering HTML. Wrap the inner HTML code using the wrapping format.
+        Callback function for rendering HTML.
         :param force_rel_nofollow: Ignored.
         :param tree_node: Current tree node to be rendered.
         :param inner_html: Inner HTML of this tree node.
@@ -90,11 +92,8 @@ class QuoteTagOptions(TagOptions):
             # Craft author name citation
             author_html = '<cite>%s</cite>' % escape_html(author_name)
 
-            # Get source URL
-            src_link = self.get_quote_link(tree_node)
-            src_link = sanitize_url(src_link)
-
             # Craft source link if any, and handle force_rel_nofollow
+            src_link = self.get_quote_link(tree_node)
             if src_link:
                 if force_rel_nofollow:
                     extra_attrs = ' rel="nofollow"'
@@ -104,7 +103,7 @@ class QuoteTagOptions(TagOptions):
 
             # Get and craft the source date
             src_date = self.get_quote_date(tree_node)
-            if src_date:
+            if src_date is not None:
                 author_html = '%s - <time datetime="%s">%s</time>' % (author_html,
                                                                       src_date.isoformat(),
                                                                       src_date.strftime(self.datetime_format))
@@ -119,7 +118,7 @@ class QuoteTagOptions(TagOptions):
 
     def render_text(self, tree_node, inner_text):
         """
-        Callback function for rendering text. Return the inner text as-is.
+        Callback function for rendering text.
         :param tree_node: Current tree node to be rendered.
         :param inner_text: Inner text of this tree node.
         :return Rendered text of this node.
@@ -133,18 +132,17 @@ class QuoteTagOptions(TagOptions):
         # Add author name one last line
         author_name = self.get_quote_author_name(tree_node)
         if author_name:
-            # FIXME Maybe unescape?
-            author_text = '%s' % author_name
+            author_text = author_name
 
             # Add source link
             src_link = self.get_quote_link(tree_node)
             if src_link:
                 # FIXME Avoid HTML encoding in render_text
-                author_text = '%s (%s)' % (author_text, sanitize_url(src_link))
+                author_text = '%s (%s)' % (author_text, src_link)
 
             # Add source date
             src_date = self.get_quote_date(tree_node)
-            if src_date:
+            if src_date is not None:
                 author_text = '%s - %s' % (author_text,
                                            src_date.strftime(self.datetime_format))
 
@@ -158,7 +156,7 @@ class QuoteTagOptions(TagOptions):
 
     def render_skcode(self, tree_node, inner_skcode):
         """
-        Callback function for rendering SkCode. Wrap the inner SkCode with the node name tag, without arguments.
+        Callback function for rendering SkCode.
         :param tree_node: Current tree node to be rendered.
         :param inner_skcode: Inner SkCode of this tree node.
         :return Rendered SkCode of this node.
@@ -176,11 +174,11 @@ class QuoteTagOptions(TagOptions):
         src_link = self.get_quote_link(tree_node)
         if src_link:
             extra_attrs += ' %s=%s' % (self.link_attr_name,
-                                       sanitize_url(src_link))
+                                       escape_attrvalue(src_link))
 
         # Get the source date
         src_date = self.get_quote_date(tree_node)
-        if src_date:
+        if src_date is not None:
             extra_attrs += ' %s="%d"' % (self.date_attr_name,
                                          calendar.timegm(src_date.timetuple()))
 
