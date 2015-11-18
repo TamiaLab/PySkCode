@@ -364,6 +364,16 @@ class TagParserTestCase(unittest.TestCase):
                 print('Exception during test:', text)
                 raise
 
+    def test_html_compatibility_mode(self):
+        """ Test if the HTML retro-compatibility mode work as expected. """
+        with self.assertRaises(ValueError):
+            parse_tag('[tagname=tagvalue]', 0, opening_tag_ch='[', closing_tag_ch=']', allow_tagvalue_attr=False)
+
+    def test_html_compatibility_mode_no_xhtml(self):
+        """ Test if the HTML retro-compatibility mode work as expected (without allowing XHTML-like tags). """
+        with self.assertRaises(ValueError):
+            parse_tag('[tagname/]', 0, opening_tag_ch='[', closing_tag_ch=']', allow_self_closing_tags=False)
+
 
 # Run test suite
 if __name__ == '__main__':
