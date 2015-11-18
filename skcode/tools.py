@@ -10,7 +10,7 @@ from urllib.parse import urlsplit, urlunsplit
 
 
 # URL charset regex for cleaning URL
-URL_CHARSET_SUB = re.compile(r'[^a-z0-9-~+_.?#=!&;,/:%@$\|*\'()\x80-\xff]', re.I)
+URL_CHARSET_SUB = re.compile(r'[^a-z0-9-~+_.?#=!&;,/:%@$\|*\'()\[\]\x80-\xff]', re.I)
 
 
 def escape_attrvalue(value):
