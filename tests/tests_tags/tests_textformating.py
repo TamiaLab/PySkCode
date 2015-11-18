@@ -4,10 +4,6 @@ SkCode acronyms tag test code.
 
 import unittest
 
-from skcode import (parse_skcode,
-                    render_to_html,
-                    render_to_text,
-                    render_to_skcode)
 from skcode.etree import TreeNode
 from skcode.tags import (BoldTextTagOptions,
                          ItalicTextTagOptions,
@@ -50,23 +46,26 @@ class BoldTextTagTestCase(unittest.TestCase):
 
     def test_html_rendering(self):
         """ Test HTML rendering. """
-        document_tree = parse_skcode('Run this test [b]ASAP[/b].')
-        rendered_output = render_to_html(document_tree)
-        expected_output = 'Run this test <strong>ASAP</strong>.'
+        opts = BoldTextTagOptions()
+        tree_node = TreeNode(None, 'b', opts)
+        rendered_output = opts.render_html(tree_node, 'ASAP')
+        expected_output = '<strong>ASAP</strong>'
         self.assertEqual(expected_output, rendered_output)
 
     def test_text_rendering(self):
         """ Test text rendering. """
-        document_tree = parse_skcode('Run this test [b]ASAP[/b].')
-        rendered_output = render_to_text(document_tree)
-        expected_output = 'Run this test ASAP.'
+        opts = BoldTextTagOptions()
+        tree_node = TreeNode(None, 'b', opts)
+        rendered_output = opts.render_text(tree_node, 'ASAP')
+        expected_output = 'ASAP'
         self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering(self):
         """ Test SkCode rendering. """
-        document_tree = parse_skcode('Run this test [b]ASAP[/b].')
-        rendered_output = render_to_skcode(document_tree)
-        expected_output = 'Run this test [b]ASAP[/b].'
+        opts = BoldTextTagOptions()
+        tree_node = TreeNode(None, 'b', opts)
+        rendered_output = opts.render_skcode(tree_node, 'ASAP')
+        expected_output = '[b]ASAP[/b]'
         self.assertEqual(expected_output, rendered_output)
 
 
@@ -96,23 +95,26 @@ class ItalicTextTagTestCase(unittest.TestCase):
 
     def test_html_rendering(self):
         """ Test HTML rendering. """
-        document_tree = parse_skcode('Run this test [i]ASAP[/i].')
-        rendered_output = render_to_html(document_tree)
-        expected_output = 'Run this test <em>ASAP</em>.'
+        opts = ItalicTextTagOptions()
+        tree_node = TreeNode(None, 'i', opts)
+        rendered_output = opts.render_html(tree_node, 'ASAP')
+        expected_output = '<em>ASAP</em>'
         self.assertEqual(expected_output, rendered_output)
 
     def test_text_rendering(self):
         """ Test text rendering. """
-        document_tree = parse_skcode('Run this test [i]ASAP[/i].')
-        rendered_output = render_to_text(document_tree)
-        expected_output = 'Run this test ASAP.'
+        opts = ItalicTextTagOptions()
+        tree_node = TreeNode(None, 'i', opts)
+        rendered_output = opts.render_text(tree_node, 'ASAP')
+        expected_output = 'ASAP'
         self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering(self):
         """ Test SkCode rendering. """
-        document_tree = parse_skcode('Run this test [i]ASAP[/i].')
-        rendered_output = render_to_skcode(document_tree)
-        expected_output = 'Run this test [i]ASAP[/i].'
+        opts = ItalicTextTagOptions()
+        tree_node = TreeNode(None, 'i', opts)
+        rendered_output = opts.render_skcode(tree_node, 'ASAP')
+        expected_output = '[i]ASAP[/i]'
         self.assertEqual(expected_output, rendered_output)
 
 
@@ -142,23 +144,26 @@ class StrikeTextTagTestCase(unittest.TestCase):
 
     def test_html_rendering(self):
         """ Test HTML rendering. """
-        document_tree = parse_skcode('Run this test [s]ASAP[/s].')
-        rendered_output = render_to_html(document_tree)
-        expected_output = 'Run this test <del>ASAP</del>.'
+        opts = StrikeTextTagOptions()
+        tree_node = TreeNode(None, 's', opts)
+        rendered_output = opts.render_html(tree_node, 'ASAP')
+        expected_output = '<del>ASAP</del>'
         self.assertEqual(expected_output, rendered_output)
 
     def test_text_rendering(self):
         """ Test text rendering. """
-        document_tree = parse_skcode('Run this test [s]ASAP[/s].')
-        rendered_output = render_to_text(document_tree)
-        expected_output = 'Run this test ASAP.'
+        opts = StrikeTextTagOptions()
+        tree_node = TreeNode(None, 's', opts)
+        rendered_output = opts.render_text(tree_node, 'ASAP')
+        expected_output = 'ASAP'
         self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering(self):
         """ Test SkCode rendering. """
-        document_tree = parse_skcode('Run this test [s]ASAP[/s].')
-        rendered_output = render_to_skcode(document_tree)
-        expected_output = 'Run this test [s]ASAP[/s].'
+        opts = StrikeTextTagOptions()
+        tree_node = TreeNode(None, 's', opts)
+        rendered_output = opts.render_skcode(tree_node, 'ASAP')
+        expected_output = '[s]ASAP[/s]'
         self.assertEqual(expected_output, rendered_output)
 
 
@@ -188,23 +193,26 @@ class UnderlineTextTagTestCase(unittest.TestCase):
 
     def test_html_rendering(self):
         """ Test HTML rendering. """
-        document_tree = parse_skcode('Run this test [u]ASAP[/u].')
-        rendered_output = render_to_html(document_tree)
-        expected_output = 'Run this test <ins>ASAP</ins>.'
+        opts = UnderlineTextTagOptions()
+        tree_node = TreeNode(None, 'u', opts)
+        rendered_output = opts.render_html(tree_node, 'ASAP')
+        expected_output = '<ins>ASAP</ins>'
         self.assertEqual(expected_output, rendered_output)
 
     def test_text_rendering(self):
         """ Test text rendering. """
-        document_tree = parse_skcode('Run this test [u]ASAP[/u].')
-        rendered_output = render_to_text(document_tree)
-        expected_output = 'Run this test ASAP.'
+        opts = UnderlineTextTagOptions()
+        tree_node = TreeNode(None, 'u', opts)
+        rendered_output = opts.render_text(tree_node, 'ASAP')
+        expected_output = 'ASAP'
         self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering(self):
         """ Test SkCode rendering. """
-        document_tree = parse_skcode('Run this test [u]ASAP[/u].')
-        rendered_output = render_to_skcode(document_tree)
-        expected_output = 'Run this test [u]ASAP[/u].'
+        opts = UnderlineTextTagOptions()
+        tree_node = TreeNode(None, 'u', opts)
+        rendered_output = opts.render_skcode(tree_node, 'ASAP')
+        expected_output = '[u]ASAP[/u]'
         self.assertEqual(expected_output, rendered_output)
 
 
@@ -230,23 +238,26 @@ class SubscriptTextTagTestCase(unittest.TestCase):
 
     def test_html_rendering(self):
         """ Test HTML rendering. """
-        document_tree = parse_skcode('Run this test [sub]ASAP[/sub].')
-        rendered_output = render_to_html(document_tree)
-        expected_output = 'Run this test <sub>ASAP</sub>.'
+        opts = SubscriptTextTagOptions()
+        tree_node = TreeNode(None, 'sub', opts)
+        rendered_output = opts.render_html(tree_node, 'ASAP')
+        expected_output = '<sub>ASAP</sub>'
         self.assertEqual(expected_output, rendered_output)
 
     def test_text_rendering(self):
         """ Test text rendering. """
-        document_tree = parse_skcode('Run this test [sub]ASAP[/sub].')
-        rendered_output = render_to_text(document_tree)
-        expected_output = 'Run this test ASAP.'
+        opts = SubscriptTextTagOptions()
+        tree_node = TreeNode(None, 'sub', opts)
+        rendered_output = opts.render_text(tree_node, 'ASAP')
+        expected_output = 'ASAP'
         self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering(self):
         """ Test SkCode rendering. """
-        document_tree = parse_skcode('Run this test [sub]ASAP[/sub].')
-        rendered_output = render_to_skcode(document_tree)
-        expected_output = 'Run this test [sub]ASAP[/sub].'
+        opts = SubscriptTextTagOptions()
+        tree_node = TreeNode(None, 'sub', opts)
+        rendered_output = opts.render_skcode(tree_node, 'ASAP')
+        expected_output = '[sub]ASAP[/sub]'
         self.assertEqual(expected_output, rendered_output)
 
 
@@ -272,23 +283,26 @@ class SupscriptTextTagTestCase(unittest.TestCase):
 
     def test_html_rendering(self):
         """ Test HTML rendering. """
-        document_tree = parse_skcode('Run this test [sup]ASAP[/sup].')
-        rendered_output = render_to_html(document_tree)
-        expected_output = 'Run this test <sup>ASAP</sup>.'
+        opts = SupscriptTextTagOptions()
+        tree_node = TreeNode(None, 'sup', opts)
+        rendered_output = opts.render_html(tree_node, 'ASAP')
+        expected_output = '<sup>ASAP</sup>'
         self.assertEqual(expected_output, rendered_output)
 
     def test_text_rendering(self):
         """ Test text rendering. """
-        document_tree = parse_skcode('Run this test [sup]ASAP[/sup].')
-        rendered_output = render_to_text(document_tree)
-        expected_output = 'Run this test ASAP.'
+        opts = SupscriptTextTagOptions()
+        tree_node = TreeNode(None, 'sup', opts)
+        rendered_output = opts.render_text(tree_node, 'ASAP')
+        expected_output = 'ASAP'
         self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering(self):
         """ Test SkCode rendering. """
-        document_tree = parse_skcode('Run this test [sup]ASAP[/sup].')
-        rendered_output = render_to_skcode(document_tree)
-        expected_output = 'Run this test [sup]ASAP[/sup].'
+        opts = SupscriptTextTagOptions()
+        tree_node = TreeNode(None, 'sup', opts)
+        rendered_output = opts.render_skcode(tree_node, 'ASAP')
+        expected_output = '[sup]ASAP[/sup]'
         self.assertEqual(expected_output, rendered_output)
 
 
@@ -314,23 +328,26 @@ class PreTextTagTestCase(unittest.TestCase):
 
     def test_html_rendering(self):
         """ Test HTML rendering. """
-        document_tree = parse_skcode('Run this test [pre]ASAP[/pre].')
-        rendered_output = render_to_html(document_tree)
-        expected_output = 'Run this test <pre>ASAP</pre>.'
+        opts = PreTextTagOptions()
+        tree_node = TreeNode(None, 'pre', opts)
+        rendered_output = opts.render_html(tree_node, 'ASAP')
+        expected_output = '<pre>ASAP</pre>'
         self.assertEqual(expected_output, rendered_output)
 
     def test_text_rendering(self):
         """ Test text rendering. """
-        document_tree = parse_skcode('Run this test [pre]ASAP[/pre].')
-        rendered_output = render_to_text(document_tree)
-        expected_output = 'Run this test ASAP.'
+        opts = PreTextTagOptions()
+        tree_node = TreeNode(None, 'pre', opts)
+        rendered_output = opts.render_text(tree_node, 'ASAP')
+        expected_output = 'ASAP'
         self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering(self):
         """ Test SkCode rendering. """
-        document_tree = parse_skcode('Run this test [pre]ASAP[/pre].')
-        rendered_output = render_to_skcode(document_tree)
-        expected_output = 'Run this test [pre]ASAP[/pre].'
+        opts = PreTextTagOptions()
+        tree_node = TreeNode(None, 'pre', opts)
+        rendered_output = opts.render_skcode(tree_node, 'ASAP')
+        expected_output = '[pre]ASAP[/pre]'
         self.assertEqual(expected_output, rendered_output)
 
 
@@ -447,23 +464,26 @@ class InlineSpoilerTextTagTestCase(unittest.TestCase):
 
     def test_html_rendering(self):
         """ Test HTML rendering. """
-        document_tree = parse_skcode('Run this test [ispoiler]ASAP[/ispoiler].')
-        rendered_output = render_to_html(document_tree)
-        expected_output = 'Run this test <span class="ispoiler">ASAP</span>.'
+        opts = InlineSpoilerTextTagOptions()
+        tree_node = TreeNode(None, 'ispoiler', opts)
+        rendered_output = opts.render_html(tree_node, 'ASAP')
+        expected_output = '<span class="ispoiler">ASAP</span>'
         self.assertEqual(expected_output, rendered_output)
 
     def test_text_rendering(self):
         """ Test text rendering. """
-        document_tree = parse_skcode('Run this test [ispoiler]ASAP[/ispoiler].')
-        rendered_output = render_to_text(document_tree)
-        expected_output = 'Run this test ASAP.'
+        opts = InlineSpoilerTextTagOptions()
+        tree_node = TreeNode(None, 'ispoiler', opts)
+        rendered_output = opts.render_text(tree_node, 'ASAP')
+        expected_output = 'ASAP'
         self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering(self):
         """ Test SkCode rendering. """
-        document_tree = parse_skcode('Run this test [ispoiler]ASAP[/ispoiler].')
-        rendered_output = render_to_skcode(document_tree)
-        expected_output = 'Run this test [ispoiler]ASAP[/ispoiler].'
+        opts = InlineSpoilerTextTagOptions()
+        tree_node = TreeNode(None, 'ispoiler', opts)
+        rendered_output = opts.render_skcode(tree_node, 'ASAP')
+        expected_output = '[ispoiler]ASAP[/ispoiler]'
         self.assertEqual(expected_output, rendered_output)
 
 
@@ -491,23 +511,26 @@ class KeyboardTextTagTestCase(unittest.TestCase):
 
     def test_html_rendering(self):
         """ Test HTML rendering. """
-        document_tree = parse_skcode('Run this test [kbd]ASAP[/kbd].')
-        rendered_output = render_to_html(document_tree)
-        expected_output = 'Run this test <kbd>ASAP</kbd>.'
+        opts = KeyboardTextTagOptions()
+        tree_node = TreeNode(None, 'kbd', opts)
+        rendered_output = opts.render_html(tree_node, 'ASAP')
+        expected_output = '<kbd>ASAP</kbd>'
         self.assertEqual(expected_output, rendered_output)
 
     def test_text_rendering(self):
         """ Test text rendering. """
-        document_tree = parse_skcode('Run this test [kbd]ASAP[/kbd].')
-        rendered_output = render_to_text(document_tree)
-        expected_output = 'Run this test ASAP.'
+        opts = KeyboardTextTagOptions()
+        tree_node = TreeNode(None, 'kbd', opts)
+        rendered_output = opts.render_text(tree_node, 'ASAP')
+        expected_output = 'ASAP'
         self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering(self):
         """ Test SkCode rendering. """
-        document_tree = parse_skcode('Run this test [kbd]ASAP[/kbd].')
-        rendered_output = render_to_skcode(document_tree)
-        expected_output = 'Run this test [kbd]ASAP[/kbd].'
+        opts = KeyboardTextTagOptions()
+        tree_node = TreeNode(None, 'kbd', opts)
+        rendered_output = opts.render_skcode(tree_node, 'ASAP')
+        expected_output = '[kbd]ASAP[/kbd]'
         self.assertEqual(expected_output, rendered_output)
 
 
@@ -537,23 +560,26 @@ class HighlightTextTagTestCase(unittest.TestCase):
 
     def test_html_rendering(self):
         """ Test HTML rendering. """
-        document_tree = parse_skcode('Run this test [mark]ASAP[/mark].')
-        rendered_output = render_to_html(document_tree)
-        expected_output = 'Run this test <mark>ASAP</mark>.'
+        opts = HighlightTextTagOptions()
+        tree_node = TreeNode(None, 'mark', opts)
+        rendered_output = opts.render_html(tree_node, 'ASAP')
+        expected_output = '<mark>ASAP</mark>'
         self.assertEqual(expected_output, rendered_output)
 
     def test_text_rendering(self):
         """ Test text rendering. """
-        document_tree = parse_skcode('Run this test [mark]ASAP[/mark].')
-        rendered_output = render_to_text(document_tree)
-        expected_output = 'Run this test ASAP.'
+        opts = HighlightTextTagOptions()
+        tree_node = TreeNode(None, 'mark', opts)
+        rendered_output = opts.render_text(tree_node, 'ASAP')
+        expected_output = 'ASAP'
         self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering(self):
         """ Test SkCode rendering. """
-        document_tree = parse_skcode('Run this test [mark]ASAP[/mark].')
-        rendered_output = render_to_skcode(document_tree)
-        expected_output = 'Run this test [mark]ASAP[/mark].'
+        opts = HighlightTextTagOptions()
+        tree_node = TreeNode(None, 'mark', opts)
+        rendered_output = opts.render_skcode(tree_node, 'ASAP')
+        expected_output = '[mark]ASAP[/mark]'
         self.assertEqual(expected_output, rendered_output)
 
 
@@ -579,21 +605,24 @@ class SmallTextTagTestCase(unittest.TestCase):
 
     def test_html_rendering(self):
         """ Test HTML rendering. """
-        document_tree = parse_skcode('Run this test [small]ASAP[/small].')
-        rendered_output = render_to_html(document_tree)
-        expected_output = 'Run this test <small>ASAP</small>.'
+        opts = SmallTextTagOptions()
+        tree_node = TreeNode(None, 'small', opts)
+        rendered_output = opts.render_html(tree_node, 'ASAP')
+        expected_output = '<small>ASAP</small>'
         self.assertEqual(expected_output, rendered_output)
 
     def test_text_rendering(self):
         """ Test text rendering. """
-        document_tree = parse_skcode('Run this test [small]ASAP[/small].')
-        rendered_output = render_to_text(document_tree)
-        expected_output = 'Run this test ASAP.'
+        opts = SmallTextTagOptions()
+        tree_node = TreeNode(None, 'small', opts)
+        rendered_output = opts.render_text(tree_node, 'ASAP')
+        expected_output = 'ASAP'
         self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering(self):
         """ Test SkCode rendering. """
-        document_tree = parse_skcode('Run this test [small]ASAP[/small].')
-        rendered_output = render_to_skcode(document_tree)
-        expected_output = 'Run this test [small]ASAP[/small].'
+        opts = SmallTextTagOptions()
+        tree_node = TreeNode(None, 'small', opts)
+        rendered_output = opts.render_skcode(tree_node, 'ASAP')
+        expected_output = '[small]ASAP[/small]'
         self.assertEqual(expected_output, rendered_output)

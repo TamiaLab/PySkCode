@@ -4,10 +4,6 @@ SkCode alerts tag test code.
 
 import unittest
 
-from skcode import (parse_skcode,
-                    render_to_html,
-                    render_to_text,
-                    render_to_skcode)
 from skcode.etree import TreeNode
 from skcode.tags import (AlertBoxTagOptions,
                          FixedAlertBoxTagOptions,
@@ -135,9 +131,10 @@ class AlertsTagtestCase(unittest.TestCase):
 
     def test_html_rendering(self):
         """ Test HTML rendering. """
+        opts = AlertBoxTagOptions()
         for alert_type in AlertBoxTagOptions.accepted_types:
-            document_tree = parse_skcode('[alert title="Test alert" type="%s"]Hello world![/alert]' % alert_type)
-            rendered_output = render_to_html(document_tree)
+            tree_node = TreeNode(None, 'alert', opts, attrs={'title': 'Test alert', 'type': alert_type})
+            rendered_output = opts.render_html(tree_node, 'Hello world!')
             expected_output = AlertBoxTagOptions.html_template[alert_type] % {
                 'type': alert_type,
                 'title': 'Test alert',
@@ -147,9 +144,10 @@ class AlertsTagtestCase(unittest.TestCase):
 
     def test_html_rendering_with_trailing_newline(self):
         """ Test HTML rendering with trailing newline. """
+        opts = AlertBoxTagOptions()
         for alert_type in AlertBoxTagOptions.accepted_types:
-            document_tree = parse_skcode('[alert title="Test alert" type="%s"]\n\nHello world!\n[/alert]' % alert_type)
-            rendered_output = render_to_html(document_tree)
+            tree_node = TreeNode(None, 'alert', opts, attrs={'title': 'Test alert', 'type': alert_type})
+            rendered_output = opts.render_html(tree_node, '\n\nHello world!\n')
             expected_output = AlertBoxTagOptions.html_template[alert_type] % {
                 'type': alert_type,
                 'title': 'Test alert',
@@ -159,9 +157,10 @@ class AlertsTagtestCase(unittest.TestCase):
 
     def test_html_rendering_without_title(self):
         """ Test HTML rendering without title. """
+        opts = AlertBoxTagOptions()
         for alert_type in AlertBoxTagOptions.accepted_types:
-            document_tree = parse_skcode('[alert type="%s"]Hello world![/alert]' % alert_type)
-            rendered_output = render_to_html(document_tree)
+            tree_node = TreeNode(None, 'alert', opts, attrs={'type': alert_type})
+            rendered_output = opts.render_html(tree_node, 'Hello world!')
             expected_output = AlertBoxTagOptions.html_template[alert_type] % {
                 'type': alert_type,
                 'title': AlertBoxTagOptions.default_titles[alert_type],
@@ -171,9 +170,10 @@ class AlertsTagtestCase(unittest.TestCase):
 
     def test_html_rendering_with_html_entities_in_title(self):
         """ Test HTML rendering with HTML entities in title. """
+        opts = AlertBoxTagOptions()
         for alert_type in AlertBoxTagOptions.accepted_types:
-            document_tree = parse_skcode('[alert title="<Test alert>" type="%s"]Hello world![/alert]' % alert_type)
-            rendered_output = render_to_html(document_tree)
+            tree_node = TreeNode(None, 'alert', opts, attrs={'title': '<Test alert>', 'type': alert_type})
+            rendered_output = opts.render_html(tree_node, 'Hello world!')
             expected_output = AlertBoxTagOptions.html_template[alert_type] % {
                 'type': alert_type,
                 'title': '&lt;Test alert&gt;',
@@ -183,9 +183,10 @@ class AlertsTagtestCase(unittest.TestCase):
 
     def test_text_rendering(self):
         """ Test text rendering. """
+        opts = AlertBoxTagOptions()
         for alert_type in AlertBoxTagOptions.accepted_types:
-            document_tree = parse_skcode('[alert title="Test alert" type="%s"]Hello world![/alert]' % alert_type)
-            rendered_output = render_to_text(document_tree)
+            tree_node = TreeNode(None, 'alert', opts, attrs={'title': 'Test alert', 'type': alert_type})
+            rendered_output = opts.render_text(tree_node, 'Hello world!')
             expected_output = """*** %s
 * Hello world!
 ***
@@ -194,9 +195,10 @@ class AlertsTagtestCase(unittest.TestCase):
 
     def test_text_rendering_with_trailing_newline(self):
         """ Test text rendering with trailing newline. """
+        opts = AlertBoxTagOptions()
         for alert_type in AlertBoxTagOptions.accepted_types:
-            document_tree = parse_skcode('[alert title="Test alert" type="%s"]\n\nHello world!\n[/alert]' % alert_type)
-            rendered_output = render_to_text(document_tree)
+            tree_node = TreeNode(None, 'alert', opts, attrs={'title': 'Test alert', 'type': alert_type})
+            rendered_output = opts.render_text(tree_node, '\n\nHello world!\n')
             expected_output = """*** %s
 * Hello world!
 ***
@@ -205,9 +207,10 @@ class AlertsTagtestCase(unittest.TestCase):
 
     def test_text_rendering_without_title(self):
         """ Test text rendering without title. """
+        opts = AlertBoxTagOptions()
         for alert_type in AlertBoxTagOptions.accepted_types:
-            document_tree = parse_skcode('[alert type="%s"]Hello world![/alert]' % alert_type)
-            rendered_output = render_to_text(document_tree)
+            tree_node = TreeNode(None, 'alert', opts, attrs={'type': alert_type})
+            rendered_output = opts.render_text(tree_node, 'Hello world!')
             expected_output = """*** %s
 * Hello world!
 ***
@@ -216,9 +219,10 @@ class AlertsTagtestCase(unittest.TestCase):
 
     def test_text_rendering_with_html_entities_in_title(self):
         """ Test text rendering with HTML entities in title. """
+        opts = AlertBoxTagOptions()
         for alert_type in AlertBoxTagOptions.accepted_types:
-            document_tree = parse_skcode('[alert title="<Test alert>" type="%s"]Hello world![/alert]' % alert_type)
-            rendered_output = render_to_text(document_tree)
+            tree_node = TreeNode(None, 'alert', opts, attrs={'title': '<Test alert>', 'type': alert_type})
+            rendered_output = opts.render_text(tree_node, 'Hello world!')
             expected_output = """*** %s
 * Hello world!
 ***
@@ -227,25 +231,28 @@ class AlertsTagtestCase(unittest.TestCase):
 
     def test_skcode_rendering(self):
         """ Test SkCode rendering. """
+        opts = AlertBoxTagOptions()
         for alert_type in AlertBoxTagOptions.accepted_types:
-            document_tree = parse_skcode('[alert title="Test alert" type="%s"]Hello world![/alert]' % alert_type)
-            rendered_output = render_to_skcode(document_tree)
+            tree_node = TreeNode(None, 'alert', opts, attrs={'title': 'Test alert', 'type': alert_type})
+            rendered_output = opts.render_skcode(tree_node, 'Hello world!')
             expected_output = '[alert type="%s" title="Test alert"]Hello world![/alert]' % alert_type
             self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering_without_title(self):
         """ Test SkCode rendering without title. """
+        opts = AlertBoxTagOptions()
         for alert_type in AlertBoxTagOptions.accepted_types:
-            document_tree = parse_skcode('[alert type="%s"]Hello world![/alert]' % alert_type)
-            rendered_output = render_to_skcode(document_tree)
+            tree_node = TreeNode(None, 'alert', opts, attrs={'type': alert_type})
+            rendered_output = opts.render_skcode(tree_node, 'Hello world!')
             expected_output = '[alert type="%s"]Hello world![/alert]' % alert_type
             self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering_with_html_entities_in_title(self):
         """ Test SkCode rendering with HTML entities in title. """
+        opts = AlertBoxTagOptions()
         for alert_type in AlertBoxTagOptions.accepted_types:
-            document_tree = parse_skcode('[alert title="<Test alert>" type="%s"]Hello world![/alert]' % alert_type)
-            rendered_output = render_to_skcode(document_tree)
+            tree_node = TreeNode(None, 'alert', opts, attrs={'title': '<Test alert>', 'type': alert_type})
+            rendered_output = opts.render_skcode(tree_node, 'Hello world!')
             expected_output = '[alert type="%s" title="<Test alert>"]Hello world![/alert]' % alert_type
             self.assertEqual(expected_output, rendered_output)
 
@@ -287,23 +294,26 @@ class FixedTypeAlertsTagtestCase(unittest.TestCase):
     def test_skcode_rendering(self):
         """ Test SkCode rendering. """
         for alert_type in AlertBoxTagOptions.accepted_types:
-            document_tree = parse_skcode('[%s title="Test alert"]Hello world![/%s]' % (alert_type, alert_type))
-            rendered_output = render_to_skcode(document_tree)
+            opts = FixedAlertBoxTagOptions(alert_type)
+            tree_node = TreeNode(None, alert_type, opts, attrs={'title': 'Test alert'})
+            rendered_output = opts.render_skcode(tree_node, 'Hello world!')
             expected_output = '[%s title="Test alert"]Hello world![/%s]' % (alert_type, alert_type)
             self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering_without_title(self):
         """ Test SkCode rendering without title. """
         for alert_type in AlertBoxTagOptions.accepted_types:
-            document_tree = parse_skcode('[%s]Hello world![/%s]' % (alert_type, alert_type))
-            rendered_output = render_to_skcode(document_tree)
+            opts = FixedAlertBoxTagOptions(alert_type)
+            tree_node = TreeNode(None, alert_type, opts, attrs={})
+            rendered_output = opts.render_skcode(tree_node, 'Hello world!')
             expected_output = '[%s]Hello world![/%s]' % (alert_type, alert_type)
             self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering_with_html_entities_in_title(self):
         """ Test SkCode rendering with HTML entities in title. """
         for alert_type in AlertBoxTagOptions.accepted_types:
-            document_tree = parse_skcode('[%s title="<Test alert>"]Hello world![/%s]' % (alert_type, alert_type))
-            rendered_output = render_to_skcode(document_tree)
+            opts = FixedAlertBoxTagOptions(alert_type)
+            tree_node = TreeNode(None, alert_type, opts, attrs={'title': '<Test alert>'})
+            rendered_output = opts.render_skcode(tree_node, 'Hello world!')
             expected_output = '[%s title="<Test alert>"]Hello world![/%s]' % (alert_type, alert_type)
             self.assertEqual(expected_output, rendered_output)

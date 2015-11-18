@@ -4,10 +4,6 @@ SkCode acronyms tag test code.
 
 import unittest
 
-from skcode import (parse_skcode,
-                    render_to_html,
-                    render_to_text,
-                    render_to_skcode)
 from skcode.etree import TreeNode
 from skcode.tags import (AcronymTagOptions,
                          DEFAULT_RECOGNIZED_TAGS)
@@ -73,70 +69,80 @@ class AcronymsTagTestCase(unittest.TestCase):
 
     def test_html_rendering(self):
         """ Test HTML rendering. """
-        document_tree = parse_skcode('Run this test [acronym title="As Soon As Possible"]ASAP[/acronym].')
-        rendered_output = render_to_html(document_tree)
-        expected_output = 'Run this test <abbr title="As Soon As Possible">ASAP</abbr>.'
+        opts = AcronymTagOptions()
+        tree_node = TreeNode(None, 'acronym', opts, attrs={'title': 'As Soon As Possible'})
+        rendered_output = opts.render_html(tree_node, 'ASAP')
+        expected_output = '<abbr title="As Soon As Possible">ASAP</abbr>'
         self.assertEqual(expected_output, rendered_output)
 
     def test_html_rendering_without_title(self):
         """ Test HTML rendering without title. """
-        document_tree = parse_skcode('Run this test [acronym]ASAP[/acronym].')
-        rendered_output = render_to_html(document_tree)
-        expected_output = 'Run this test ASAP.'
+        opts = AcronymTagOptions()
+        tree_node = TreeNode(None, 'acronym', opts, attrs={})
+        rendered_output = opts.render_html(tree_node, 'ASAP')
+        expected_output = 'ASAP'
         self.assertEqual(expected_output, rendered_output)
 
     def test_html_rendering_with_html_entities_in_title(self):
         """ Test HTML rendering with HTML entities in title. """
-        document_tree = parse_skcode('Run this test [acronym title="<As Soon As Possible>"]ASAP[/acronym].')
-        rendered_output = render_to_html(document_tree)
-        expected_output = 'Run this test <abbr title="&lt;As Soon As Possible&gt;">ASAP</abbr>.'
+        opts = AcronymTagOptions()
+        tree_node = TreeNode(None, 'acronym', opts, attrs={'title': '<As Soon As Possible>'})
+        rendered_output = opts.render_html(tree_node, 'ASAP')
+        expected_output = '<abbr title="&lt;As Soon As Possible&gt;">ASAP</abbr>'
         self.assertEqual(expected_output, rendered_output)
 
     def test_text_rendering(self):
         """ Test text rendering. """
-        document_tree = parse_skcode('Run this test [acronym title="As Soon As Possible"]ASAP[/acronym].')
-        rendered_output = render_to_text(document_tree)
-        expected_output = 'Run this test ASAP (As Soon As Possible).'
+        opts = AcronymTagOptions()
+        tree_node = TreeNode(None, 'acronym', opts, attrs={'title': 'As Soon As Possible'})
+        rendered_output = opts.render_text(tree_node, 'ASAP')
+        expected_output = 'ASAP (As Soon As Possible)'
         self.assertEqual(expected_output, rendered_output)
 
     def test_text_rendering_without_title(self):
         """ Test text rendering without title. """
-        document_tree = parse_skcode('Run this test [acronym]ASAP[/acronym].')
-        rendered_output = render_to_text(document_tree)
-        expected_output = 'Run this test ASAP.'
+        opts = AcronymTagOptions()
+        tree_node = TreeNode(None, 'acronym', opts, attrs={})
+        rendered_output = opts.render_text(tree_node, 'ASAP')
+        expected_output = 'ASAP'
         self.assertEqual(expected_output, rendered_output)
 
     def test_text_rendering_with_html_entities_in_title(self):
         """ Test text rendering with HTML entities in title. """
-        document_tree = parse_skcode('Run this test [acronym title="<As Soon As Possible>"]ASAP[/acronym].')
-        rendered_output = render_to_text(document_tree)
-        expected_output = 'Run this test ASAP (<As Soon As Possible>).'
+        opts = AcronymTagOptions()
+        tree_node = TreeNode(None, 'acronym', opts, attrs={'title': '<As Soon As Possible>'})
+        rendered_output = opts.render_text(tree_node, 'ASAP')
+        expected_output = 'ASAP (<As Soon As Possible>)'
         self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering(self):
         """ Test SkCode rendering. """
-        document_tree = parse_skcode('Run this test [acronym title="As Soon As Possible"]ASAP[/acronym].')
-        rendered_output = render_to_skcode(document_tree)
-        expected_output = 'Run this test [acronym title="As Soon As Possible"]ASAP[/acronym].'
+        opts = AcronymTagOptions()
+        tree_node = TreeNode(None, 'acronym', opts, attrs={'title': 'As Soon As Possible'})
+        rendered_output = opts.render_skcode(tree_node, 'ASAP')
+        expected_output = '[acronym title="As Soon As Possible"]ASAP[/acronym]'
         self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering_alias(self):
         """ Test SkCode rendering using alias. """
-        document_tree = parse_skcode('Run this test [abbr title="As Soon As Possible"]ASAP[/abbr].')
-        rendered_output = render_to_skcode(document_tree)
-        expected_output = 'Run this test [abbr title="As Soon As Possible"]ASAP[/abbr].'
+        opts = AcronymTagOptions()
+        tree_node = TreeNode(None, 'abbr', opts, attrs={'title': 'As Soon As Possible'})
+        rendered_output = opts.render_skcode(tree_node, 'ASAP')
+        expected_output = '[abbr title="As Soon As Possible"]ASAP[/abbr]'
         self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering_without_title(self):
         """ Test SkCode rendering without title. """
-        document_tree = parse_skcode('Run this test [acronym]ASAP[/acronym].')
-        rendered_output = render_to_skcode(document_tree)
-        expected_output = 'Run this test [acronym title=""]ASAP[/acronym].'
+        opts = AcronymTagOptions()
+        tree_node = TreeNode(None, 'acronym', opts, attrs={})
+        rendered_output = opts.render_skcode(tree_node, 'ASAP')
+        expected_output = '[acronym title=""]ASAP[/acronym]'
         self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering_with_html_entities_in_title(self):
         """ Test SkCode rendering with HTML entities in title. """
-        document_tree = parse_skcode('Run this test [acronym title="<As Soon As Possible>"]ASAP[/acronym].')
-        rendered_output = render_to_skcode(document_tree)
-        expected_output = 'Run this test [acronym title="<As Soon As Possible>"]ASAP[/acronym].'
+        opts = AcronymTagOptions()
+        tree_node = TreeNode(None, 'acronym', opts, attrs={'title': '<As Soon As Possible>'})
+        rendered_output = opts.render_skcode(tree_node, 'ASAP')
+        expected_output = '[acronym title="<As Soon As Possible>"]ASAP[/acronym]'
         self.assertEqual(expected_output, rendered_output)

@@ -4,10 +4,7 @@ SkCode specials tag test code.
 
 import unittest
 
-from skcode import (parse_skcode,
-                    render_to_html,
-                    render_to_text,
-                    render_to_skcode)
+from skcode.etree import TreeNode
 from skcode.tags import (NoParseTagOptions,
                          DEFAULT_RECOGNIZED_TAGS)
 
@@ -36,49 +33,56 @@ class NoParseTagtestCase(unittest.TestCase):
 
     def test_html_rendering(self):
         """ Test HTML rendering. """
-        document_tree = parse_skcode('Use the [noparse][u]... some text[/u][/noparse] tag to underline text.')
-        rendered_output = render_to_html(document_tree)
-        expected_output = 'Use the [u]... some text[/u] tag to underline text.'
+        opts = NoParseTagOptions()
+        tree_node = TreeNode(None, 'noparse', opts, content='[u]... some text[/u]')
+        rendered_output = opts.render_html(tree_node, '')
+        expected_output = '[u]... some text[/u]'
         self.assertEqual(expected_output, rendered_output)
 
     def test_html_rendering_with_html_entities(self):
         """ Test HTML rendering with HTML entities. """
-        document_tree = parse_skcode('Use the [noparse][u]... <some text>[/u][/noparse] tag to underline text.')
-        rendered_output = render_to_html(document_tree)
-        expected_output = 'Use the [u]... &lt;some text&gt;[/u] tag to underline text.'
+        opts = NoParseTagOptions()
+        tree_node = TreeNode(None, 'noparse', opts, content='[u]... <some text>[/u]')
+        rendered_output = opts.render_html(tree_node, '')
+        expected_output = '[u]... &lt;some text&gt;[/u]'
         self.assertEqual(expected_output, rendered_output)
 
     def test_html_rendering_with_encoded_html_entities(self):
         """ Test HTML rendering with encoded HTML entities. """
-        document_tree = parse_skcode('Use the [noparse][u]... &lt;some text&gt;[/u][/noparse] tag to underline text.')
-        rendered_output = render_to_html(document_tree)
-        expected_output = 'Use the [u]... &lt;some text&gt;[/u] tag to underline text.'
+        opts = NoParseTagOptions()
+        tree_node = TreeNode(None, 'noparse', opts, content='[u]... &lt;some text&gt;[/u]')
+        rendered_output = opts.render_html(tree_node, '')
+        expected_output = '[u]... &lt;some text&gt;[/u]'
         self.assertEqual(expected_output, rendered_output)
 
     def test_text_rendering(self):
         """ Test text rendering. """
-        document_tree = parse_skcode('Use the [noparse][u]... some text[/u][/noparse] tag to underline text.')
-        rendered_output = render_to_text(document_tree)
-        expected_output = 'Use the [u]... some text[/u] tag to underline text.'
+        opts = NoParseTagOptions()
+        tree_node = TreeNode(None, 'noparse', opts, content='[u]... some text[/u]')
+        rendered_output = opts.render_text(tree_node, '')
+        expected_output = '[u]... some text[/u]'
         self.assertEqual(expected_output, rendered_output)
 
     def test_text_rendering_with_html_entities(self):
         """ Test text rendering with encoded HTML entities. """
-        document_tree = parse_skcode('Use the [noparse][u]... &lt;some text&gt;[/u][/noparse] tag to underline text.')
-        rendered_output = render_to_text(document_tree)
-        expected_output = 'Use the [u]... <some text>[/u] tag to underline text.'
+        opts = NoParseTagOptions()
+        tree_node = TreeNode(None, 'noparse', opts, content='[u]... &lt;some text&gt;[/u]')
+        rendered_output = opts.render_text(tree_node, '')
+        expected_output = '[u]... <some text>[/u]'
         self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering(self):
         """ Test SkCode rendering. """
-        document_tree = parse_skcode('Use the [noparse][u]... some text[/u][/noparse] tag to underline text.')
-        rendered_output = render_to_skcode(document_tree)
-        expected_output = 'Use the [noparse][u]... some text[/u][/noparse] tag to underline text.'
+        opts = NoParseTagOptions()
+        tree_node = TreeNode(None, 'noparse', opts, content='[u]... some text[/u]')
+        rendered_output = opts.render_skcode(tree_node, '')
+        expected_output = '[noparse][u]... some text[/u][/noparse]'
         self.assertEqual(expected_output, rendered_output)
 
     def test_skcode_rendering_with_html_entities(self):
         """ Test SkCode rendering with encoded HTML entities. """
-        document_tree = parse_skcode('Use the [noparse][u]... &lt;some text&gt;[/u][/noparse] tag to underline text.')
-        rendered_output = render_to_skcode(document_tree)
-        expected_output = 'Use the [noparse][u]... <some text>[/u][/noparse] tag to underline text.'
+        opts = NoParseTagOptions()
+        tree_node = TreeNode(None, 'noparse', opts, content='[u]... &lt;some text&gt;[/u]')
+        rendered_output = opts.render_skcode(tree_node, '')
+        expected_output = '[noparse][u]... <some text>[/u][/noparse]'
         self.assertEqual(expected_output, rendered_output)
