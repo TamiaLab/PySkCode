@@ -229,6 +229,17 @@ class CodeBlocksTagtestCase(unittest.TestCase):
 """
         self.assertEqual(expected_result, output_result)
 
+    def test_render_html_with_invalid_language(self):
+        """ Test the ``render_html`` method with an invalid language set. """
+        opts = CodeBlockTagOptions()
+        tree_node = TreeNode(None, 'code', opts, attrs={'code': 'somethingnotexisting'}, content='# Hello World!')
+        output_result = opts.render_html(tree_node, '')
+        expected_result = """<table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">1</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"># Hello World!
+</pre></div>
+</td></tr></table>
+"""
+        self.assertEqual(expected_result, output_result)
+
     def test_render_html_with_default_language(self):
         """ Test the ``render_html`` method with the default language set. """
         opts = CodeBlockTagOptions()
@@ -296,6 +307,22 @@ class CodeBlocksTagtestCase(unittest.TestCase):
 </figure>"""
         self.assertEqual(expected_result, output_result)
 
+    def test_render_html_with_src_link_only(self):
+        """ Test the ``render_html`` method with 'src" set. """
+        opts = CodeBlockTagOptions()
+        tree_node = TreeNode(None, 'code', opts, attrs={'code': 'python', 'hl_lines': '1',
+                                                        'linenostart': '5',
+                                                        'src': 'https://github.com/TamiaLab/PySkCode'},
+                             content='# Hello World!')
+        output_result = opts.render_html(tree_node, '')
+        expected_result = """<figure>
+<table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
+</span></pre></div>
+</td></tr></table>
+<figcaption><a href="https://github.com/TamiaLab/PySkCode" rel="nofollow" target="_blank">Source : https://github.com/TamiaLab/PySkCode <i class="fa fa-link"></i></a></figcaption>
+</figure>"""
+        self.assertEqual(expected_result, output_result)
+
     def test_render_html_with_src_link_without_force_nofollow(self):
         """ Test the ``render_html`` method with 'src" set. """
         opts = CodeBlockTagOptions()
@@ -333,6 +360,14 @@ class CodeBlocksTagtestCase(unittest.TestCase):
         """ Test the ``render_text`` method. """
         opts = CodeBlockTagOptions()
         tree_node = TreeNode(None, 'code', opts, attrs={'code': 'python'}, content='# Hello World!')
+        output_result = opts.render_text(tree_node, '')
+        expected_result = '1.   # Hello World!\n'
+        self.assertEqual(expected_result, output_result)
+
+    def test_render_text_with_trailing_blank_lines(self):
+        """ Test the ``render_text`` method with trailing blank lines. """
+        opts = CodeBlockTagOptions()
+        tree_node = TreeNode(None, 'code', opts, attrs={'code': 'python'}, content='\n\n# Hello World!\n')
         output_result = opts.render_text(tree_node, '')
         expected_result = '1.   # Hello World!\n'
         self.assertEqual(expected_result, output_result)
@@ -383,6 +418,17 @@ class CodeBlocksTagtestCase(unittest.TestCase):
                              content='# Hello World!')
         output_result = opts.render_text(tree_node, '')
         expected_result = '5.   # Hello World!\nSource : test.py (https://github.com/TamiaLab/PySkCode)\n'
+        self.assertEqual(expected_result, output_result)
+
+    def test_render_text_with_src_link_only(self):
+        """ Test the ``render_text`` method with 'src" set. """
+        opts = CodeBlockTagOptions()
+        tree_node = TreeNode(None, 'code', opts, attrs={'code': 'python', 'hl_lines': '1',
+                                                        'linenostart': '5',
+                                                        'src': 'https://github.com/TamiaLab/PySkCode'},
+                             content='# Hello World!')
+        output_result = opts.render_text(tree_node, '')
+        expected_result = '5.   # Hello World!\nSource : https://github.com/TamiaLab/PySkCode\n'
         self.assertEqual(expected_result, output_result)
 
     def test_render_text_with_figure_id(self):
