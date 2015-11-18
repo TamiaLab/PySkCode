@@ -72,6 +72,12 @@ class TextModifierTagsTestCase(unittest.TestCase):
         tree_node = TreeNode(None, 'capitalize', opts)
         self.assertEqual('Test', opts.render_text(tree_node, 'test'))
 
+    def test_render_text_unknown_modifier(self):
+        """ Test the ``render_text`` method. """
+        opts = TextModifierBaseTagOptions('unknown')
+        tree_node = TreeNode(None, 'unknown', opts)
+        self.assertEqual('teST', opts.render_text(tree_node, 'teST'))
+
     def test_render_skcode_lowercase(self):
         """ Test the ``render_skcode`` method. """
         opts = LowerCaseTextTagOptions()
