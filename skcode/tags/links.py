@@ -344,6 +344,7 @@ class GoToAnchorTagOptions(TagOptions):
         # Render the anchor link
         if anchor_id:
             node_name = tree_node.name
-            return '[%s=%s]%s[/%s]' % (node_name, escape_attrvalue(anchor_id), inner_skcode, node_name)
+            return '[%s %s=%s]%s[/%s]' % (node_name, self.anchor_id_attr_name,
+                                          escape_attrvalue(anchor_id), inner_skcode, node_name)
         else:
             return inner_skcode
