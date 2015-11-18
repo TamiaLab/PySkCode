@@ -2,15 +2,10 @@
 SkCode title tag definitions code.
 """
 
-from .base import TagOptions
-from ..tools import escape_attrvalue
-
 from html import escape as escape_html
 
-
-# Internal tree node attribute name for permalink slug
-# If available at rendering, an HTML anchor will be added to the title.
-PERMALINK_SLUG_ATTRNAME = 'permalink_slug'
+from .base import TagOptions
+from ..tools import escape_attrvalue, slugify
 
 
 class TitleTagOptions(TagOptions):
@@ -18,7 +13,7 @@ class TitleTagOptions(TagOptions):
 
     same_tag_closes = True
 
-    # Slug Id attribute name
+    # Slug ID attribute name
     slug_id_attr_name = 'id'
 
     def __init__(self, title_level, **kwargs):
@@ -37,9 +32,8 @@ class TitleTagOptions(TagOptions):
         """
         Return the permalink slug for this title.
         The permalink slug can be set by setting the slug_id_attr_name attribute of the tag or simply
-        by setting the tag name attribute. The permalink slug can also be set from the outside code by setting
-        the PERMALINK_SLUG_ATTRNAME attribute of the tree node itself.
-        The lookup order is: tag name (first), acronym_title_attr_name, tree node level attribute.
+        by setting the tag name attribute.
+        The lookup order is: tag name (first), acronym_title_attr_name.
         :param tree_node: The current tree node instance.
         :return The permalink slug for this title, or an empty string.
         """
@@ -48,9 +42,7 @@ class TitleTagOptions(TagOptions):
         permalink_slug = tree_node.attrs.get(tree_node.name, '')
         if not permalink_slug:
             permalink_slug = tree_node.attrs.get(self.slug_id_attr_name, '')
-        if not permalink_slug:
-            permalink_slug = getattr(tree_node, PERMALINK_SLUG_ATTRNAME, '')
-        return permalink_slug
+        return slugify(permalink_slug)
 
     def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
         """
@@ -63,7 +55,6 @@ class TitleTagOptions(TagOptions):
 
         # Add permalink if available
         permalink_slug = self.get_permalink_slug(tree_node)
-        # FIXME Slugify?
         if permalink_slug:
             inner_html = '<a id="%s">%s</a>' % (escape_html(permalink_slug), inner_html)
 
