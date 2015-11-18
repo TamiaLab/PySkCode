@@ -99,7 +99,7 @@ def slugify(value):
     """
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
     value = re.sub('[^\w\s-]', '', value).strip().lower()
-    return re.sub('[-\s]+', '-', value)
+    return re.sub('[-\s]+', '-', value).strip('-')
 
 
 def unique_slugify(value, existing_slug, slug_namespace=''):
