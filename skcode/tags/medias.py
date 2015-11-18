@@ -35,7 +35,7 @@ class ImageTagOptions(TagOptions):
         :param tree_node: The current tree node instance.
         :return The image source link URL (not sanitized).
         """
-        src_link = tree_node.get_raw_content()
+        src_link = tree_node.get_raw_content().strip()
         return sanitize_url(src_link, allowed_schemes=self.allowed_schemes)
 
     def get_alt_text(self, tree_node):
@@ -194,7 +194,7 @@ class YoutubeTagOptions(TagOptions):
         """
 
         # Get the URL
-        url = tree_node.get_raw_content()
+        url = tree_node.get_raw_content().strip()
 
         # Split the URL
         try:
