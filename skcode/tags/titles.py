@@ -68,7 +68,12 @@ class TitleTagOptions(TagOptions):
         :param inner_text: Inner text of this tree node.
         :return Rendered text of this node.
         """
-        return '%s %s\n' % ('#' * self.title_level, inner_text)
+        # Add permalink if available
+        permalink_slug = self.get_permalink_slug(tree_node)
+        if permalink_slug:
+            return '%s[#%s] %s\n' % ('#' * self.title_level, permalink_slug, inner_text)
+        else:
+            return '%s %s\n' % ('#' * self.title_level, inner_text)
 
     def render_skcode(self, tree_node, inner_skcode):
         """
