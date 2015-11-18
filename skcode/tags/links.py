@@ -232,7 +232,7 @@ class AnchorTagOptions(TagOptions):
 
         # Render the anchor link
         if anchor_id:
-            return '<a id="%s">%s</a>' % (escape_html(anchor_id), inner_html)
+            return '<a id="%s"></a>' % escape_html(anchor_id)
         else:
             return inner_html
 
