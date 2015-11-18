@@ -256,11 +256,6 @@ def parse_tag(text, start_offset, opening_tag_ch, closing_tag_ch,
     # Handle self closing tag
     if ch == '/':
 
-        # Handle erroneous self closing tag
-        if is_closing_tag:
-            # FIXME Unreachable code, if before tag value avoid this
-            raise ValueError('Invalid tag format: malformed self closing tag')
-
         # Check for support
         if not allow_self_closing_tags:
             raise ValueError('Invalid tag format: self closing tags support disabled by caller.')
