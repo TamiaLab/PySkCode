@@ -33,7 +33,8 @@ def escape_attrvalue(value):
 
 def sanitize_url(url, default_scheme='http',
                  allowed_schemes=('http', 'https', 'ftp', 'ftps', 'mailto'),
-                 encode_html_entities=True, force_default_scheme=False):
+                 encode_html_entities=True, force_default_scheme=False,
+                 force_remove_scheme=False):
     """
     Sanitize the given URL. Avoid XSS by filtering-out forbidden protocol.
     Allowed protocols by default are: http, https, ftp, ftps and mailto.
@@ -43,10 +44,13 @@ def sanitize_url(url, default_scheme='http',
     :param allowed_schemes: List of allowed schemes (see default above).
     :param encode_html_entities: If set, the output URL is encoded to avoid raw HTML entities (default True).
     :param force_default_scheme: Set to True to force the default scheme to be used in all case (default False).
+    :param force_remove_scheme: Set to True to remove the scheme if set (default False).
     :return: The sanitized URL as string.
     """
     assert default_scheme, "A default scheme is mandatory to avoid XSS."
     assert len(allowed_schemes) > 0, "You need to allow at least one scheme to get a result!"
+    assert not (force_default_scheme and
+                force_remove_scheme), "You cannot force the default scheme and also force-remove the scheme."
 
     # Shortcut for empty string
     if not url:
@@ -70,6 +74,10 @@ def sanitize_url(url, default_scheme='http',
     # Add http scheme to non-local URL if required
     if (not scheme and netloc) or force_default_scheme:
         scheme = default_scheme
+
+    # Remove the scheme if requested
+    if force_remove_scheme:
+        scheme = ''
 
     # Build the final URL
     result = urlunsplit((scheme, netloc, path, query, fragment))
