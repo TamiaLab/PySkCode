@@ -65,13 +65,13 @@ class TagOptionsTestCase(unittest.TestCase):
         """ Test default ``render_text`` method implementation. """
         opts = TagOptions()
         with self.assertRaises(NotImplementedError):
-            opts.render_html(None, '')
+            opts.render_text(None, '')
 
     def test_default_render_skcode_implementation(self):
         """ Test default ``render_skcode`` method implementation. """
         opts = TagOptions()
         with self.assertRaises(NotImplementedError):
-            opts.render_html(None, '')
+            opts.render_skcode(None, '')
 
 
 class WrappingTagOptionsTestCase(unittest.TestCase):
