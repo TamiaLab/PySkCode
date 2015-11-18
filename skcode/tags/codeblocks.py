@@ -237,9 +237,7 @@ class CodeBlockTagOptions(TagOptions):
 
         # Render the code block
         lines = []
-        for num, line in enumerate(tree_node.content.splitlines(), start=get_start_line_number):
-            if not line:
-                continue
+        for num, line in enumerate(tree_node.content.strip('\r\n').splitlines(), start=get_start_line_number):
             line = line.replace('\t', ' ' * self.tab_size)
             if num in hl_lines:
                 line_prefix = '%d>' % num
