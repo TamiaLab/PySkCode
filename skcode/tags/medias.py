@@ -2,11 +2,16 @@
 SkCode medias tag definitions code.
 """
 
-from urllib.parse import urlsplit, parse_qs, quote_plus
+from urllib.parse import (urlsplit,
+                          parse_qs,
+                          quote_plus)
+
 from html import escape as escape_html
+from html import unescape as unescape_html_entities
 
 from .base import TagOptions
-from ..tools import escape_attrvalue, sanitize_url
+from ..tools import (escape_attrvalue,
+                     sanitize_url)
 
 
 class ImageTagOptions(TagOptions):
@@ -21,13 +26,17 @@ class ImageTagOptions(TagOptions):
     # Image height attribute name
     height_attr_name = 'height'
 
+    # Allowed schemes for URL
+    allowed_schemes = ('http', 'https')
+
     def get_image_src_link(self, tree_node):
         """
         Get the image source link URL.
         :param tree_node: The current tree node instance.
         :return The image source link URL (not sanitized).
         """
-        return tree_node.get_raw_content()
+        src_link = tree_node.get_raw_content()
+        return sanitize_url(src_link, allowed_schemes=self.allowed_schemes)
 
     def get_alt_text(self, tree_node):
         """
@@ -35,7 +44,8 @@ class ImageTagOptions(TagOptions):
         :param tree_node: The current tree node instance.
         :return The image alternative text as string, or an empty string.
         """
-        return tree_node.attrs.get(self.alt_attr_name, '')
+        alt_text = tree_node.attrs.get(self.alt_attr_name, '')
+        return unescape_html_entities(alt_text)
 
     def get_img_width(self, tree_node):
         """
@@ -76,7 +86,6 @@ class ImageTagOptions(TagOptions):
 
         # Get the image source link
         src_link = self.get_image_src_link(tree_node)
-        src_link = sanitize_url(src_link, allowed_schemes=('http', 'https'))
 
         # Shortcut if no source link
         if not src_link:
@@ -112,7 +121,6 @@ class ImageTagOptions(TagOptions):
 
         # Get the image source link
         src_link = self.get_image_src_link(tree_node)
-        src_link = sanitize_url(src_link, allowed_schemes=('http', 'https'))
 
         # Shortcut if no source link
         if not src_link:
@@ -135,7 +143,6 @@ class ImageTagOptions(TagOptions):
 
         # Get the image source link
         src_link = self.get_image_src_link(tree_node)
-        src_link = sanitize_url(src_link, allowed_schemes=('http', 'https'))
 
         # Shortcut if no source link
         if not src_link:
@@ -144,7 +151,8 @@ class ImageTagOptions(TagOptions):
         # Get the alternative text
         alt_text = self.get_alt_text(tree_node)
         if alt_text:
-            extra_attrs = ' %s=%s' % (self.alt_attr_name, escape_attrvalue(alt_text))
+            extra_attrs = ' %s=%s' % (self.alt_attr_name,
+                                      escape_attrvalue(alt_text))
         else:
             extra_attrs = ''
 
