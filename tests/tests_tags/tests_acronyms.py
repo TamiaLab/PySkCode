@@ -57,7 +57,7 @@ class AcronymsTagTestCase(unittest.TestCase):
         title = opts.get_acronym_title(tree_node)
         self.assertEqual('test', title)
 
-    def get_acronym_title_without_title_set(self):
+    def test_get_acronym_title_without_title_set(self):
         """ Test the ``get_acronym_title`` when the title is not set at all. """
         opts = AcronymTagOptions()
         tree_node = TreeNode(None, 'acronym', opts, attrs={'acronym': 'test'})
