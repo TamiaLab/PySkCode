@@ -33,7 +33,7 @@ def escape_attrvalue(value):
 
 def sanitize_url(url, default_scheme='http',
                  allowed_schemes=('http', 'https', 'ftp', 'ftps', 'mailto'),
-                 encode_html_entities=True):
+                 encode_html_entities=True, force_default_scheme=False):
     """
     Sanitize the given URL. Avoid XSS by filtering-out forbidden protocol.
     Allowed protocols by default are: http, https, ftp, ftps and mailto.
@@ -42,6 +42,7 @@ def sanitize_url(url, default_scheme='http',
     :param default_scheme: Default scheme to use (default to http).
     :param allowed_schemes: List of allowed schemes (see default above).
     :param encode_html_entities: If set, the output URL is encoded to avoid raw HTML entities (default True).
+    :param force_default_scheme: Set to True to force the default scheme to be used in all case (default False).
     :return: The sanitized URL as string.
     """
     assert default_scheme, "A default scheme is mandatory to avoid XSS."
@@ -67,7 +68,7 @@ def sanitize_url(url, default_scheme='http',
         return ''
 
     # Add http scheme to non-local URL if required
-    if not scheme and netloc:
+    if (not scheme and netloc) or force_default_scheme:
         scheme = default_scheme
 
     # Build the final URL
