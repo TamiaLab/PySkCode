@@ -6,7 +6,8 @@ from html import escape as escape_html
 
 from .base import TagOptions
 from ..tools import (escape_attrvalue,
-                     sanitize_url)
+                     sanitize_url,
+                     slugify)
 
 
 class UrlLinkTagOptions(TagOptions):
@@ -27,12 +28,13 @@ class UrlLinkTagOptions(TagOptions):
         """
         Return the target link URL.
         :param tree_node: The current tree node instance.
-        :return The target link URL (not sanitized).
+        :return The target link URL.
         """
         if self.is_url_inside_tag_content(tree_node):
-            return tree_node.get_raw_content().strip()
+            target_url = tree_node.get_raw_content().strip()
         else:
-            return tree_node.attrs.get(tree_node.name, '')
+            target_url = tree_node.attrs.get(tree_node.name, '')
+        return sanitize_url(target_url)
 
     def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
         """
@@ -51,7 +53,6 @@ class UrlLinkTagOptions(TagOptions):
 
         # Get the target URL
         target_url = self.get_target_link(tree_node)
-        target_url = sanitize_url(target_url)
 
         # Render the link
         if target_url:
@@ -72,7 +73,6 @@ class UrlLinkTagOptions(TagOptions):
 
         # Get the target URL
         target_url = self.get_target_link(tree_node)
-        target_url = sanitize_url(target_url)
 
         # Render the link
         if target_url:
@@ -93,7 +93,6 @@ class UrlLinkTagOptions(TagOptions):
 
         # Get the target URL
         target_url = self.get_target_link(tree_node)
-        target_url = sanitize_url(target_url)
 
         # Render the link
         if target_url:
@@ -127,9 +126,13 @@ class EmailLinkTagOptions(TagOptions):
         :return The target email address.
         """
         if self.is_email_inside_tag_content(tree_node):
-            return tree_node.get_raw_content()
+            email_address = tree_node.get_raw_content()
         else:
-            return tree_node.attrs.get(tree_node.name, '')
+            email_address = tree_node.attrs.get(tree_node.name, '')
+        # TODO remove mailto: scheme and (better) made a function sanitize_email_address()
+        return sanitize_url(email_address,
+                            default_scheme='mailto',
+                            allowed_schemes=('mailto', ))
 
     def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
         """
@@ -142,9 +145,6 @@ class EmailLinkTagOptions(TagOptions):
 
         # Get the email address
         email_address = self.get_email_address(tree_node)
-        email_address = sanitize_url(email_address,
-                                     default_scheme='mailto',
-                                     allowed_schemes=('mailto', ))
 
         # Render the email link
         if email_address:
@@ -165,10 +165,6 @@ class EmailLinkTagOptions(TagOptions):
 
         # Get the email address
         email_address = self.get_email_address(tree_node)
-        email_address = sanitize_url(email_address,
-                                     default_scheme='mailto',
-                                     allowed_schemes=('mailto', ))
-        # TODO remove mailto: scheme and (better) made a function sanitize_email_address()
 
         # Render the email link
         if email_address:
@@ -189,9 +185,6 @@ class EmailLinkTagOptions(TagOptions):
 
         # Get the email address
         email_address = self.get_email_address(tree_node)
-        email_address = sanitize_url(email_address,
-                                     default_scheme='mailto',
-                                     allowed_schemes=('mailto', ))
 
         # Render the email link
         if email_address:
@@ -216,8 +209,7 @@ class AnchorTagOptions(TagOptions):
         :param tree_node: the current tree node instance.
         :return The ID of this anchor, or an empty string.
         """
-        # FIXME Slugify ID
-        return tree_node.get_raw_content()
+        return slugify(tree_node.get_raw_content())
 
     def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
         """
@@ -294,7 +286,7 @@ class GoToAnchorTagOptions(TagOptions):
         user_anchor_id = tree_node.attrs.get(tree_node.name, '')
         if not user_anchor_id:
             user_anchor_id = tree_node.attrs.get(self.anchor_id_attr_name, '')
-        return user_anchor_id
+        return slugify(user_anchor_id)
 
     def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
         """
