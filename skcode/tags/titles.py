@@ -71,7 +71,7 @@ class TitleTagOptions(TagOptions):
         # Add permalink if available
         permalink_slug = self.get_permalink_slug(tree_node)
         if permalink_slug:
-            return '%s[#%s] %s\n' % ('#' * self.title_level, permalink_slug, inner_text)
+            return '%s[%s] %s\n' % ('#' * self.title_level, permalink_slug, inner_text)
         else:
             return '%s %s\n' % ('#' * self.title_level, inner_text)
 
