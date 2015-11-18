@@ -11,8 +11,6 @@ from ..tools import escape_attrvalue, slugify
 class TitleTagOptions(TagOptions):
     """ Title tag options container class. """
 
-    same_tag_closes = True
-
     # Slug ID attribute name
     slug_id_attr_name = 'id'
 
