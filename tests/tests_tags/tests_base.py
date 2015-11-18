@@ -53,7 +53,7 @@ class TagOptionsTestCase(unittest.TestCase):
     def test_default_postprocess_node_implementation(self):
         """ Test default ``postprocess_node`` method implementation. """
         opts = TagOptions()
-        self.assertFalse(opts.postprocess_node(None, None))
+        self.assertTrue(opts.postprocess_node(None, None))
 
     def test_default_render_html_implementation(self):
         """ Test default ``render_html`` method implementation. """
