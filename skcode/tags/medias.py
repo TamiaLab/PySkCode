@@ -180,6 +180,12 @@ class YoutubeTagOptions(TagOptions):
     # Default iframe height
     default_iframe_height = 315
 
+    # Allowed Youtube domains
+    allowed_domains = ('www.youtube.com', 'youtube.com')
+
+    # Youtube video ID query arg name
+    video_id_query_arg_name = 'v'
+
     def get_youtube_video_id(self, tree_node):
         """
         Get the Youtube video ID.
@@ -199,7 +205,7 @@ class YoutubeTagOptions(TagOptions):
             return ''
 
         # Check for bad netloc
-        if netloc != 'www.youtube.com' and netloc != 'youtube.com':
+        if netloc not in self.allowed_domains:
             return ''
 
         # Check for bad url query
@@ -208,7 +214,7 @@ class YoutubeTagOptions(TagOptions):
 
         # Get the video ID
         query_args = parse_qs(query)
-        video_id = query_args.get('v', None)
+        video_id = query_args.get(self.video_id_query_arg_name, None)
 
         # Query args return a list of values
         if not video_id:
