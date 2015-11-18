@@ -8,6 +8,7 @@ from skcode import (parse_skcode,
                     render_to_html,
                     render_to_text,
                     render_to_skcode)
+from skcode.etree import TreeNode
 from skcode.tags import (BoldTextTagOptions,
                          ItalicTextTagOptions,
                          StrikeTextTagOptions,
@@ -347,32 +348,81 @@ class InlineCodeTextTagTestCase(unittest.TestCase):
         self.assertFalse(opts.newline_closes)
         self.assertFalse(opts.same_tag_closes)
         self.assertFalse(opts.standalone)
-        self.assertTrue(opts.parse_embedded)
+        self.assertFalse(opts.parse_embedded)
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertTrue(opts.inline)
         self.assertFalse(opts.close_inlines)
         self.assertFalse(opts.make_paragraphs_here)
 
-    def test_html_rendering(self):
-        """ Test HTML rendering. """
-        document_tree = parse_skcode('Run this test [icode]ASAP[/icode].')
-        rendered_output = render_to_html(document_tree)
-        expected_output = 'Run this test <code>ASAP</code>.'
-        self.assertEqual(expected_output, rendered_output)
+    def test_render_html(self):
+        """ Test the ``render_html`` method. """
+        opts = InlineCodeTextTagOptions()
+        tree_node = TreeNode(None, 'icode', opts, content='test')
+        output_result = opts.render_html(tree_node, '')
+        self.assertEqual('<code>test</code>', output_result)
 
-    def test_text_rendering(self):
-        """ Test text rendering. """
-        document_tree = parse_skcode('Run this test [icode]ASAP[/icode].')
-        rendered_output = render_to_text(document_tree)
-        expected_output = 'Run this test ASAP.'
-        self.assertEqual(expected_output, rendered_output)
+    def test_render_html_with_brackets(self):
+        """ Test the ``render_html`` method. """
+        opts = InlineCodeTextTagOptions()
+        tree_node = TreeNode(None, 'icode', opts, content='[test]')
+        output_result = opts.render_html(tree_node, '')
+        self.assertEqual('<code>[test]</code>', output_result)
 
-    def test_skcode_rendering(self):
-        """ Test SkCode rendering. """
-        document_tree = parse_skcode('Run this test [icode]ASAP[/icode].')
-        rendered_output = render_to_skcode(document_tree)
-        expected_output = 'Run this test [icode]ASAP[/icode].'
-        self.assertEqual(expected_output, rendered_output)
+    def test_render_html_with_html_entities(self):
+        """ Test the ``render_html`` method with HTML entities. """
+        opts = InlineCodeTextTagOptions()
+        tree_node = TreeNode(None, 'icode', opts, content='<test>')
+        output_result = opts.render_html(tree_node, '')
+        self.assertEqual('<code>&lt;test&gt;</code>', output_result)
+
+    def test_render_html_with_encoded_html_entities(self):
+        """ Test the ``render_html`` method with encoded HTML entities. """
+        opts = InlineCodeTextTagOptions()
+        tree_node = TreeNode(None, 'icode', opts, content='&lt;test&gt;')
+        output_result = opts.render_html(tree_node, '')
+        self.assertEqual('<code>&lt;test&gt;</code>', output_result)
+
+    def test_render_text(self):
+        """ Test the ``render_text`` method. """
+        opts = InlineCodeTextTagOptions()
+        tree_node = TreeNode(None, 'icode', opts, content='test')
+        output_result = opts.render_text(tree_node, '')
+        self.assertEqual('test', output_result)
+
+    def test_render_text_with_brackets(self):
+        """ Test the ``render_text`` method. """
+        opts = InlineCodeTextTagOptions()
+        tree_node = TreeNode(None, 'icode', opts, content='[test]')
+        output_result = opts.render_text(tree_node, '')
+        self.assertEqual('[test]', output_result)
+
+    def test_render_text_with_html_entities(self):
+        """ Test the ``render_text`` method with HTML entities. """
+        opts = InlineCodeTextTagOptions()
+        tree_node = TreeNode(None, 'icode', opts, content='&lt;test&gt;')
+        output_result = opts.render_text(tree_node, '')
+        self.assertEqual('<test>', output_result)
+
+    def test_render_skcode(self):
+        """ Test the ``render_skcode`` method. """
+        opts = InlineCodeTextTagOptions()
+        tree_node = TreeNode(None, 'icode', opts, content='test')
+        output_result = opts.render_skcode(tree_node, '')
+        self.assertEqual('[icode]test[/icode]', output_result)
+
+    def test_render_skcode_with_brackets(self):
+        """ Test the ``render_skcode`` method. """
+        opts = InlineCodeTextTagOptions()
+        tree_node = TreeNode(None, 'icode', opts, content='[test]')
+        output_result = opts.render_skcode(tree_node, '')
+        self.assertEqual('[icode][test][/icode]', output_result)
+
+    def test_render_skcode_with_html_entities(self):
+        """ Test the ``render_skcode`` method with HTML entities. """
+        opts = InlineCodeTextTagOptions()
+        tree_node = TreeNode(None, 'icode', opts, content='&lt;test&gt;')
+        output_result = opts.render_skcode(tree_node, '')
+        self.assertEqual('[icode]<test>[/icode]', output_result)
 
 
 class InlineSpoilerTextTagTestCase(unittest.TestCase):
