@@ -26,6 +26,8 @@ from .alerts import (AlertBoxTagOptions,
                      ALERT_TYPE_SUCCESS,
                      ALERT_TYPE_NOTE,
                      ALERT_TYPE_QUESTION)
+from .footnotes import (FootnoteDeclarationTagOptions,
+                        FootnoteReferenceTagOptions)
 from .textformating import (BoldTextTagOptions,
                             ItalicTextTagOptions,
                             StrikeTextTagOptions,
@@ -207,9 +209,9 @@ DEFAULT_RECOGNIZED_TAGS = {
     'quote': QuoteTagOptions(),
 
     # --- Footnotes
-    # 'footnote' (id/footnote) # TODO
-    # 'fn' (id/fn) # TODO
-    # 'fnref' (id/fnref, standalone) # TODO
+    'footnote': FootnoteDeclarationTagOptions(),
+    'fn': FootnoteDeclarationTagOptions(),
+    'fnref': FootnoteReferenceTagOptions(),
 
     # --- Acronymes
     'abbr': AcronymTagOptions(),
