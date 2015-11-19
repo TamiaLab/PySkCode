@@ -95,6 +95,9 @@ class ListTagOptions(TagOptions):
     # List type attribute name
     list_type_attr_name = 'type'
 
+    # List start number attribute name
+    list_start_number_attr_name = 'start'
+
     def get_list_type(self, tree_node):
         """
         Get the type of this list.
@@ -122,6 +125,23 @@ class ListTagOptions(TagOptions):
         # Return the type
         return list_type
 
+    def get_list_first_number(self, tree_node):
+        """
+        Get the first number of the list for ordering.
+        :param tree_node: The current tree node instance.
+        :return: The first number of the list, or 1.
+        """
+        first_number = tree_node.attrs.get(self.list_start_number_attr_name, '')
+        if not first_number:
+            return 1
+        try:
+            first_number = int(first_number)
+            if first_number > 0:
+                return first_number
+        except ValueError:
+            return 1
+        return 1
+
     def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
         """
         Callback function for rendering HTML.
@@ -138,7 +158,16 @@ class ListTagOptions(TagOptions):
         if list_type == UNORDERED_LIST_TYPE:
             return '<ul>%s</ul>\n' % inner_html
         else:
-            return '<ol type="%s">%s</ol>\n' % (HTML_LIST_TYPE_LUT[list_type], inner_html)
+
+            # Get list first number
+            first_list_number = self.get_list_first_number(tree_node)
+
+            # Render the ordered list
+            if first_list_number != 1:
+                return '<ol type="%s" start="%d">%s</ol>\n' % (HTML_LIST_TYPE_LUT[list_type],
+                                                               first_list_number, inner_html)
+            else:
+                return '<ol type="%s">%s</ol>\n' % (HTML_LIST_TYPE_LUT[list_type], inner_html)
 
     def render_text(self, tree_node, inner_text):
         """
@@ -211,7 +240,6 @@ class ListElementTagOptions(TagOptions):
     """ List element tag options container class. """
 
     make_paragraphs_here = True
-    same_tag_closes = True
 
     # Default parent list type
     default_list_type = UNORDERED_LIST_TYPE
@@ -228,6 +256,18 @@ class ListElementTagOptions(TagOptions):
         else:
             return self.default_list_type
 
+    def get_parent_list_first_number(self, tree_node):
+        """
+        Get the parent list first number.
+        :param tree_node: The current tree node instance.
+        :return The parent list first number, or 1.
+        """
+        parent_opts = tree_node.parent.opts
+        if isinstance(parent_opts, ListTagOptions):
+            return parent_opts.get_list_first_number(tree_node.parent)
+        else:
+            return 1
+
     def get_element_number_from_parent(self, tree_node):
         """
         Get the current element number from the parent node.
@@ -236,8 +276,9 @@ class ListElementTagOptions(TagOptions):
         """
         parent_node_children = tree_node.parent.children
         cur_index = parent_node_children.index(tree_node)
-        children_before_cur = parent_node_children[:cur_index + 1]
-        return sum([1 if isinstance(child.opts, ListElementTagOptions) else 0 for child in children_before_cur])
+        children_before_cur = parent_node_children[:cur_index]
+        count = sum([1 if isinstance(child.opts, ListElementTagOptions) else 0 for child in children_before_cur])
+        return count + self.get_parent_list_first_number(tree_node)
 
     def get_list_bullet(self, tree_node):
         """
@@ -287,6 +328,8 @@ class ListElementTagOptions(TagOptions):
                 lines.append('%s %s' % (bullet, line))
             else:
                 lines.append('%s %s' % (indent, line))
+        if is_first_line:
+            lines.append('%s' % bullet)
         lines.append('')
         return '\n'.join(lines)
 
