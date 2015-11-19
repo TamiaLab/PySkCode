@@ -12,6 +12,7 @@ from skcode.tags import (BoldTextTagOptions,
                          SubscriptTextTagOptions,
                          SupscriptTextTagOptions,
                          PreTextTagOptions,
+                         CiteTextTagOptions,
                          InlineCodeTextTagOptions,
                          InlineSpoilerTextTagOptions,
                          KeyboardTextTagOptions,
@@ -348,6 +349,51 @@ class PreTextTagTestCase(unittest.TestCase):
         tree_node = TreeNode(None, 'pre', opts)
         rendered_output = opts.render_skcode(tree_node, 'ASAP')
         expected_output = '[pre]ASAP[/pre]'
+        self.assertEqual(expected_output, rendered_output)
+
+
+class CiteTextTagTestCase(unittest.TestCase):
+    """ Tests suite for the cite text tag module. """
+
+    def test_tag_and_aliases_in_default_recognized_tags_dict(self):
+        """ Test the presence of the tag and aliases in the dictionary of default recognized tags. """
+        self.assertIn('cite', DEFAULT_RECOGNIZED_TAGS)
+        self.assertIsInstance(DEFAULT_RECOGNIZED_TAGS['cite'], CiteTextTagOptions)
+
+    def test_tag_constant_values(self):
+        """ Test tag constants. """
+        opts = CiteTextTagOptions()
+        self.assertFalse(opts.newline_closes)
+        self.assertFalse(opts.same_tag_closes)
+        self.assertFalse(opts.standalone)
+        self.assertTrue(opts.parse_embedded)
+        self.assertFalse(opts.swallow_trailing_newline)
+        self.assertTrue(opts.inline)
+        self.assertFalse(opts.close_inlines)
+        self.assertFalse(opts.make_paragraphs_here)
+
+    def test_html_rendering(self):
+        """ Test HTML rendering. """
+        opts = CiteTextTagOptions()
+        tree_node = TreeNode(None, 'cite', opts)
+        rendered_output = opts.render_html(tree_node, 'ASAP')
+        expected_output = '<cite>ASAP</cite>'
+        self.assertEqual(expected_output, rendered_output)
+
+    def test_text_rendering(self):
+        """ Test text rendering. """
+        opts = CiteTextTagOptions()
+        tree_node = TreeNode(None, 'cite', opts)
+        rendered_output = opts.render_text(tree_node, 'ASAP')
+        expected_output = 'ASAP'
+        self.assertEqual(expected_output, rendered_output)
+
+    def test_skcode_rendering(self):
+        """ Test SkCode rendering. """
+        opts = CiteTextTagOptions()
+        tree_node = TreeNode(None, 'cite', opts)
+        rendered_output = opts.render_skcode(tree_node, 'ASAP')
+        expected_output = '[cite]ASAP[/cite]'
         self.assertEqual(expected_output, rendered_output)
 
 

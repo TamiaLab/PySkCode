@@ -33,6 +33,7 @@ from .textformating import (BoldTextTagOptions,
                             SubscriptTextTagOptions,
                             SupscriptTextTagOptions,
                             PreTextTagOptions,
+                            CiteTextTagOptions,
                             InlineCodeTextTagOptions,
                             InlineSpoilerTextTagOptions,
                             KeyboardTextTagOptions,
@@ -140,7 +141,7 @@ DEFAULT_RECOGNIZED_TAGS = {
     'small': SmallTextTagOptions(),
     
     # imath  # TODO
-    # cite  # TODO
+    'cite': CiteTextTagOptions(),
 
     # --- Text alignment
     'center': CenterTextTagOptions(),

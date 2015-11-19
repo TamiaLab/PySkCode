@@ -57,6 +57,12 @@ class PreTextTagOptions(InlineWrappingTagOptions):
     def __init__(self, **kwargs):
         super(PreTextTagOptions, self).__init__('<pre>%s</pre>', **kwargs)
 
+class CiteTextTagOptions(InlineWrappingTagOptions):
+    """ Cite text tag options container class. """
+
+    def __init__(self, **kwargs):
+        super(CiteTextTagOptions, self).__init__('<cite>%s</cite>', **kwargs)
+
 
 class InlineCodeTextTagOptions(TagOptions):
     """ Inline code text tag options container class. """
