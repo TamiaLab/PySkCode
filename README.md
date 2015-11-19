@@ -1,7 +1,7 @@
 # SkCode - BBcode parser implementation for Python 3.4
 ## By Fabien Batteix (alias Skywodd)
 
-**Current project stage: experimental, not for production yet.** 
+**Current project stage: in active development, not for stable/production yet.** 
 
 ### Overview
 
@@ -70,9 +70,9 @@ Tag name: ``acronym`` (alias: ``abbr``)
 
 Supported attribute: ``title`` (alias: tag name)
 
-Syntax: ``Do this [acronym title="As Soon As Possible"]ASAP[/acronym]``
+Syntax: ``Do this [acronym title="As Soon As Possible"]ASAP[/acronym].``
 
-Shortcut syntax: ``Do this [acronym="As Soon As Possible"]ASAP[/acronym]``
+Shortcut syntax: ``Do this [acronym="As Soon As Possible"]ASAP[/acronym].``
 
 #### Alert box
  
@@ -97,11 +97,13 @@ Supported types can also be used as shortcut syntax.
 
 Example: ``[error title="Shit happen"]We're doomed![/error]``
 
+Default HTML require the ``panel`` CSS module from bootstrap and some font awesome icon.
+
 #### Code block
 
 Tag name: ``code`` (with multiple aliases, see below)
 
-Supported attributes: ``language`` (alias: tag name), ``hl_lines``, ``linenostart``, ``filename``, ``src``
+Supported attributes: ``language`` (alias: tag name), ``hl_lines``, ``linenostart``, ``filename``, ``src``, ``id``
 
 Syntax: ``[code language="python"]# Python code here[/code]``
 
@@ -112,6 +114,7 @@ Attributes usage (all optional):
 - ``linenostart``: First line numer.
 - ``filename``: Source file name.
 - ``src``: Source file link URL.
+- ``id``: enable HTML anchors on lines (format ``id-linenum`` and on the whole code block.
 
 Shortcuts for commonly used programming languages:
 - ``python``
@@ -148,11 +151,26 @@ Syntax: ``Pull the [not]RESET[/not] pin to low to reset.``
 
 #### Figure
 
-TODO
+Tag name: ``figure`` (figure itself), ``figcaption`` (legend)
+
+Supported attribute: ``id`` (alias: tag name) for ``figure``.
+
+Syntax: ``[figure]Example figure[/figure]``
+Syntax: ``[figure]Example figure[figcaption]With a legend[/figcaption][/figure]``
+
+Syntax: ``[figure id="example-figure"]Example figure[/figure]``
+Shortcut syntax: ``[figure="example-figure"]Example figure[/figure]``
 
 #### Footnote
 
-TODO
+Tag name: ``footnote`` (alias: ``fn``), ``fnref`` (reference to a footnote)
+
+Supported attribute: ``id`` (alias: tag name) for ``footnote``.
+
+Syntax: ``This is a footnote[footnote id="first-footnote"]A this is the text of the footnote.[/footnote].``
+Syntax: ``This is a reference to another footnote[fnref]first-footnote[/fnref].``
+
+If the ID is not specified, an incremental counter (per document) is used.
 
 #### Verbatim, aka "no parse"
 
@@ -446,6 +464,14 @@ Supported attribute: none.
 
 Syntax: ``[pre]Monospaced text[/pre]``
 
+##### Inline citation
+  
+Tag name: ``cite``
+
+Supported attribute: none.
+
+Syntax: ``The film [cite]Matrix[/cite] was really good.``
+
 ##### Inline code block
 
 Tag name: ``icode``
@@ -453,6 +479,8 @@ Tag name: ``icode``
 Supported attribute: none.
 
 Syntax: ``[icode]some_code[/icode]``
+
+This tag, like the code blocks tag, is a "no parse" tag. Inner tags will **not** be processed, but displayed as-is instead.
 
 ##### Inline spoiler
 
@@ -526,6 +554,8 @@ Syntax:
 [task]Be super rich.[/task]
 [/todolist]
 ```
+
+Tag name can also be used to mark the task as "done" : ``[task="done"]Implement TODO list tag.[/task]``
 
 #### Horizontal line
 
