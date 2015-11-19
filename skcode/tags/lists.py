@@ -2,8 +2,6 @@
 SkCode list tag definitions code.
 """
 
-from string import ascii_lowercase, ascii_uppercase
-
 from .base import TagOptions
 
 
@@ -108,21 +106,21 @@ class ListTagOptions(TagOptions):
         """
 
         # Get the list type
-        user_list_type = tree_node.attrs.get(tree_node.name, None)
-        if user_list_type is None:
-            user_list_type = tree_node.attrs.get(self.list_type_attr_name, self.default_list_type)
+        list_type = tree_node.attrs.get(tree_node.name, '')
+        if not list_type:
+            list_type = tree_node.attrs.get(self.list_type_attr_name, self.default_list_type)
 
         # Check for alias, then normalize
-        if user_list_type in LIST_TYPE_ALIAS:
-            user_list_type = LIST_TYPE_ALIAS[user_list_type]
-        user_list_type = user_list_type.lower()
+        if list_type in LIST_TYPE_ALIAS:
+            list_type = LIST_TYPE_ALIAS[list_type]
+        list_type = list_type.lower()
 
         # Whitelist list type
-        if user_list_type not in self.allowed_list_types:
-            user_list_type = self.default_list_type
+        if list_type not in self.allowed_list_types:
+            list_type = self.default_list_type
 
         # Return the type
-        return user_list_type
+        return list_type
 
     def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
         """
