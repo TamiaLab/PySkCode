@@ -26,6 +26,8 @@ from .alerts import (AlertBoxTagOptions,
                      ALERT_TYPE_SUCCESS,
                      ALERT_TYPE_NOTE,
                      ALERT_TYPE_QUESTION)
+from .figures import (FigureDeclarationTagOptions,
+                      FigureCaptionTagOptions)
 from .footnotes import (FootnoteDeclarationTagOptions,
                         FootnoteReferenceTagOptions)
 from .textformating import (BoldTextTagOptions,
@@ -177,8 +179,8 @@ DEFAULT_RECOGNIZED_TAGS = {
     'spoiler': SpoilerTagOptions(),
 
     # --- Figure and caption
-    # 'figure': FigureDeclarationTagOptions(),  # TODO text version
-    # 'figcaption': FigureCaptionTagOptions(),  # TODO
+    'figure': FigureDeclarationTagOptions(),
+    'figcaption': FigureCaptionTagOptions(),
 
     # --- Lists
     'list': ListTagOptions(),  # TODO better text version
