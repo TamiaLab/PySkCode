@@ -47,6 +47,9 @@ class TodoTaskTagOptions(TagOptions):
     # "Is done" attribute name (standalone attribute)
     is_done_attr_name = 'done'
 
+    # "Is done" value (tag name value)
+    is_done_tagname_value = 'done'
+
     # HTML class for "task done"
     task_done_html_class = 'task_done'
 
@@ -56,10 +59,18 @@ class TodoTaskTagOptions(TagOptions):
     def get_is_done_task_flag(self, tree_node):
         """
         Get the "is done" task flag.
+        The flag can be set by set the is_done_attr_name attribute or by setting the
+        tag name value to is_done_tagname_value.
+        The lookup order is: is_done_attr_name attribute (first), tag name value, False.
         :param tree_node: The current tree node instance.
         :return A boolean True if the task is done, False is the task is not.
         """
-        return self.is_done_attr_name in tree_node.attrs
+        if self.is_done_attr_name in tree_node.attrs:
+            return True
+        elif tree_node.attrs.get(tree_node.name, '') == self.is_done_tagname_value:
+            return True
+        else:
+            return False
 
     def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
         """
@@ -83,7 +94,7 @@ class TodoTaskTagOptions(TagOptions):
         task_is_done = self.get_is_done_task_flag(tree_node)
         lines = []
         is_first_line = True
-        for line in inner_text.splitlines():
+        for line in inner_text.strip().splitlines():
             if is_first_line:
                 is_first_line = False
                 lines.append('[%s] %s' % ('x' if task_is_done else ' ', line))
