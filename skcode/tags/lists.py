@@ -34,6 +34,49 @@ HTML_LIST_TYPE_LUT = {
     LOWER_ROMAN_LIST_TYPE: 'i',
 }
 
+ROMAN_NUMERALS = (
+    ('M', 1000),
+    ('CM', 900),
+    ('D', 500),
+    ('CD',400),
+    ('C', 100),
+    ('XC', 90),
+    ('L', 50),
+    ('XL', 40),
+    ('X', 10),
+    ('IX', 9),
+    ('V', 5),
+    ('IV', 4),
+    ('I', 1),
+)
+
+
+def int_to_roman_numerals(value):
+    assert value >= 0, "Value can only be positive."
+    if not value:
+        return ''
+    numerals = []
+    for numeral, ivalue in ROMAN_NUMERALS:
+        while ivalue <= value:
+            value -= ivalue
+            numerals.append(numeral)
+    return ''.join(numerals)
+
+
+ALPHABET_NUMERALS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+
+def int_to_alphabet_numerals(value):
+    assert value >= 0, "Value can only be positive."
+    if not value:
+        return ''
+    numerals = []
+    while value:
+        value -= 1
+        value, i = divmod(value, 26)
+        numerals.append(ALPHABET_NUMERALS[i])
+    return ''.join(reversed(numerals))
+
 
 class ListTagOptions(TagOptions):
     """ List tag options container class. """
@@ -211,13 +254,13 @@ class ListElementTagOptions(TagOptions):
         elif parent_list_type == NUMERIC_LIST_TYPE:
             return '%d.' % element_num
         elif parent_list_type == UPPERCASE_LIST_TYPE:
-            return '%d.' % element_num  # TODO
+            return '%s.' % int_to_alphabet_numerals(element_num)
         elif parent_list_type == LOWERCASE_LIST_TYPE:
-            return '%d.' % element_num  # TODO
+            return '%s.' % int_to_alphabet_numerals(element_num).lower()
         elif parent_list_type == UPPER_ROMAN_LIST_TYPE:
-            return '%d.' % element_num  # TODO
+            return '%s.' % int_to_roman_numerals(element_num)
         elif parent_list_type == LOWER_ROMAN_LIST_TYPE:
-            return '%d.' % element_num  # TODO
+            return '%s.' % int_to_roman_numerals(element_num).lower()
 
     def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
         """
