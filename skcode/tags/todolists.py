@@ -25,7 +25,7 @@ class TodoListTagOptions(TagOptions):
         :param inner_text: Inner text of this tree node.
         :return Rendered text of this node.
         """
-        return '-- TODO LIST --\n%s' % inner_text
+        return '-- TODO LIST --\n%s\n' % inner_text
 
     def render_skcode(self, tree_node, inner_skcode):
         """
