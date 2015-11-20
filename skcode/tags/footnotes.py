@@ -10,7 +10,10 @@ from ..tools import (escape_attrvalue,
 
 
 # Footnote ID format for HTML rendering
-FOOTNOTE_ID_HTML_FORMAT = 'footnotes-%s'
+FOOTNOTE_ID_HTML_FORMAT = 'footnote-%s'
+
+# Footnote ID format for HTML rendering (back ref to declaration)
+FOOTNOTE_ID_HTML_FORMAT_BACKREF = 'footnote-ref-%s'
 
 
 class FootnoteDeclarationTagOptions(TagOptions):
@@ -80,7 +83,10 @@ class FootnoteDeclarationTagOptions(TagOptions):
         footnote_id = self.get_footnote_id(tree_node)
 
         # Render the footnote
-        return '<a id="%s"><sup>[%s]</sup></a>' % (escape_html(FOOTNOTE_ID_HTML_FORMAT % footnote_id), footnote_id)
+        return '<a id="%s" href="#%s"><sup>[%s]</sup></a>' % (
+            escape_html(FOOTNOTE_ID_HTML_FORMAT_BACKREF % footnote_id),
+            escape_html(FOOTNOTE_ID_HTML_FORMAT % footnote_id),
+            footnote_id)
 
     def render_text(self, tree_node, inner_text):
         """
@@ -147,7 +153,8 @@ class FootnoteReferenceTagOptions(TagOptions):
 
         # Render the footnote
         if footnote_id:
-            return '<a id="%s"><sup>[%s]</sup></a>' % (escape_html(FOOTNOTE_ID_HTML_FORMAT % footnote_id), footnote_id)
+            return '<a href="#%s"><sup>[%s]</sup></a>' % (escape_html(FOOTNOTE_ID_HTML_FORMAT % footnote_id),
+                                                          footnote_id)
         else:
             return ''
 
