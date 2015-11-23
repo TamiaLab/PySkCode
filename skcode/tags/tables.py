@@ -143,14 +143,14 @@ class TableCellOptions(TagOptions):
 
         # Get the column span
         colspan = self.get_cell_colspan(tree_node)
-        if colspan:
+        if colspan != 1:
             extra_attrs = ' colspan="%d"' % colspan
         else:
             extra_attrs = ''
 
         # Get the row span
         rowspan = self.get_cell_rowspan(tree_node)
-        if rowspan:
+        if rowspan != 1:
             extra_attrs += ' rowspan="%d"' % rowspan
 
         # Return the string
@@ -165,14 +165,14 @@ class TableCellOptions(TagOptions):
 
         # Get the column span
         colspan = self.get_cell_colspan(tree_node)
-        if colspan:
+        if colspan != 1:
             extra_attrs = ' %s="%d"' % (self.colspan_attr_name, colspan)
         else:
             extra_attrs = ''
 
         # Get the row span
         rowspan = self.get_cell_rowspan(tree_node)
-        if rowspan:
+        if rowspan != 1:
             extra_attrs += ' %s="%d"' % (self.rowspan_attr_name, rowspan)
 
         # Return the string
