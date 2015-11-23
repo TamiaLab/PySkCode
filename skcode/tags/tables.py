@@ -88,20 +88,23 @@ class TableCellOptions(TagOptions):
         """
         Return the column span value of this cell.
         :param tree_node: The current tree node instance.
-        :return The column span value of this cell, or None.
+        :return The column span value of this cell, or 1.
         """
 
         # Get the raw string value
-        user_colspan = tree_node.attrs.get(self.colspan_attr_name, None)
+        user_colspan = tree_node.attrs.get(self.colspan_attr_name, '')
+
+        # Shortcut if no value
+        if not user_colspan:
+            return 1
 
         # If set, turn the string into an int
-        if user_colspan is not None:
-            try:
-                user_colspan = int(user_colspan)
-                if user_colspan <= 1:
-                    user_colspan = None
-            except ValueError:
-                user_colspan = None
+        try:
+            user_colspan = int(user_colspan)
+            if user_colspan < 1:
+                user_colspan = 1
+        except ValueError:
+            user_colspan = 1
 
         # Return the result
         return user_colspan
@@ -110,20 +113,23 @@ class TableCellOptions(TagOptions):
         """
         Return the row span value of this cell.
         :param tree_node: The current tree node instance.
-        :return The row span value of this cell, or None.
+        :return The row span value of this cell, or 1.
         """
 
         # Get the raw string value
-        user_rowspan = tree_node.attrs.get(self.rowspan_attr_name, None)
+        user_rowspan = tree_node.attrs.get(self.rowspan_attr_name, '')
+
+        # Shortcut if no value
+        if not user_rowspan:
+            return 1
 
         # If set, turn the string into an int
-        if user_rowspan is not None:
-            try:
-                user_rowspan = int(user_rowspan)
-                if user_rowspan <= 0:
-                    user_rowspan = None
-            except ValueError:
-                user_rowspan = None
+        try:
+            user_rowspan = int(user_rowspan)
+            if user_rowspan < 1:
+                user_rowspan = 1
+        except ValueError:
+            user_rowspan = 1
 
         # Return the result
         return user_rowspan
