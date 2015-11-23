@@ -68,7 +68,7 @@ from .definitions import (DefinitionListTagOptions,
 from .tables import (TableTagOptions,
                      TableRowTagOptions,
                      TableHeaderCellTagOptions,
-                     TableCellOptions)
+                     TableCellTagOptions)
 from .webspecials import (HorizontalLineTagOptions,
                           LineBreakTagOptions)
 from .quotes import QuoteTagOptions
@@ -201,7 +201,7 @@ DEFAULT_RECOGNIZED_TAGS = {
     'table': TableTagOptions(),  # TODO text version
     'tr': TableRowTagOptions(),
     'th': TableHeaderCellTagOptions(),
-    'td': TableCellOptions(),
+    'td': TableCellTagOptions(),
 
     # --- Web special
     'hr': HorizontalLineTagOptions(),

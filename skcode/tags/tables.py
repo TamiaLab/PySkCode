@@ -73,7 +73,7 @@ class TableRowTagOptions(TagOptions):
         return '[%s]%s[/%s]' % (node_name, inner_skcode, node_name)
 
 
-class TableCellOptions(TagOptions):
+class TableCellTagOptions(TagOptions):
     """ Table tag options container class. """
 
     make_paragraphs_here = True
@@ -211,7 +211,7 @@ class TableCellOptions(TagOptions):
         return '[%s%s]%s[/%s]' % (node_name, extra_attrs, inner_skcode, node_name)
 
 
-class TableHeaderCellTagOptions(TableCellOptions):
+class TableHeaderCellTagOptions(TableCellTagOptions):
     """ Table tag options container class. """
 
     def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
