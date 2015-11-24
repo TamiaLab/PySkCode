@@ -24,7 +24,7 @@ setup(
     version=skcode.__version__,
     author='Fabien Batteix',
     author_email='fabien.batteix@tamialab.fr',
-    packages=['skcode', ],
+    packages=['skcode', 'skcode.tags', 'skcode.utility'],
     include_package_data=True,
     license='GPLv3',
     description='SkCode - BBcode parser implementation for Python 3.4',
