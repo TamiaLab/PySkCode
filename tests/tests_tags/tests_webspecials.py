@@ -63,8 +63,8 @@ class LineBreakTagTestCase(unittest.TestCase):
         self.assertTrue(opts.standalone)
         self.assertTrue(opts.parse_embedded)
         self.assertFalse(opts.swallow_trailing_newline)
-        self.assertFalse(opts.inline)
-        self.assertTrue(opts.close_inlines)
+        self.assertTrue(opts.inline)
+        self.assertFalse(opts.close_inlines)
         self.assertFalse(opts.make_paragraphs_here)
 
     def test_render_html(self):

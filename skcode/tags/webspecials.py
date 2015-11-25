@@ -44,6 +44,8 @@ class LineBreakTagOptions(TagOptions):
     """ Line break tag options container class. """
 
     standalone = True
+    inline = True
+    close_inlines = False
 
     def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
         """

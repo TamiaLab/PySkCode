@@ -126,7 +126,7 @@ class NewlineTagOptions(TagOptions):
         :param inner_html: Inner HTML of this tree node.
         :return Rendered HTML of this node.
         """
-        return '\n'
+        return ''
 
     def render_text(self, tree_node, inner_text):
         """
@@ -136,7 +136,7 @@ class NewlineTagOptions(TagOptions):
         :param inner_text: Inner text of this tree node.
         :return Rendered text of this node.
         """
-        return '\n'
+        return ' '
 
     def render_skcode(self, tree_node, inner_skcode):
         """
@@ -160,3 +160,22 @@ class HardNewlineTagOptions(NewlineTagOptions):
         :return Rendered HTML of this node.
         """
         return '<br>\n'
+
+    def render_text(self, tree_node, inner_text):
+        """
+        Callback function for rendering text. Return an ASCII newline.
+        Not safe at all if used for HTML display! Use "render_html" for that.
+        :param tree_node: Current tree node to be rendered.
+        :param inner_text: Inner text of this tree node.
+        :return Rendered text of this node.
+        """
+        return '\n'
+
+    def render_skcode(self, tree_node, inner_skcode):
+        """
+        Callback function for rendering SkCode. Return an ASCII newline.
+        :param tree_node: Current tree node to be rendered.
+        :param inner_skcode: Inner SkCode of this tree node.
+        :return Rendered SkCode of this node.
+        """
+        return '\n'
