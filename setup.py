@@ -8,7 +8,7 @@ Setup file for the SkCode project.
 import os
 from setuptools import setup
 
-import skcode
+from skcode import __version__ as skcode_version
 
 
 # Dump readme content as text
@@ -21,7 +21,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 # Setup config
 setup(
     name='skcode',
-    version=skcode.__version__,
+    version=skcode_version,
     author='Fabien Batteix',
     author_email='fabien.batteix@tamialab.fr',
     packages=['skcode', 'skcode.tags', 'skcode.utility'],
