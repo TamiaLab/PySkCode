@@ -29,7 +29,8 @@ def parse_skcode(text,
                  newline_node_opts=NewlineTagOptions(),
                  drop_unrecognized=False,
                  texturize_unclosed_tags=False,
-                 drop_erroneous=False):
+                 drop_erroneous=False,
+                 max_nesting_depth=16):
     """
     Parse the given text as a SkCode formatted document.
     Return the resulting document tree (DOM-like parser).
@@ -46,6 +47,7 @@ def parse_skcode(text,
     :param drop_unrecognized: If set to True, any unknown tag will be drop (default to False).
     :param texturize_unclosed_tags: If set, unclosed tag will be turn into erroneous text node.
     :param drop_erroneous: If set, erroneous nodes during sanitation will be drop instead of being unwrapped.
+    :param max_nesting_depth: Maximum nesting depth, set to zero to disable (default to 16).
     :return The resulting document tree at the end of the parsing stage.
     """
     assert len(opening_tag_ch) == 1, "Opening tag character must be one char long exactly."
@@ -66,6 +68,7 @@ def parse_skcode(text,
     # Init parser
     root_tree_node = tree_node = RootTreeNode(root_node_opts)
     swallow_next_newline = False
+    cur_nesting_depth = 0
 
     # Cleanup text to avoid parsing useless trailing whitespaces
     text = text.strip()
@@ -138,6 +141,16 @@ def parse_skcode(text,
             
         elif token_type == TOKEN_OPEN_TAG:
 
+            # Handle nesting depth limit
+            if cur_nesting_depth >= max_nesting_depth:
+
+                # Tag cannot be open, fallback as (erroneous) text
+                tree_node.new_child(TEXT_NODE_NAME, erroneous_text_node_opts,
+                                    content=token_source)
+
+                # End of processing for this tag
+                continue
+
             # Handle same_tag_closes option
             if tree_node.opts.same_tag_closes \
                and tag_name == tree_node.name \
@@ -162,6 +175,9 @@ def parse_skcode(text,
             # Jump to the new child node if not standalone
             if not tag_opts.standalone:
                 tree_node = new_node
+
+                # Update nesting depth limit
+                cur_nesting_depth += 1
         
         elif token_type == TOKEN_CLOSE_TAG:
 
@@ -180,6 +196,9 @@ def parse_skcode(text,
                 # Close the current tree node
                 tree_node.source_close_tag = token_source
                 tree_node = tree_node.parent
+
+                # Update nesting depth limit
+                cur_nesting_depth -= 1
         
         elif token_type == TOKEN_SELF_CLOSE_TAG:
 
