@@ -334,6 +334,21 @@ Supported attribute: none.
 
 Syntax: ``[spoiler]Harry Potter die at the end.[/spoiler]``
 
+Example of Javascript (use Jquery) for the hide/show button :
+
+```
+$(".spoiler").each(function(index) {
+	var t = $(this);
+	t.hide();
+	var l = $('<div><input type="button" value="Show spoiler"></div>');
+	l.insertBefore($(this));
+	l.click(function() {
+		t.show();
+		$(this).hide();
+	});
+});
+```
+
 #### Table
 
 Tag name: ``table``, ``tr``, ``th``, ``td``
@@ -489,6 +504,21 @@ Tag name: ``ispoiler``
 Supported attribute: none.
 
 Syntax: ``[ispoiler]I see you.[/ispoiler]``
+
+Example of Javascript (use Jquery) for the hide/show button :
+
+```
+$(".ispoiler").each(function(index) {
+	var t = $(this);
+	t.hide();
+	var l = $('<input type="button" value="Show spoiler">');
+	l.insertBefore($(this));
+	l.click(function() {
+		t.show();
+		$(this).hide();
+	});
+});
+```
 
 ##### Keyboard shortcut
 
