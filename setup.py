@@ -41,6 +41,6 @@ setup(
         'Topic :: Text Processing :: Markup',
         'Topic :: Text Processing :: Markup :: HTML',
     ],
-    install_requires=['pygments'],
-    tests_require=['nose', 'coverage'],
+    install_requires=['Pygments>=2.0.2'],
+    tests_require=['nose>=1.3.7', 'coverage>=4.0.3'],
 )
