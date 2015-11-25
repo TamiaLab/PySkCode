@@ -25,6 +25,7 @@ setup(
     author='Fabien Batteix',
     author_email='fabien.batteix@tamialab.fr',
     packages=['skcode', 'skcode.tags', 'skcode.utility'],
+    scripts=['skterm.py'],
     include_package_data=True,
     license='GPLv3',
     description='SkCode - BBcode parser implementation for Python 3.4',
