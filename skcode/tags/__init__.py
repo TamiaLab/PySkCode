@@ -209,6 +209,7 @@ DEFAULT_RECOGNIZED_TAGS = {
 
     # --- Quotes
     'quote': QuoteTagOptions(),
+    'blockquote': QuoteTagOptions(),
 
     # --- Footnotes
     'footnote': FootnoteDeclarationTagOptions(),
