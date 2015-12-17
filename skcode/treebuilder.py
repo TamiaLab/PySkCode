@@ -94,6 +94,7 @@ def parse_skcode(text,
                 continue
 
             # Ignore newline_closes option
+            swallow_next_newline = False
 
             # Wait for closing tag
             if token_type != TOKEN_CLOSE_TAG \
