@@ -17,6 +17,9 @@ from ..tools import (escape_attrvalue,
 class ImageTagOptions(TagOptions):
     """ Image tag options container class. """
 
+    inline = True
+    close_inlines = False
+
     # Alternate text attribute name
     alt_attr_name = 'alt'
 
