@@ -316,7 +316,7 @@ Syntax: ``[youtube]https://www.youtube.com/watch?v=dQw4w9WgXcQ[/youtube]``
 
 #### Quote
 
-Tag name: ``quote``
+Tag name: ``quote`` (alias: ``blockquote``)
 
 Supported attribute: ``author`` (alias: tag name), ``link``, ``date`` (unix timestamp).
 
