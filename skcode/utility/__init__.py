@@ -7,8 +7,12 @@ from .paragraphs import (PARAGRAPH_NODE_NAME,
                          ParagraphTagOptions,
                          make_paragraphs)
 
-# TODO replace cosmetic utility (maybe mixin for postrender callback instead?)
-# TODO replace smiley utility (maybe mixin for postrender callback instead?)
+# Cosmetics replacement utility
+from .cosmetics import setup_cosmetics_replacement
+
+# Smileys replacement utility
+from .smileys import setup_smileys_replacement
+
 # TODO replace links utility
 
 # Footnotes utilities

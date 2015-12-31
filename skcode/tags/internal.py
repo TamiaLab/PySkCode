@@ -4,6 +4,9 @@ SkCode internal tag definitions code.
 
 from .base import TagOptions
 
+from ..utility.smileys import do_smileys_replacement
+from ..utility.cosmetics import do_cosmetics_replacement
+
 from html import escape as escape_html
 from html import unescape as unescape_html_entities
 
@@ -48,9 +51,8 @@ class TextTagOptions(TagOptions):
     inline = True
     close_inlines = False
 
-    replace_smileys = True
-    replace_links = True
-    replace_cosmetic = True
+    inject_smileys_options = True
+    inject_cosmetic_options = True
 
     def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
         """
@@ -64,8 +66,18 @@ class TextTagOptions(TagOptions):
         content = tree_node.content
         content = unescape_html_entities(content)
         content = escape_html(content)
-        # FIXME Smileys and cosmetics here?
+        content = self.do_custom_html_processing(content)
         return content
+
+    def do_custom_html_processing(self, input_text):
+        """
+        Do some custom HTML processing for cosmetics and smiley replacement.
+        :param input_text: Input text.
+        :return: Input text with smileys and cosmetics replaced.
+        """
+        output_text = do_smileys_replacement(input_text, self)
+        output_text = do_cosmetics_replacement(output_text, self)
+        return output_text
 
     def render_text(self, tree_node, inner_text):
         """
@@ -77,8 +89,17 @@ class TextTagOptions(TagOptions):
         """
         content = tree_node.content
         content = unescape_html_entities(content)
-        # FIXME Cosmetics here?
+        content = self.do_custom_text_processing(content)
         return content
+
+    def do_custom_text_processing(self, input_text):
+        """
+        Do some custom text processing for cosmetics and smiley replacement.
+        :param input_text: Input text.
+        :return: Input text with smileys and cosmetics replaced.
+        """
+        output_text = do_cosmetics_replacement(input_text, self)
+        return output_text
 
     def render_skcode(self, tree_node, inner_skcode):
         """
@@ -95,10 +116,6 @@ class TextTagOptions(TagOptions):
 class ErroneousTextTagOptions(TextTagOptions):
     """ Erroneous text tag options container class. """
 
-    replace_smileys = False
-    replace_links = False
-    replace_cosmetic = False
-
     def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
         """
         Callback function for rendering HTML. Get the output of the standard TextTagOptions but wrap the output
@@ -110,6 +127,22 @@ class ErroneousTextTagOptions(TextTagOptions):
         """
         content = super(ErroneousTextTagOptions, self).render_html(tree_node, inner_html)
         return '<span style="font-weight: bold; color: red;">%s</span>' % content
+
+    def do_custom_html_processing(self, input_text):
+        """
+        Do nothing.
+        :param input_text: Input text.
+        :return: Input text.
+        """
+        return input_text
+
+    def do_custom_text_processing(self, input_text):
+        """
+        Do nothing.
+        :param input_text: Input text.
+        :return: Input text.
+        """
+        return input_text
 
 
 class NewlineTagOptions(TagOptions):
@@ -126,7 +159,7 @@ class NewlineTagOptions(TagOptions):
         :param inner_html: Inner HTML of this tree node.
         :return Rendered HTML of this node.
         """
-        return ''
+        return '\n'
 
     def render_text(self, tree_node, inner_text):
         """

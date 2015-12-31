@@ -41,14 +41,14 @@ class TagOptions(object):
 
     # ----- Utilities options
 
-    # Set to True if smiley should be replaced inside this tag.
-    # replace_smileys = False
+    # Set to True if this tag require options to replace smileys.
+    inject_smileys_options = False
     
     # Set to True if URLs should be replaced with link markup inside this tag.
     # replace_links = False
     
-    # Set to True if cosmetic replacements (elipses, dashes, etc.) should be performed inside this tag.
-    # replace_cosmetic = False
+    # Set to True if this tag require options to replace cosmetic replacements (elipses, dashes, etc.).
+    inject_cosmetic_options = False
 
     def __init__(self, **kwargs):
         """ Set options according to kwargs. """
