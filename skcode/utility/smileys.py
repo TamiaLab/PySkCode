@@ -240,7 +240,7 @@ def setup_smileys_replacement(document_tree, base_url, emoticons_map=DEFAULT_EMO
     """
 
     # Craft the emoticons regex
-    emoticons_regex = '(\s+)(?P<emoticon>%s)(\s+|$)' % '|'.join([re.escape(escape_html(e)) for e, _ in emoticons_map])
+    emoticons_regex = '(^|\s+)(?P<emoticon>%s)(\s+|$)' % '|'.join([re.escape(escape_html(e)) for e, _ in emoticons_map])
     emoticons_regex = re.compile(emoticons_regex)
 
     # Turn emoticons map into a dictionary
