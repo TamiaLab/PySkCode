@@ -115,7 +115,9 @@ DEFAULT_EMOTICONS_MAP = (
     ('*\\0/*', 'victory.png'),
     ('\\0/', 'victory.png'),
     ('*\\O/*', 'victory.png'),
+    ('*\\o/*', 'victory.png'),
     ('\\O/', 'victory.png'),
+    ('\\o/', 'victory.png'),
 
     ('O:-)', 'innocent.png'),
     ('0:-3', 'innocent.png'),
