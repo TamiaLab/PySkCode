@@ -129,11 +129,11 @@ class EmailLinkTagOptions(TagOptions):
             email_address = tree_node.get_raw_content()
         else:
             email_address = tree_node.attrs.get(tree_node.name, '')
-        # TODO remove mailto: scheme and (better) made a function sanitize_email_address()
         return sanitize_url(email_address,
                             default_scheme='mailto',
                             allowed_schemes=('mailto', ),
-                            force_remove_scheme=True)
+                            force_remove_scheme=True,
+                            fix_non_local_urls=False)
 
     def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
         """

@@ -227,7 +227,8 @@ class EmailLinksTagTestCase(unittest.TestCase):
         mock.assert_called_once_with('john.doe@example.com',
                                      default_scheme='mailto',
                                      allowed_schemes=('mailto', ),
-                                     force_remove_scheme=True)
+                                     force_remove_scheme=True,
+                                     fix_non_local_urls=False)
 
     def test_render_html(self):
         """ Test the ``render_html`` method. """
