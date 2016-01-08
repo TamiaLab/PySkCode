@@ -34,7 +34,7 @@ def escape_attrvalue(value):
 def sanitize_url(url, default_scheme='http',
                  allowed_schemes=('http', 'https', 'ftp', 'ftps', 'mailto'),
                  encode_html_entities=True, force_default_scheme=False,
-                 force_remove_scheme=False):
+                 force_remove_scheme=False, fix_non_local_urls=True):
     """
     Sanitize the given URL. Avoid XSS by filtering-out forbidden protocol.
     Allowed protocols by default are: http, https, ftp, ftps and mailto.
@@ -45,6 +45,7 @@ def sanitize_url(url, default_scheme='http',
     :param encode_html_entities: If set, the output URL is encoded to avoid raw HTML entities (default True).
     :param force_default_scheme: Set to True to force the default scheme to be used in all case (default False).
     :param force_remove_scheme: Set to True to remove the scheme if set (default False).
+    :param fix_non_local_urls: Set to True (default) to fix non local URL with netloc in path.
     :return: The sanitized URL as string.
     """
     assert default_scheme, "A default scheme is mandatory to avoid XSS."
@@ -71,8 +72,8 @@ def sanitize_url(url, default_scheme='http',
     if scheme and scheme not in allowed_schemes:
         return ''
 
-    # Detect and fix non local URL without // at begining (not supported by urlsplit)
-    if not netloc and path and not path.startswith('/'):
+    # Detect and fix non local URL without // at beginning (not supported by urlsplit)
+    if not netloc and path and not path.startswith('/') and fix_non_local_urls:
         parts = path.split('/', 1)
         if len(parts) == 2:
             netloc, path = parts
