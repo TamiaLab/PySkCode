@@ -16,7 +16,7 @@ class TableTagOptions(TagOptions):
         :param inner_html: Inner HTML of this tree node.
         :return Rendered HTML of this node.
         """
-        return '<table>%s</table>\n' % inner_html
+        return '<table class="table table-condensed table-striped">%s</table>\n' % inner_html
 
     def render_text(self, tree_node, inner_text):
         """

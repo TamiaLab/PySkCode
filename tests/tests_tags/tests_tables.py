@@ -37,7 +37,7 @@ class TablesTagtestCase(unittest.TestCase):
         opts = TableTagOptions()
         tree_node = TreeNode(None, 'table', opts)
         rendered_output = opts.render_html(tree_node, 'test')
-        expected_output = '<table>test</table>\n'
+        expected_output = '<table class="table table-condensed table-striped">test</table>\n'
         self.assertEqual(expected_output, rendered_output)
 
     def test_text_rendering(self):
