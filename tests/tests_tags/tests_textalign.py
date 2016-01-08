@@ -34,25 +34,25 @@ class TextAlignTagsTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertFalse(opts.inline)
         self.assertTrue(opts.close_inlines)
-        self.assertTrue(opts.make_paragraphs_here)
+        self.assertFalse(opts.make_paragraphs_here)
 
     def test_render_html_center(self):
         """ Test the ``render_html`` method. """
         opts = CenterTextTagOptions()
         tree_node = TreeNode(None, 'center', opts)
-        self.assertEqual('<div class="text-center">test</div>\n', opts.render_html(tree_node, 'test'))
+        self.assertEqual('<p class="text-center">test</p>\n', opts.render_html(tree_node, 'test'))
 
     def test_render_html_left(self):
         """ Test the ``render_html`` method. """
         opts = LeftTextTagOptions()
         tree_node = TreeNode(None, 'left', opts)
-        self.assertEqual('<div class="text-left">test</div>\n', opts.render_html(tree_node, 'test'))
+        self.assertEqual('<p class="text-left">test</p>\n', opts.render_html(tree_node, 'test'))
 
     def test_render_html_right(self):
         """ Test the ``render_html`` method. """
         opts = RightTextTagOptions()
         tree_node = TreeNode(None, 'right', opts)
-        self.assertEqual('<div class="text-right">test</div>\n', opts.render_html(tree_node, 'test'))
+        self.assertEqual('<p class="text-right">test</p>\n', opts.render_html(tree_node, 'test'))
 
     def test_render_text_center(self):
         """ Test the ``render_text`` method. """

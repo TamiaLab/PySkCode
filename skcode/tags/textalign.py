@@ -8,8 +8,6 @@ from .base import TagOptions
 class TextAlignBaseTagOptions(TagOptions):
     """ Base class for all text alignment tag class. """
 
-    make_paragraphs_here = True
-
     def __init__(self, text_alignment, **kwargs):
         """
         Text alignment tag constructor.
@@ -27,7 +25,7 @@ class TextAlignBaseTagOptions(TagOptions):
         :param inner_html: Inner HTML of this tree node.
         :return Rendered HTML of this node.
         """
-        return '<div class="text-%s">%s</div>\n' % (self.text_alignment, inner_html)
+        return '<p class="text-%s">%s</p>\n' % (self.text_alignment, inner_html)
 
     def render_text(self, tree_node, inner_text):
         """
