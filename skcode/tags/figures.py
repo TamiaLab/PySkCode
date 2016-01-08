@@ -57,7 +57,7 @@ class FigureDeclarationTagOptions(TagOptions):
 
         # Render the figure
         figure_attr = '' if not figure_id else ' id="%s"' % escape_html(figure_id)
-        return '<figure%s>%s</figure>\n' % (figure_attr, inner_html)
+        return '<figure class="thumbnail"%s>%s</figure>\n' % (figure_attr, inner_html)
 
     def render_text(self, tree_node, inner_text):
         """
@@ -123,7 +123,7 @@ class FigureCaptionTagOptions(TagOptions):
         :param inner_html: Inner HTML of this tree node.
         :return Rendered HTML of this node.
         """
-        return '<figcaption>%s</figcaption>\n' % inner_html
+        return '<figcaption class="caption">%s</figcaption>\n' % inner_html
 
     def render_text(self, tree_node, inner_text):
         """
