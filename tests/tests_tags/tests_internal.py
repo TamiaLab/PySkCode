@@ -166,7 +166,7 @@ class NewlineTagTestCase(unittest.TestCase):
     def test_render_html(self):
         """ Test the ``render_html`` method. """
         opts = NewlineTagOptions()
-        self.assertEqual('', opts.render_html(None, ''))
+        self.assertEqual('\n', opts.render_html(None, ''))
 
     def test_render_text(self):
         """ Test the ``render_text`` method. """
