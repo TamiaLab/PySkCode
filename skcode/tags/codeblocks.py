@@ -189,6 +189,9 @@ class CodeBlockTagOptions(TagOptions):
                                   anchorlinenos=anchorlinenos)
         source_code = highlight(tree_node.content, lexer, formatter)
 
+        # Wrap table in div for horizontal scrolling
+        source_code = '<div class="codetable">%s</div>' % source_code
+
         # Get extra filename and source link
         src_filename = self.get_filename(tree_node)
         src_link_url = self.get_source_link_url(tree_node)

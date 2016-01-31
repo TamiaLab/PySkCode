@@ -223,9 +223,9 @@ class CodeBlocksTagtestCase(unittest.TestCase):
         opts = CodeBlockTagOptions()
         tree_node = TreeNode(None, 'code', opts, attrs={'code': 'python'}, content='# Hello World!')
         output_result = opts.render_html(tree_node, '')
-        expected_result = """<table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">1</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="color: #408080; font-style: italic"># Hello World!</span>
+        expected_result = """<div class="codetable"><table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">1</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="color: #408080; font-style: italic"># Hello World!</span>
 </pre></div>
-</td></tr></table>
+</td></tr></table></div>
 """
         self.assertEqual(expected_result, output_result)
 
@@ -234,9 +234,9 @@ class CodeBlocksTagtestCase(unittest.TestCase):
         opts = CodeBlockTagOptions()
         tree_node = TreeNode(None, 'code', opts, attrs={'code': 'somethingnotexisting'}, content='# Hello World!')
         output_result = opts.render_html(tree_node, '')
-        expected_result = """<table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">1</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"># Hello World!
+        expected_result = """<div class="codetable"><table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">1</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"># Hello World!
 </pre></div>
-</td></tr></table>
+</td></tr></table></div>
 """
         self.assertEqual(expected_result, output_result)
 
@@ -245,9 +245,9 @@ class CodeBlocksTagtestCase(unittest.TestCase):
         opts = CodeBlockTagOptions()
         tree_node = TreeNode(None, 'code', opts, attrs={}, content='# Hello World!')
         output_result = opts.render_html(tree_node, '')
-        expected_result = """<table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">1</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"># Hello World!
+        expected_result = """<div class="codetable"><table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">1</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"># Hello World!
 </pre></div>
-</td></tr></table>
+</td></tr></table></div>
 """
         self.assertEqual(expected_result, output_result)
 
@@ -257,9 +257,9 @@ class CodeBlocksTagtestCase(unittest.TestCase):
         tree_node = TreeNode(None, 'code', opts, attrs={'code': 'python', 'hl_lines': '1'},
                              content='# Hello World!')
         output_result = opts.render_html(tree_node, '')
-        expected_result = """<table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">1</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
+        expected_result = """<div class="codetable"><table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">1</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
 </span></pre></div>
-</td></tr></table>
+</td></tr></table></div>
 """
         self.assertEqual(expected_result, output_result)
 
@@ -270,9 +270,9 @@ class CodeBlocksTagtestCase(unittest.TestCase):
                                                         'linenostart': '5'},
                              content='# Hello World!')
         output_result = opts.render_html(tree_node, '')
-        expected_result = """<table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
+        expected_result = """<div class="codetable"><table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
 </span></pre></div>
-</td></tr></table>
+</td></tr></table></div>
 """
         self.assertEqual(expected_result, output_result)
 
@@ -284,9 +284,9 @@ class CodeBlocksTagtestCase(unittest.TestCase):
                              content='# Hello World!')
         output_result = opts.render_html(tree_node, '')
         expected_result = """<figure>
-<table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
+<div class="codetable"><table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
 </span></pre></div>
-</td></tr></table>
+</td></tr></table></div>
 <figcaption>Source : test.py</figcaption>
 </figure>"""
         self.assertEqual(expected_result, output_result)
@@ -300,9 +300,9 @@ class CodeBlocksTagtestCase(unittest.TestCase):
                              content='# Hello World!')
         output_result = opts.render_html(tree_node, '')
         expected_result = """<figure>
-<table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
+<div class="codetable"><table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
 </span></pre></div>
-</td></tr></table>
+</td></tr></table></div>
 <figcaption><a href="https://github.com/TamiaLab/PySkCode" rel="nofollow" target="_blank">Source : test.py <i class="fa fa-link"></i></a></figcaption>
 </figure>"""
         self.assertEqual(expected_result, output_result)
@@ -316,9 +316,9 @@ class CodeBlocksTagtestCase(unittest.TestCase):
                              content='# Hello World!')
         output_result = opts.render_html(tree_node, '')
         expected_result = """<figure>
-<table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
+<div class="codetable"><table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
 </span></pre></div>
-</td></tr></table>
+</td></tr></table></div>
 <figcaption><a href="https://github.com/TamiaLab/PySkCode" rel="nofollow" target="_blank">Source : https://github.com/TamiaLab/PySkCode <i class="fa fa-link"></i></a></figcaption>
 </figure>"""
         self.assertEqual(expected_result, output_result)
@@ -332,9 +332,9 @@ class CodeBlocksTagtestCase(unittest.TestCase):
                              content='# Hello World!')
         output_result = opts.render_html(tree_node, '', force_rel_nofollow=False)
         expected_result = """<figure>
-<table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
+<div class="codetable"><table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
 </span></pre></div>
-</td></tr></table>
+</td></tr></table></div>
 <figcaption><a href="https://github.com/TamiaLab/PySkCode" target="_blank">Source : test.py <i class="fa fa-link"></i></a></figcaption>
 </figure>"""
         self.assertEqual(expected_result, output_result)
@@ -349,9 +349,9 @@ class CodeBlocksTagtestCase(unittest.TestCase):
                              content='# Hello World!')
         output_result = opts.render_html(tree_node, '')
         expected_result = """<figure id="helloworld">
-<table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%"><a href="#helloworld-5">5</a></pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><a name="helloworld-5"></a><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
+<div class="codetable"><table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%"><a href="#helloworld-5">5</a></pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><a name="helloworld-5"></a><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
 </span></pre></div>
-</td></tr></table>
+</td></tr></table></div>
 <figcaption><a href="https://github.com/TamiaLab/PySkCode" rel="nofollow" target="_blank">Source : test.py <i class="fa fa-link"></i></a></figcaption>
 </figure>"""
         self.assertEqual(expected_result, output_result)
