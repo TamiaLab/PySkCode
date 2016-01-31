@@ -1,10 +1,10 @@
 """
-SkCode (Python implementation of BBcode syntax) parser library.
+PySkCode, Python implementation of a full-featured BBCode syntax parser library.
 """
 
 # Package information
 __author__ = "Fabien Batteix (@skywodd)"
-__copyright__ = "Copyright 2015, TamiaLab"
+__copyright__ = "Copyright 2016, TamiaLab"
 __credits__ = ["Fabien Batteix", "TamiaLab"]
 __license__ = "GPLv3"
 __version__ = "1.0.7"
