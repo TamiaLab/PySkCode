@@ -125,6 +125,16 @@ Shortcuts for commonly used programming languages:
 
 Example: ``[python]# Python code here[/python]``
 
+To add an horizontal scrollbar to all code blocks in HTML use :
+
+```
+.codetable {
+    width:100%;
+    height: auto;
+    overflow: auto;
+}
+```
+
 #### Definition list
 
 Tag name: ``dl`` (list), ``dt`` (term), ``dd`` (definition)
