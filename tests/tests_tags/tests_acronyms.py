@@ -4,8 +4,10 @@ SkCode acronyms tag test code.
 
 import unittest
 
-from skcode.etree import TreeNode
-from skcode.tags import (AcronymTagOptions,
+from skcode.etree import (RootTreeNode,
+                          TreeNode)
+from skcode.tags import (RootTagOptions,
+                         AcronymTagOptions,
                          DEFAULT_RECOGNIZED_TAGS)
 
 
@@ -13,7 +15,7 @@ class AcronymsTagTestCase(unittest.TestCase):
     """ Tests suite for the acronyms tag module. """
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
-        """ Test the presence of the tag and aliases in the dictionary of default recognized tags. """
+        """ Test the presence of the tag and aliases in the default dictionary of recognized tags. """
         self.assertIn('abbr', DEFAULT_RECOGNIZED_TAGS)
         self.assertIsInstance(DEFAULT_RECOGNIZED_TAGS['abbr'], AcronymTagOptions)
         self.assertIn('acronym', DEFAULT_RECOGNIZED_TAGS)
@@ -33,44 +35,50 @@ class AcronymsTagTestCase(unittest.TestCase):
         self.assertEqual(opts.acronym_title_attr_name, 'title')
 
     def test_get_acronym_title_with_tagname_set(self):
-        """ Test the ``get_acronym_title`` when the tag name attribute is set. """
+        """ Test the ``get_acronym_title`` method when the tag name attribute is set. """
         opts = AcronymTagOptions()
-        tree_node = TreeNode(None, 'acronym', opts, attrs={'acronym': 'test'})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('acronym', opts, attrs={'acronym': 'test'})
         title = opts.get_acronym_title(tree_node)
         self.assertEqual('test', title)
 
     def test_get_acronym_title_with_title_set(self):
-        """ Test the ``get_acronym_title`` when the "title" attribute is set. """
+        """ Test the ``get_acronym_title`` method when the "title" attribute is set. """
         opts = AcronymTagOptions()
-        tree_node = TreeNode(None, 'acronym', opts, attrs={'title': 'test'})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('acronym', opts, attrs={'title': 'test'})
         title = opts.get_acronym_title(tree_node)
         self.assertEqual('test', title)
 
     def test_get_acronym_title_with_title_and_tagname_set(self):
-        """ Test the ``get_acronym_title`` when the "title" and tag name attribute is set. """
+        """ Test the ``get_acronym_title`` method when the "title" and tag name attribute is set. """
         opts = AcronymTagOptions()
-        tree_node = TreeNode(None, 'acronym', opts, attrs={'acronym': 'test', 'title': 'test2'})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('acronym', opts, attrs={'acronym': 'test', 'title': 'test2'})
         title = opts.get_acronym_title(tree_node)
         self.assertEqual('test', title)
 
     def test_get_acronym_title_without_title_set(self):
-        """ Test the ``get_acronym_title`` when the title is not set at all. """
+        """ Test the ``get_acronym_title`` method when the title is not set at all. """
         opts = AcronymTagOptions()
-        tree_node = TreeNode(None, 'acronym', opts, attrs={})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('acronym', opts, attrs={})
         title = opts.get_acronym_title(tree_node)
         self.assertEqual('', title)
 
     def test_get_acronym_title_with_html_entities(self):
-        """ Test the ``get_acronym_title`` when the title contain HTML entities. """
+        """ Test the ``get_acronym_title`` method with a title containing HTML entities. """
         opts = AcronymTagOptions()
-        tree_node = TreeNode(None, 'acronym', opts, attrs={'title': '&lt;test&gt;'})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('acronym', opts, attrs={'title': '&lt;test&gt;'})
         title = opts.get_acronym_title(tree_node)
         self.assertEqual('<test>', title)
 
     def test_html_rendering(self):
         """ Test HTML rendering. """
         opts = AcronymTagOptions()
-        tree_node = TreeNode(None, 'acronym', opts, attrs={'title': 'As Soon As Possible'})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('acronym', opts, attrs={'title': 'As Soon As Possible'})
         rendered_output = opts.render_html(tree_node, 'ASAP')
         expected_output = '<abbr title="As Soon As Possible">ASAP</abbr>'
         self.assertEqual(expected_output, rendered_output)
@@ -78,7 +86,8 @@ class AcronymsTagTestCase(unittest.TestCase):
     def test_html_rendering_without_title(self):
         """ Test HTML rendering without title. """
         opts = AcronymTagOptions()
-        tree_node = TreeNode(None, 'acronym', opts, attrs={})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('acronym', opts, attrs={})
         rendered_output = opts.render_html(tree_node, 'ASAP')
         expected_output = 'ASAP'
         self.assertEqual(expected_output, rendered_output)
@@ -86,7 +95,8 @@ class AcronymsTagTestCase(unittest.TestCase):
     def test_html_rendering_with_html_entities_in_title(self):
         """ Test HTML rendering with HTML entities in title. """
         opts = AcronymTagOptions()
-        tree_node = TreeNode(None, 'acronym', opts, attrs={'title': '<As Soon As Possible>'})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('acronym', opts, attrs={'title': '<As Soon As Possible>'})
         rendered_output = opts.render_html(tree_node, 'ASAP')
         expected_output = '<abbr title="&lt;As Soon As Possible&gt;">ASAP</abbr>'
         self.assertEqual(expected_output, rendered_output)
@@ -94,7 +104,8 @@ class AcronymsTagTestCase(unittest.TestCase):
     def test_text_rendering(self):
         """ Test text rendering. """
         opts = AcronymTagOptions()
-        tree_node = TreeNode(None, 'acronym', opts, attrs={'title': 'As Soon As Possible'})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('acronym', opts, attrs={'title': 'As Soon As Possible'})
         rendered_output = opts.render_text(tree_node, 'ASAP')
         expected_output = 'ASAP (As Soon As Possible)'
         self.assertEqual(expected_output, rendered_output)
@@ -102,7 +113,8 @@ class AcronymsTagTestCase(unittest.TestCase):
     def test_text_rendering_without_title(self):
         """ Test text rendering without title. """
         opts = AcronymTagOptions()
-        tree_node = TreeNode(None, 'acronym', opts, attrs={})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('acronym', opts, attrs={})
         rendered_output = opts.render_text(tree_node, 'ASAP')
         expected_output = 'ASAP'
         self.assertEqual(expected_output, rendered_output)
@@ -110,39 +122,16 @@ class AcronymsTagTestCase(unittest.TestCase):
     def test_text_rendering_with_html_entities_in_title(self):
         """ Test text rendering with HTML entities in title. """
         opts = AcronymTagOptions()
-        tree_node = TreeNode(None, 'acronym', opts, attrs={'title': '<As Soon As Possible>'})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('acronym', opts, attrs={'title': '<As Soon As Possible>'})
         rendered_output = opts.render_text(tree_node, 'ASAP')
         expected_output = 'ASAP (<As Soon As Possible>)'
         self.assertEqual(expected_output, rendered_output)
 
-    def test_skcode_rendering(self):
-        """ Test SkCode rendering. """
+    def test_get_skcode_attributes(self):
+        """ Test the ``get_skcode_attributes`` used for SkCode rendering. """
         opts = AcronymTagOptions()
-        tree_node = TreeNode(None, 'acronym', opts, attrs={'title': 'As Soon As Possible'})
-        rendered_output = opts.render_skcode(tree_node, 'ASAP')
-        expected_output = '[acronym title="As Soon As Possible"]ASAP[/acronym]'
-        self.assertEqual(expected_output, rendered_output)
-
-    def test_skcode_rendering_alias(self):
-        """ Test SkCode rendering using alias. """
-        opts = AcronymTagOptions()
-        tree_node = TreeNode(None, 'abbr', opts, attrs={'title': 'As Soon As Possible'})
-        rendered_output = opts.render_skcode(tree_node, 'ASAP')
-        expected_output = '[abbr title="As Soon As Possible"]ASAP[/abbr]'
-        self.assertEqual(expected_output, rendered_output)
-
-    def test_skcode_rendering_without_title(self):
-        """ Test SkCode rendering without title. """
-        opts = AcronymTagOptions()
-        tree_node = TreeNode(None, 'acronym', opts, attrs={})
-        rendered_output = opts.render_skcode(tree_node, 'ASAP')
-        expected_output = '[acronym title=""]ASAP[/acronym]'
-        self.assertEqual(expected_output, rendered_output)
-
-    def test_skcode_rendering_with_html_entities_in_title(self):
-        """ Test SkCode rendering with HTML entities in title. """
-        opts = AcronymTagOptions()
-        tree_node = TreeNode(None, 'acronym', opts, attrs={'title': '<As Soon As Possible>'})
-        rendered_output = opts.render_skcode(tree_node, 'ASAP')
-        expected_output = '[acronym title="<As Soon As Possible>"]ASAP[/acronym]'
-        self.assertEqual(expected_output, rendered_output)
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('acronym', opts, attrs={'title': 'As Soon As Possible'})
+        expected_result = ({'title': 'As Soon As Possible'}, 'title')
+        self.assertEqual(expected_result, opts.get_skcode_attributes(tree_node, 'ASAP'))
