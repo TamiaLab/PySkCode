@@ -170,7 +170,7 @@ class RootTreeNode(TreeNode):
         :param attrs: The root node attributes dictionary (default to an empty dictionary).
         :param children: The root node children list (default to an empty list).
         """
-        super(RootTreeNode, self).__init__(None, ROOT_NODE_NAME, opts, attrs, children=children)
+        super(RootTreeNode, self).__init__(self, None, ROOT_NODE_NAME, opts, attrs, children=children)
 
     def unwrap_as_erroneous(self, erroneous_text_node_opts):
         """
