@@ -2,11 +2,8 @@
 SkCode links tag definitions code.
 """
 
-from html import escape as escape_html
-
 from .base import TagOptions
-from ..tools import (escape_attrvalue,
-                     sanitize_url,
+from ..tools import (sanitize_url,
                      slugify)
 
 
@@ -18,9 +15,9 @@ class UrlLinkTagOptions(TagOptions):
 
     def is_url_inside_tag_content(self, tree_node):
         """
-        Return True if the target URL is in the tag content (not in attributes).
+        Return ``True`` if the target URL is in the tag content (not in attributes).
         :param tree_node: The current tree node instance.
-        :return True if the target URL is in the tag content, not in attributes.
+        :return ``True`` if the target URL is in the tag content, not in attributes.
         """
         return tree_node.name not in tree_node.attrs
 
@@ -34,41 +31,40 @@ class UrlLinkTagOptions(TagOptions):
             target_url = tree_node.get_raw_content().strip()
         else:
             target_url = tree_node.attrs.get(tree_node.name, '')
+        # TODO Add relative-absolute URL conversion
         return sanitize_url(target_url)
 
-    def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
+    def render_html(self, tree_node, inner_html, force_rel_nofollow=True, **kwargs):
         """
         Callback function for rendering HTML.
-        :param force_rel_nofollow: If set, all links in the rendered HTML will have "rel=nofollow" (default to True).
-        :param tree_node: Current tree node to be rendered.
-        :param inner_html: Inner HTML of this tree node.
-        :return Rendered HTML of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_html: The inner HTML of this tree node.
+        :param force_rel_nofollow: If set to ``True``, all links in the rendered HTML will have the atribute
+        "rel=nofollow" to avoid search engines to scrawl them (default ``True``).
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
         """
 
         # Handle force_rel_nofollow
-        if force_rel_nofollow:
-            extra_attrs = ' rel="nofollow"'
-        else:
-            extra_attrs = ''
+        extra_attrs = ' rel="nofollow"' if force_rel_nofollow else ''
 
         # Get the target URL
         target_url = self.get_target_link(tree_node)
 
         # Render the link
         if target_url:
-            if self.is_url_inside_tag_content(tree_node):
-                return '<a href="%s"%s>%s</a>' % (target_url, extra_attrs, target_url)
-            else:
-                return '<a href="%s"%s>%s</a>' % (target_url, extra_attrs, inner_html)
+            return '<a href="%s"%s>%s</a>' % (target_url, extra_attrs,
+                                              target_url if self.is_url_inside_tag_content(tree_node) else inner_html)
         else:
             return inner_html
 
-    def render_text(self, tree_node, inner_text):
+    def render_text(self, tree_node, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_text: Inner text of this tree node.
-        :return Rendered text of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_text: The inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered text of this node.
         """
 
         # Get the target URL
@@ -83,26 +79,23 @@ class UrlLinkTagOptions(TagOptions):
         else:
             return inner_text
 
-    def render_skcode(self, tree_node, inner_skcode):
+    def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
         """
-        Callback function for rendering SkCode.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
+        Getter function for retrieving all attributes of this node required for rendering SkCode.
+        :param tree_node: The tree node to be rendered.
+        :param inner_skcode: The inner SkCode of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return A dictionary of all attributes required for rendering SkCode and the tag value
+        attribute name for the shortcut syntax (if required).
         """
-
-        # Get the target URL
-        target_url = self.get_target_link(tree_node)
-
-        # Render the link
-        if target_url:
-            node_name = tree_node.name
-            if self.is_url_inside_tag_content(tree_node):
-                return '[%s]%s[/%s]' % (node_name, target_url, node_name)
-            else:
-                return '[%s=%s]%s[/%s]' % (node_name, escape_attrvalue(target_url), inner_skcode, node_name)
+        if self.is_url_inside_tag_content(tree_node):
+            return {}, None
         else:
-            return inner_skcode
+            # Get the target URL
+            target_url = self.get_target_link(tree_node)
+            return {
+                       tree_node.name: target_url
+                   }, tree_node.name
 
 
 class EmailLinkTagOptions(TagOptions):
@@ -113,15 +106,15 @@ class EmailLinkTagOptions(TagOptions):
 
     def is_email_inside_tag_content(self, tree_node):
         """
-        Return True if the target email address is in the tag content (not in attributes).
+        Return ``True`` if the target email address is in the tag content (not in attributes).
         :param tree_node: The current tree node instance.
-        :return True if the target email address is in the tag content, not in attributes.
+        :return ``True`` if the target email address is in the tag content, not in attributes.
         """
         return tree_node.name not in tree_node.attrs
 
     def get_email_address(self, tree_node):
         """
-         Return the target email address.
+        Return the target email address.
         :param tree_node: The current tree node instance.
         :return The target email address.
         """
@@ -135,39 +128,39 @@ class EmailLinkTagOptions(TagOptions):
                             force_remove_scheme=True,
                             fix_non_local_urls=False)
 
-    def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
+    def render_html(self, tree_node, inner_html, force_rel_nofollow=True, **kwargs):
         """
         Callback function for rendering HTML.
-        :param force_rel_nofollow: If set, all links in the rendered HTML will have "rel=nofollow" (default to True).
-        :param tree_node: Current tree node to be rendered.
-        :param inner_html: Inner HTML of this tree node.
-        :return Rendered HTML of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_html: The inner HTML of this tree node.
+        :param force_rel_nofollow: If set to ``True``, all links in the rendered HTML will have the atribute
+        "rel=nofollow" to avoid search engines to scrawl them (default ``True``).
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
         """
 
         # Get the email address
         email_address = self.get_email_address(tree_node)
 
         # Handle nofollow
-        if force_rel_nofollow:
-            extra_html = ' rel="nofollow"'
-        else:
-            extra_html = ''
+        extra_html = ' rel="nofollow"' if force_rel_nofollow else ''
 
         # Render the email link
         if email_address:
-            if self.is_email_inside_tag_content(tree_node):
-                return '<a href="mailto:%s"%s>%s</a>' % (email_address, extra_html, email_address)
-            else:
-                return '<a href="mailto:%s"%s>%s</a>' % (email_address, extra_html, inner_html)
+            return '<a href="mailto:%s"%s>%s</a>' % (
+                email_address, extra_html,
+                email_address if self.is_email_inside_tag_content(tree_node) else inner_html
+            )
         else:
             return inner_html
 
-    def render_text(self, tree_node, inner_text):
+    def render_text(self, tree_node, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_text: Inner text of this tree node.
-        :return Rendered text of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_text: The inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered text of this node.
         """
 
         # Get the email address
@@ -182,26 +175,23 @@ class EmailLinkTagOptions(TagOptions):
         else:
             return inner_text
 
-    def render_skcode(self, tree_node, inner_skcode):
+    def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
         """
-        Callback function for rendering SkCode.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
+        Getter function for retrieving all attributes of this node required for rendering SkCode.
+        :param tree_node: The tree node to be rendered.
+        :param inner_skcode: The inner SkCode of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return A dictionary of all attributes required for rendering SkCode and the tag value
+        attribute name for the shortcut syntax (if required).
         """
-
-        # Get the email address
-        email_address = self.get_email_address(tree_node)
-
-        # Render the email link
-        if email_address:
-            node_name = tree_node.name
-            if self.is_email_inside_tag_content(tree_node):
-                return '[%s]%s[/%s]' % (node_name, email_address, node_name)
-            else:
-                return '[%s=%s]%s[/%s]' % (node_name, escape_attrvalue(email_address), inner_skcode, node_name)
+        if self.is_email_inside_tag_content(tree_node):
+            return {}, None
         else:
-            return inner_skcode
+            # Get the email address
+            email_address = self.get_email_address(tree_node)
+            return {
+                       tree_node.name: email_address
+                   }, tree_node.name
 
 
 class AnchorTagOptions(TagOptions):
@@ -213,63 +203,46 @@ class AnchorTagOptions(TagOptions):
     def get_anchor_id(self, tree_node):
         """
         Get the ID of this anchor from the content of the node.
-        :param tree_node: the current tree node instance.
+        :param tree_node: The current tree node instance.
         :return The ID of this anchor, or an empty string.
         """
         return slugify(tree_node.get_raw_content())
 
-    def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
+    def render_html(self, tree_node, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param force_rel_nofollow: Ignored.
         :param tree_node: Current tree node to be rendered.
         :param inner_html: Inner HTML of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
         :return Rendered HTML of this node.
         """
 
         # Get the anchor ID
         anchor_id = self.get_anchor_id(tree_node)
+        return '<a id="%s"></a>' % anchor_id if anchor_id else inner_html
 
-        # Render the anchor link
-        if anchor_id:
-            return '<a id="%s"></a>' % escape_html(anchor_id)
-        else:
-            return inner_html
-
-    def render_text(self, tree_node, inner_text):
+    def render_text(self, tree_node, inner_text, **kwargs):
         """
         Callback function for rendering text.
         :param tree_node: Current tree node to be rendered.
         :param inner_text: Inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
         :return Rendered text of this node.
         """
 
         # Get the anchor ID
         anchor_id = self.get_anchor_id(tree_node)
+        return '[#%s]' % anchor_id if anchor_id else inner_text
 
-        # Render the anchor link
-        if anchor_id:
-            return '[#%s]' % anchor_id
-        else:
-            return inner_text
-
-    def render_skcode(self, tree_node, inner_skcode):
+    def get_skcode_inner_content(self, tree_node, inner_skcode, **kwargs):
         """
-        Callback function for rendering SkCode.
+        Callback function for retrieving the inner content for rendering SkCode.
         :param tree_node: Current tree node to be rendered.
         :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The inner content for SkCode rendering.
         """
-
-        # Get the anchor ID
-        anchor_id = self.get_anchor_id(tree_node)
-
-        # Render the anchor link
-        if anchor_id:
-            node_name = tree_node.name
-            return '[%s]%s[/%s]' % (node_name, anchor_id, node_name)
-        else:
-            return inner_skcode
+        return self.get_anchor_id(tree_node)
 
 
 class GoToAnchorTagOptions(TagOptions):
@@ -284,10 +257,10 @@ class GoToAnchorTagOptions(TagOptions):
     def get_anchor_id(self, tree_node):
         """
         Get the target anchor ID of this link.
-        The target anchor ID can be set by setting the anchor_id_attr_name attribute of the tag or simply
+        The target anchor ID can be set by setting the ``anchor_id_attr_name`` attribute of the tag or simply
         by setting the tag name attribute.
-        The lookup order is: tag name (first), anchor_id_attr_name.
-        :param tree_node: the current tree node instance.
+        The lookup order is: tag name (first), ``anchor_id_attr_name``.
+        :param tree_node: The current tree node instance.
         :return The target anchor ID of this link, or an empty string.
         """
         user_anchor_id = tree_node.attrs.get(tree_node.name, '')
@@ -295,56 +268,43 @@ class GoToAnchorTagOptions(TagOptions):
             user_anchor_id = tree_node.attrs.get(self.anchor_id_attr_name, '')
         return slugify(user_anchor_id)
 
-    def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
+    def render_html(self, tree_node, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param force_rel_nofollow: Ignored.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_html: Inner HTML of this tree node.
-        :return Rendered HTML of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_html: The inner HTML of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
         """
 
         # Get the anchor ID
         anchor_id = self.get_anchor_id(tree_node)
+        return '<a href="#%s">%s</a>' % (anchor_id, inner_html) if anchor_id else inner_html
 
-        # Render the anchor link
-        if anchor_id:
-            return '<a href="#%s">%s</a>' % (escape_html(anchor_id), inner_html)
-        else:
-            return inner_html
-
-    def render_text(self, tree_node, inner_text):
+    def render_text(self, tree_node, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_text: Inner text of this tree node.
-        :return Rendered text of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_text: The inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered text of this node.
         """
 
         # Get the anchor ID
         anchor_id = self.get_anchor_id(tree_node)
+        return '%s (#%s)' % (inner_text, anchor_id) if anchor_id else inner_text
 
-        # Render the anchor link
-        if anchor_id:
-            return '%s (#%s)' % (inner_text, anchor_id)
-        else:
-            return inner_text
-
-    def render_skcode(self, tree_node, inner_skcode):
+    def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
         """
-        Callback function for rendering SkCode.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
+        Getter function for retrieving all attributes of this node required for rendering SkCode.
+        :param tree_node: The tree node to be rendered.
+        :param inner_skcode: The inner SkCode of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return A dictionary of all attributes required for rendering SkCode and the tag value
+        attribute name for the shortcut syntax (if required).
         """
-
         # Get the anchor ID
         anchor_id = self.get_anchor_id(tree_node)
-
-        # Render the anchor link
-        if anchor_id:
-            node_name = tree_node.name
-            return '[%s %s=%s]%s[/%s]' % (node_name, self.anchor_id_attr_name,
-                                          escape_attrvalue(anchor_id), inner_skcode, node_name)
-        else:
-            return inner_skcode
+        return {
+                   self.anchor_id_attr_name: anchor_id
+               }, self.anchor_id_attr_name

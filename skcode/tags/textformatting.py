@@ -1,5 +1,5 @@
 """
-SkCode text formating tag definitions code.
+SkCode text formatting tag definitions code.
 """
 
 from html import escape as escape_html
@@ -57,6 +57,7 @@ class PreTextTagOptions(InlineWrappingTagOptions):
     def __init__(self, **kwargs):
         super(PreTextTagOptions, self).__init__('<pre>%s</pre>', **kwargs)
 
+
 class CiteTextTagOptions(InlineWrappingTagOptions):
     """ Cite text tag options container class. """
 
@@ -71,41 +72,42 @@ class InlineCodeTextTagOptions(TagOptions):
     inline = True
     close_inlines = False
 
-    def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
+    def render_html(self, tree_node, inner_html, **kwargs):
         """
-        Callback function for rendering HTML. Wrap the inner HTML code using the wrapping format.
-        :param force_rel_nofollow: Ignored.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_html: Inner HTML of this tree node.
-        :return Rendered HTML of this node.
+        Callback function for rendering HTML.
+        :param tree_node: The tree node to be rendered.
+        :param inner_html: The inner HTML of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
         """
         content = tree_node.content
         content = unescape_html_entities(content)
         content = escape_html(content)
         return '<code>%s</code>' % content
 
-    def render_text(self, tree_node, inner_text):
+    def render_text(self, tree_node, inner_text, **kwargs):
         """
-        Callback function for rendering text. Return the inner text as-is.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_text: Inner text of this tree node.
-        :return Rendered text of this node.
+        Callback function for rendering text.
+        :param tree_node: The tree node to be rendered.
+        :param inner_text: The inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered text of this node.
         """
         content = tree_node.content
         content = unescape_html_entities(content)
         return content
 
-    def render_skcode(self, tree_node, inner_skcode):
+    def get_skcode_inner_content(self, tree_node, inner_skcode, **kwargs):
         """
-        Callback function for rendering SkCode. Wrap the inner SkCode with the node name tag, without arguments.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
+        Getter function for retrieving the inner content of this node for rendering SkCode.
+        :param tree_node: The tree node to be rendered.
+        :param inner_skcode: The inner SkCode of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The inner content for SkCode rendering.
         """
         content = tree_node.content
         content = unescape_html_entities(content)
-        node_name = tree_node.name
-        return '[%s]%s[/%s]' % (node_name, content, node_name)
+        return content
 
 
 class InlineSpoilerTextTagOptions(InlineWrappingTagOptions):

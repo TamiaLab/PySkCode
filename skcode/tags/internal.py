@@ -16,31 +16,33 @@ class RootTagOptions(TagOptions):
 
     make_paragraphs_here = True
 
-    def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
+    def render_html(self, tree_node, inner_html, **kwargs):
         """
-        Callback function for rendering HTML. Return the inner HTML as-is.
-        :param force_rel_nofollow: Ignored.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_html: Inner HTML of this tree node.
-        :return Rendered HTML of this node.
+        Callback function for rendering HTML.
+        :param tree_node: The tree node to be rendered.
+        :param inner_html: The inner HTML of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
         """
         return inner_html
 
-    def render_text(self, tree_node, inner_text):
+    def render_text(self, tree_node, inner_text, **kwargs):
         """
-        Callback function for rendering text. Return the inner text as-is.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_text: Inner text of this tree node.
-        :return Rendered text of this node.
+        Callback function for rendering text.
+        :param tree_node: The tree node to be rendered.
+        :param inner_text: The inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered text of this node.
         """
         return inner_text
 
-    def render_skcode(self, tree_node, inner_skcode):
+    def render_skcode(self, tree_node, inner_skcode, **kwargs):
         """
-        Callback function for rendering SkCode. Return the inner SkCode as-is.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
+        Callback function for rendering SkCode.
+        :param tree_node: The tree node to be rendered.
+        :param inner_skcode: The inner SkCode of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered SkCode of this node.
         """
         return inner_skcode
 
@@ -51,62 +53,61 @@ class TextTagOptions(TagOptions):
     inline = True
     close_inlines = False
 
-    inject_smileys_options = True
-    inject_cosmetic_options = True
-
-    def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
+    def render_html(self, tree_node, inner_html, **kwargs):
         """
-        Callback function for rendering HTML. Un-escape the node content before escaping it again and return it.
-        This allow HTML special char in the text without causing trouble later (retro-compatibility with BBcode).
-        :param force_rel_nofollow: Ignored.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_html: Inner HTML of this tree node.
-        :return Rendered HTML of this node.
+        Callback function for rendering HTML.
+        :param tree_node: The tree node to be rendered.
+        :param inner_html: The inner HTML of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
         """
         content = tree_node.content
         content = unescape_html_entities(content)
         content = escape_html(content)
-        content = self.do_custom_html_processing(content)
+        content = self.do_custom_html_processing(tree_node.root_tree_node, content)
         return content
 
-    def do_custom_html_processing(self, input_text):
+    def do_custom_html_processing(self, root_tree_node, input_text):
         """
         Do some custom HTML processing for cosmetics and smiley replacement.
+        :param root_tree_node: The root tree node instance.
         :param input_text: Input text.
         :return: Input text with smileys and cosmetics replaced.
         """
-        output_text = do_smileys_replacement(input_text, self)
-        output_text = do_cosmetics_replacement(output_text, self)
+        output_text = do_smileys_replacement(root_tree_node, input_text)
+        output_text = do_cosmetics_replacement(root_tree_node, output_text)
         return output_text
 
-    def render_text(self, tree_node, inner_text):
+    def render_text(self, tree_node, inner_text, **kwargs):
         """
-        Callback function for rendering text. Un-escape the node content before returning it.
-        Not safe at all if used for HTML display! Use "render_html" for that.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_text: Inner text of this tree node.
-        :return Rendered text of this node.
+        Callback function for rendering text.
+        :param tree_node: The tree node to be rendered.
+        :param inner_text: The inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered text of this node.
         """
         content = tree_node.content
         content = unescape_html_entities(content)
-        content = self.do_custom_text_processing(content)
+        content = self.do_custom_text_processing(tree_node.root_tree_node, content)
         return content
 
-    def do_custom_text_processing(self, input_text):
+    def do_custom_text_processing(self, root_tree_node, input_text):
         """
-        Do some custom text processing for cosmetics and smiley replacement.
+        Do some custom text processing for cosmetics replacement.
+        :param root_tree_node: The root tree node instance.
         :param input_text: Input text.
-        :return: Input text with smileys and cosmetics replaced.
+        :return: Input text with cosmetics replaced.
         """
-        output_text = do_cosmetics_replacement(input_text, self)
+        output_text = do_cosmetics_replacement(root_tree_node, input_text)
         return output_text
 
-    def render_skcode(self, tree_node, inner_skcode):
+    def render_skcode(self, tree_node, inner_skcode, **kwargs):
         """
         Callback function for rendering SkCode.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_skcode: The inner SkCode of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered SkCode of this node.
         """
         content = tree_node.content
         content = unescape_html_entities(content)
@@ -116,31 +117,32 @@ class TextTagOptions(TagOptions):
 class ErroneousTextTagOptions(TextTagOptions):
     """ Erroneous text tag options container class. """
 
-    def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
+    def render_html(self, tree_node, inner_html, **kwargs):
         """
-        Callback function for rendering HTML. Get the output of the standard TextTagOptions but wrap the output
-        in a big bold red text style span.
-        :param force_rel_nofollow: Ignored.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_html: Inner HTML of this tree node.
-        :return Rendered HTML of this node.
+        Callback function for rendering HTML.
+        :param tree_node: The tree node to be rendered.
+        :param inner_html: The inner HTML of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
         """
-        content = super(ErroneousTextTagOptions, self).render_html(tree_node, inner_html)
+        content = super(ErroneousTextTagOptions, self).render_html(tree_node, inner_html, **kwargs)
         return '<span style="font-weight: bold; color: red;">%s</span>' % content
 
-    def do_custom_html_processing(self, input_text):
+    def do_custom_html_processing(self, root_tree_node, input_text):
         """
         Do nothing.
+        :param root_tree_node: The root tree node instance.
         :param input_text: Input text.
-        :return: Input text.
+        :return: Input text as-is.
         """
         return input_text
 
-    def do_custom_text_processing(self, input_text):
+    def do_custom_text_processing(self, root_tree_node, input_text):
         """
         Do nothing.
+        :param root_tree_node: The root tree node instance.
         :param input_text: Input text.
-        :return: Input text.
+        :return: Input text as-is.
         """
         return input_text
 
@@ -151,32 +153,33 @@ class NewlineTagOptions(TagOptions):
     inline = True
     close_inlines = False
 
-    def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
+    def render_html(self, tree_node, inner_html, **kwargs):
         """
-        Callback function for rendering HTML. Return an ASCII newline (not an HTML line break).
-        :param force_rel_nofollow: Ignored.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_html: Inner HTML of this tree node.
-        :return Rendered HTML of this node.
+        Callback function for rendering HTML.
+        :param tree_node: The tree node to be rendered.
+        :param inner_html: The inner HTML of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
         """
         return '\n'
 
-    def render_text(self, tree_node, inner_text):
+    def render_text(self, tree_node, inner_text, **kwargs):
         """
-        Callback function for rendering text. Return an ASCII newline.
-        Not safe at all if used for HTML display! Use "render_html" for that.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_text: Inner text of this tree node.
-        :return Rendered text of this node.
+        Callback function for rendering text.
+        :param tree_node: The tree node to be rendered.
+        :param inner_text: The inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered text of this node.
         """
         return ' '
 
-    def render_skcode(self, tree_node, inner_skcode):
+    def render_skcode(self, tree_node, inner_skcode, **kwargs):
         """
-        Callback function for rendering SkCode. Return an ASCII newline.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
+        Callback function for rendering SkCode.
+        :param tree_node: The tree node to be rendered.
+        :param inner_skcode: The inner SkCode of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered SkCode of this node.
         """
         return '\n'
 
@@ -184,31 +187,32 @@ class NewlineTagOptions(TagOptions):
 class HardNewlineTagOptions(NewlineTagOptions):
     """ Newline (hard line break variant) tag options container class. """
 
-    def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
+    def render_html(self, tree_node, inner_html, **kwargs):
         """
-        Callback function for rendering HTML. Return an HTML line break (not an ASCII newline).
-        :param force_rel_nofollow: Ignored.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_html: Inner HTML of this tree node.
-        :return Rendered HTML of this node.
+        Callback function for rendering HTML.
+        :param tree_node: The tree node to be rendered.
+        :param inner_html: The inner HTML of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
         """
         return '<br>\n'
 
-    def render_text(self, tree_node, inner_text):
+    def render_text(self, tree_node, inner_text, **kwargs):
         """
-        Callback function for rendering text. Return an ASCII newline.
-        Not safe at all if used for HTML display! Use "render_html" for that.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_text: Inner text of this tree node.
-        :return Rendered text of this node.
+        Callback function for rendering text.
+        :param tree_node: The tree node to be rendered.
+        :param inner_text: The inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered text of this node.
         """
         return '\n'
 
-    def render_skcode(self, tree_node, inner_skcode):
+    def render_skcode(self, tree_node, inner_skcode, **kwargs):
         """
-        Callback function for rendering SkCode. Return an ASCII newline.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
+        Callback function for rendering SkCode.
+        :param tree_node: The tree node to be rendered.
+        :param inner_skcode: The inner SkCode of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered SkCode of this node.
         """
         return '\n'

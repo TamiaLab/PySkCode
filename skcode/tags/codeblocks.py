@@ -13,7 +13,6 @@ from pygments.util import ClassNotFound
 
 from .base import TagOptions
 from ..tools import (sanitize_url,
-                     escape_attrvalue,
                      slugify)
 
 
@@ -53,12 +52,15 @@ class CodeBlockTagOptions(TagOptions):
     # Figure ID attribute name
     figure_id_attr_name = 'id'
 
+    # CSS class of the wrapping div
+    wrapping_div_class_name = 'codetable'
+
     def get_language_name(self, tree_node):
         """
         Return the language name of this code block for syntax highlighting.
-        The language name can be set by setting the language_attr_name attribute of the tag or simply
+        The language name can be set by setting the ``language_attr_name`` attribute of the tag or simply
         by setting the tag name attribute.
-        The lookup order is: tag name (first), language_attr_name.
+        The lookup order is: tag name (first), ``language_attr_name``.
         :param tree_node: The current tree node instance.
         :return The language name of this code block, or the default one if not specified.
         """
@@ -139,6 +141,7 @@ class CodeBlockTagOptions(TagOptions):
         :return: The source URL of the current code block, or an empty string.
         """
         src_link_url = tree_node.attrs.get(self.source_link_attr_name, '')
+        # TODO Add relative-absolute URL conversion
         return sanitize_url(src_link_url)
 
     def get_figure_id(self, tree_node):
@@ -150,35 +153,32 @@ class CodeBlockTagOptions(TagOptions):
         figure_id = tree_node.attrs.get(self.figure_id_attr_name, '')
         return slugify(figure_id)
 
-    def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
+    def render_html(self, tree_node, inner_html, force_rel_nofollow=True, **kwargs):
         """
         Callback function for rendering HTML.
-        :param force_rel_nofollow: If set, all links in the rendered HTML will have "rel=nofollow" (default to True).
-        :param tree_node: Current tree node to be rendered.
-        :param inner_html: Inner HTML of this tree node.
-        :return Rendered HTML of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_html: The inner HTML of this tree node.
+        :param force_rel_nofollow: If set to ``True``, all links in the rendered HTML will have the atribute
+        "rel=nofollow" to avoid search engines to scrawl them (default ``True``).
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
         """
 
         # Get figure ID
         figure_id = self.get_figure_id(tree_node)
 
         # Handle line anchors
-        if figure_id:
-            lineanchors = figure_id
-            anchorlinenos = True
-        else:
-            lineanchors = ''
-            anchorlinenos = False
+        lineanchors = figure_id if figure_id else ''
+        anchorlinenos = bool(figure_id)
 
         # Render the source code
         try:
-            lexer = get_lexer_by_name(self.get_language_name(tree_node),
-                                      tabsize=self.tab_size)
+            lexer = get_lexer_by_name(self.get_language_name(tree_node), tabsize=self.tab_size)
         except ClassNotFound:
 
             # Handle unknown language name
-            lexer = get_lexer_by_name(self.default_language_name,
-                                      tabsize=self.tab_size)
+            lexer = get_lexer_by_name(self.default_language_name, tabsize=self.tab_size)
+
         style = get_style_by_name(self.pygments_css_style_name)
         formatter = HtmlFormatter(style=style,
                                   linenos='table' if self.display_line_numbers else False,
@@ -190,7 +190,7 @@ class CodeBlockTagOptions(TagOptions):
         source_code = highlight(tree_node.content, lexer, formatter)
 
         # Wrap table in div for horizontal scrolling
-        source_code = '<div class="codetable">%s</div>' % source_code
+        source_code = '<div class="%s">%s</div>\n' % (self.wrapping_div_class_name, source_code)
 
         # Get extra filename and source link
         src_filename = self.get_filename(tree_node)
@@ -200,10 +200,7 @@ class CodeBlockTagOptions(TagOptions):
         if src_filename or src_link_url:
 
             # Source code with caption
-            if src_filename:
-                caption = 'Source : %s' % escape_html(src_filename)
-            else:
-                caption = 'Source : %s' % src_link_url
+            caption = 'Source : %s' % (escape_html(src_filename) if src_filename else src_link_url)
 
             # And source link
             if src_link_url:
@@ -213,22 +210,20 @@ class CodeBlockTagOptions(TagOptions):
 
             # Return the final HTML
             figure_extra = ' id="%s"' % figure_id if figure_id else ''
-            return """<figure%s>
-%s
-<figcaption>%s</figcaption>
-</figure>""" % (figure_extra, source_code, caption)
+            return "<figure%s>\n%s<figcaption>%s</figcaption>\n</figure>\n" % (figure_extra, source_code, caption)
 
         else:
             # Source code only
             figure_extra = '<a id="%s"></a>\n' % figure_id if figure_id else ''
             return '%s%s\n' % (figure_extra, source_code)
 
-    def render_text(self, tree_node, inner_text):
+    def render_text(self, tree_node, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_text: Inner text of this tree node.
-        :return Rendered text of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_text: The inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered text of this node.
         """
 
         # Get all attributes
@@ -242,10 +237,7 @@ class CodeBlockTagOptions(TagOptions):
         lines = []
         for num, line in enumerate(tree_node.content.strip('\r\n').splitlines(), start=get_start_line_number):
             line = line.replace('\t', ' ' * self.tab_size)
-            if num in hl_lines:
-                line_prefix = '%d>' % num
-            else:
-                line_prefix = '%d.' % num
+            line_prefix = '%d>' % num if num in hl_lines else '%d.' % num
             lines.append('%s %s' % (line_prefix.ljust(4), line))
 
         # Add the caption
@@ -264,64 +256,43 @@ class CodeBlockTagOptions(TagOptions):
         lines.append('')
         return '\n'.join(lines)
 
-    def get_extra_attrs_for_render_skcode(self, tree_node, include_language_attr=True):
+    def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
         """
-        Return all extra attributes for SkCode rendering (avoid code duplication).
-        :param tree_node: The current tree node instance.
-        :param include_language_attr: Set to True (default) to include the language attribute, False to exclude it.
-        :return: A string with all extra attributes ready for SkCode rendering.
+        Getter function for retrieving all attributes of this node required for rendering SkCode.
+        :param tree_node: The tree node to be rendered.
+        :param inner_skcode: The inner SkCode of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return A dictionary of all attributes required for rendering SkCode and the tag value
+        attribute name for the shortcut syntax (if required).
         """
 
         # Get all attributes
         language_name = self.get_language_name(tree_node)
-        if language_name != self.default_language_name and include_language_attr:
-            extra_attrs = ' %s=%s' % (self.language_attr_name,
-                                      escape_attrvalue(language_name))
-        else:
-            extra_attrs = ''
-
+        language_name = language_name if language_name != self.default_language_name else ''
         hl_lines = self.get_highlight_lines(tree_node)
-        if hl_lines:
-            extra_attrs += ' %s=%s' % (self.hl_lines_attr_name,
-                                       escape_attrvalue(','.join(str(line) for line in hl_lines)))
-
         linenostart = self.get_start_line_number(tree_node)
-        if linenostart != 1:
-            extra_attrs += ' %s="%d"' % (self.line_start_num_attr_name,
-                                         linenostart)
-
+        linenostart = linenostart if linenostart != 1 else ''
         src_filename = self.get_filename(tree_node)
-        if src_filename:
-            extra_attrs += ' %s=%s' % (self.filename_attr_name,
-                                       escape_attrvalue(src_filename))
-
         src_link_url = self.get_source_link_url(tree_node)
-        if src_link_url:
-            extra_attrs += ' %s=%s' % (self.source_link_attr_name,
-                                       escape_attrvalue(src_link_url))
-
         figure_id = self.get_figure_id(tree_node)
-        if figure_id:
-            extra_attrs += ' %s=%s' % (self.figure_id_attr_name,
-                                       escape_attrvalue(figure_id))
+        return {
+                   self.language_attr_name: language_name,
+                   self.hl_lines_attr_name: ','.join(str(line) for line in hl_lines),
+                   self.line_start_num_attr_name: linenostart,
+                   self.filename_attr_name: src_filename,
+                   self.source_link_attr_name: src_link_url,
+                   self.figure_id_attr_name: figure_id
+               }, self.language_attr_name
 
-        return extra_attrs
-
-    def render_skcode(self, tree_node, inner_skcode):
+    def get_skcode_inner_content(self, tree_node, inner_skcode, **kwargs):
         """
-        Callback function for rendering SkCode.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
+        Getter function for retrieving the inner content of this node for rendering SkCode.
+        :param tree_node: The tree node to be rendered.
+        :param inner_skcode: The inner SkCode of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The inner content for SkCode rendering.
         """
-
-        # Get all attributes
-        extra_attrs = self.get_extra_attrs_for_render_skcode(tree_node)
-
-        # Render the skcode
-        node_name = tree_node.name
-        return '[%s%s]%s[/%s]' % (node_name, extra_attrs,
-                                  tree_node.content, node_name)
+        return tree_node.content
 
 
 class FixedCodeBlockTagOptions(CodeBlockTagOptions):
@@ -333,6 +304,7 @@ class FixedCodeBlockTagOptions(CodeBlockTagOptions):
         :param language_name: The language name to use.
         :param kwargs: Keyword arguments for super constructor.
         """
+        assert language_name, "The language name is mandatory."
         super(FixedCodeBlockTagOptions, self).__init__(**kwargs)
         self.language_name = language_name
 
@@ -340,22 +312,19 @@ class FixedCodeBlockTagOptions(CodeBlockTagOptions):
         """
         Return the language name of this code block for syntax highlighting.
         :param tree_node: The current tree node instance.
-        :return The language name of this code block, as set in __init__.
+        :return The language name of this code block, as set in ``__init__``.
         """
         return self.language_name
 
-    def render_skcode(self, tree_node, inner_skcode):
+    def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
         """
-        Callback function for rendering SkCode.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
+        Getter function for retrieving all attributes of this node required for rendering SkCode.
+        :param tree_node: The tree node to be rendered.
+        :param inner_skcode: The inner SkCode of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return A dictionary of all attributes required for rendering SkCode and the tag value
+        attribute name for the shortcut syntax (if required).
         """
-
-        # Get all attributes
-        extra_attrs = self.get_extra_attrs_for_render_skcode(tree_node, include_language_attr=False)
-
-        # Render the skcode
-        node_name = tree_node.name
-        return '[%s%s]%s[/%s]' % (node_name, extra_attrs,
-                                  tree_node.content, node_name)
+        attrs, name = super(FixedCodeBlockTagOptions, self).get_skcode_attributes(tree_node, inner_skcode, **kwargs)
+        attrs.pop(self.language_attr_name)
+        return attrs, None

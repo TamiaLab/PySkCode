@@ -5,7 +5,7 @@ SkCode title tag definitions code.
 from html import escape as escape_html
 
 from .base import TagOptions
-from ..tools import escape_attrvalue, slugify
+from ..tools import slugify
 
 
 class TitleTagOptions(TagOptions):
@@ -21,34 +21,33 @@ class TitleTagOptions(TagOptions):
         :param kwargs: Keyword arguments for super constructor.
         """
         super(TitleTagOptions, self).__init__(**kwargs)
-        assert title_level > 0, "Title level must be greater than zero."
-        assert title_level <= 6, "Title level must be less or equal to 6."
+        assert 6 >= title_level > 0, "Title level must be between zero and 6 (included)."
         self.title_level = title_level
         self.title_tagname = 'h%d' % title_level
 
     def get_permalink_slug(self, tree_node):
         """
         Return the permalink slug for this title.
-        The permalink slug can be set by setting the slug_id_attr_name attribute of the tag or simply
+        The permalink slug can be set by setting the ``slug_id_attr_name`` attribute of the tag or simply
         by setting the tag name attribute.
-        The lookup order is: tag name (first), acronym_title_attr_name.
+        The lookup order is: tag name (first), ``acronym_title_attr_name``.
         :param tree_node: The current tree node instance.
         :return The permalink slug for this title, or an empty string.
         """
-        
+
         # Get existing permalink if available
         permalink_slug = tree_node.attrs.get(tree_node.name, '')
         if not permalink_slug:
             permalink_slug = tree_node.attrs.get(self.slug_id_attr_name, '')
         return slugify(permalink_slug)
 
-    def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
+    def render_html(self, tree_node, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param force_rel_nofollow: If set, all links in the rendered HTML will have "rel=nofollow" (default to True).
-        :param tree_node: Current tree node to be rendered.
-        :param inner_html: Inner HTML of this tree node.
-        :return Rendered HTML of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_html: The inner HTML of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
         """
 
         # Add permalink if available
@@ -57,17 +56,17 @@ class TitleTagOptions(TagOptions):
             inner_html = '<a id="%s">%s</a>' % (escape_html(permalink_slug), inner_html)
 
         # Return the HTML code
-        return '<%s>%s</%s>\n' % (self.title_tagname,
-                                  inner_html,
-                                  self.title_tagname)
+        return '<%s>%s</%s>\n' % (self.title_tagname, inner_html, self.title_tagname)
 
-    def render_text(self, tree_node, inner_text):
+    def render_text(self, tree_node, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_text: Inner text of this tree node.
-        :return Rendered text of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_text: The inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered text of this node.
         """
+
         # Add permalink if available
         permalink_slug = self.get_permalink_slug(tree_node)
         if permalink_slug:
@@ -75,21 +74,17 @@ class TitleTagOptions(TagOptions):
         else:
             return '%s %s\n' % ('#' * self.title_level, inner_text)
 
-    def render_skcode(self, tree_node, inner_skcode):
+    def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
         """
-        Callback function for rendering SkCode.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
+        Getter function for retrieving all attributes of this node required for rendering SkCode.
+        :param tree_node: The tree node to be rendered.
+        :param inner_skcode: The inner SkCode of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return A dictionary of all attributes required for rendering SkCode and the tag value
+        attribute name for the shortcut syntax (if required).
         """
-
-        # Add permalink if available
+        # Get permalink if available
         permalink_slug = self.get_permalink_slug(tree_node)
-        if permalink_slug:
-            extra_attrs = ' id=%s' % escape_attrvalue(permalink_slug)
-        else:
-            extra_attrs = ''
-
-        # Render the SkCode
-        node_name = tree_node.name
-        return '[%s%s]%s[/%s]' % (node_name, extra_attrs, inner_skcode, node_name)
+        return {
+                   self.slug_id_attr_name: permalink_slug
+               }, self.slug_id_attr_name

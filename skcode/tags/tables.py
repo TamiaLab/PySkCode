@@ -8,69 +8,54 @@ from .base import TagOptions
 class TableTagOptions(TagOptions):
     """ Table tag options container class. """
 
-    def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
+    # CSS class name for the table
+    css_class_name = 'table table-condensed table-striped'
+
+    def render_html(self, tree_node, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param force_rel_nofollow: If set, all links in the rendered HTML will have "rel=nofollow" (default to True).
-        :param tree_node: Current tree node to be rendered.
-        :param inner_html: Inner HTML of this tree node.
-        :return Rendered HTML of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_html: The inner HTML of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
         """
-        return '<table class="table table-condensed table-striped">%s</table>\n' % inner_html
+        return '<table class="%s">%s</table>\n' % (self.css_class_name, inner_html)
 
-    def render_text(self, tree_node, inner_text):
+    def render_text(self, tree_node, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_text: Inner text of this tree node.
-        :return Rendered text of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_text: The inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered text of this node.
         """
         # TODO But how?
         return inner_text
-
-    def render_skcode(self, tree_node, inner_skcode):
-        """
-        Callback function for rendering SkCode.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
-        """
-        node_name = tree_node.name
-        return '[%s]%s[/%s]' % (node_name, inner_skcode, node_name)
 
 
 class TableRowTagOptions(TagOptions):
     """ Table row tag options container class. """
 
-    def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
+    def render_html(self, tree_node, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param force_rel_nofollow: If set, all links in the rendered HTML will have "rel=nofollow" (default to True).
-        :param tree_node: Current tree node to be rendered.
-        :param inner_html: Inner HTML of this tree node.
-        :return Rendered HTML of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_html: The inner HTML of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
         """
         return '<tr>%s</tr>\n' % inner_html
 
-    def render_text(self, tree_node, inner_text):
+    def render_text(self, tree_node, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_text: Inner text of this tree node.
-        :return Rendered text of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_text: The inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered text of this node.
         """
         # TODO But how?
         return inner_text
-
-    def render_skcode(self, tree_node, inner_skcode):
-        """
-        Callback function for rendering SkCode.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
-        """
-        node_name = tree_node.name
-        return '[%s]%s[/%s]' % (node_name, inner_skcode, node_name)
 
 
 class TableCellTagOptions(TagOptions):
@@ -143,10 +128,7 @@ class TableCellTagOptions(TagOptions):
 
         # Get the column span
         colspan = self.get_cell_colspan(tree_node)
-        if colspan != 1:
-            extra_attrs = ' colspan="%d"' % colspan
-        else:
-            extra_attrs = ''
+        extra_attrs = ' colspan="%d"' % colspan if colspan != 1 else ''
 
         # Get the row span
         rowspan = self.get_cell_rowspan(tree_node)
@@ -156,81 +138,67 @@ class TableCellTagOptions(TagOptions):
         # Return the string
         return extra_attrs
 
-    def get_skcode_extra_attrs(self, tree_node):
-        """
-        Return any extra attributes for the SkCode rendering.
-        :param tree_node: The current tree node instance.
-        :return Any extra attributes for the SkCode rendering.
-        """
-
-        # Get the column span
-        colspan = self.get_cell_colspan(tree_node)
-        if colspan != 1:
-            extra_attrs = ' %s="%d"' % (self.colspan_attr_name, colspan)
-        else:
-            extra_attrs = ''
-
-        # Get the row span
-        rowspan = self.get_cell_rowspan(tree_node)
-        if rowspan != 1:
-            extra_attrs += ' %s="%d"' % (self.rowspan_attr_name, rowspan)
-
-        # Return the string
-        return extra_attrs
-
-    def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
+    def render_html(self, tree_node, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param force_rel_nofollow: If set, all links in the rendered HTML will have "rel=nofollow" (default to True).
-        :param tree_node: Current tree node to be rendered.
-        :param inner_html: Inner HTML of this tree node.
-        :return Rendered HTML of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_html: The inner HTML of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
         """
         extra_attrs = self.get_html_extra_attrs(tree_node)
         return '<td%s>%s</td>\n' % (extra_attrs, inner_html)
 
-    def render_text(self, tree_node, inner_text):
+    def render_text(self, tree_node, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_text: Inner text of this tree node.
-        :return Rendered text of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_text: The inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered text of this node.
         """
         # TODO But how?
         return inner_text
 
-    def render_skcode(self, tree_node, inner_skcode):
+    def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
         """
-        Callback function for rendering SkCode.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
+        Getter function for retrieving all attributes of this node required for rendering SkCode.
+        :param tree_node: The tree node to be rendered.
+        :param inner_skcode: The inner SkCode of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return A dictionary of all attributes required for rendering SkCode and the tag value
+        attribute name for the shortcut syntax (if required).
         """
-        extra_attrs = self.get_html_extra_attrs(tree_node)
-        node_name = tree_node.name
-        return '[%s%s]%s[/%s]' % (node_name, extra_attrs, inner_skcode, node_name)
+        # Get the column and row span
+        colspan = self.get_cell_colspan(tree_node)
+        rowspan = self.get_cell_rowspan(tree_node)
+        return {
+                   self.colspan_attr_name: colspan if colspan != 1 else '',
+                   self.rowspan_attr_name: rowspan if rowspan != 1 else ''
+               }, None
 
 
 class TableHeaderCellTagOptions(TableCellTagOptions):
     """ Table tag options container class. """
 
-    def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
+    def render_html(self, tree_node, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param force_rel_nofollow: If set, all links in the rendered HTML will have "rel=nofollow" (default to True).
-        :param tree_node: Current tree node to be rendered.
-        :param inner_html: Inner HTML of this tree node.
-        :return Rendered HTML of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_html: The inner HTML of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
         """
         extra_attrs = self.get_html_extra_attrs(tree_node)
         return '<th%s>%s</th>\n' % (extra_attrs, inner_html)
 
-    def render_text(self, tree_node, inner_text):
+    def render_text(self, tree_node, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_text: Inner text of this tree node.
-        :return Rendered text of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_text: The inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered text of this node.
         """
         # TODO But how?
         return inner_text

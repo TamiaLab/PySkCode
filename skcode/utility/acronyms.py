@@ -14,6 +14,8 @@ def extract_acronyms(document_tree,
     :param acronym_ops_cls: The options class used for acronym declarations.
     :return: A list of all acronyms node instances in the document.
     """
+    assert document_tree, "Document tree is mandatory."
+    # TODO Replace *_cls with the new categories based system
 
     # List of acronyms found
     acronyms = []

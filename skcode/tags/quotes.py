@@ -9,7 +9,7 @@ from html import escape as escape_html
 from html import unescape as unescape_html_entities
 
 from .base import TagOptions
-from ..tools import escape_attrvalue, sanitize_url
+from ..tools import sanitize_url
 
 
 class QuoteTagOptions(TagOptions):
@@ -35,9 +35,9 @@ class QuoteTagOptions(TagOptions):
     def get_quote_author_name(self, tree_node):
         """
         Return the quote author name.
-        The author name can be set by setting the author_attr_name attribute of the tag or simply
+        The author name can be set by setting the ``author_attr_name`` attribute of the tag or simply
         by setting the tag name attribute.
-        The lookup order is: tag name (first), author_attr_name.
+        The lookup order is: tag name (first), ``author_attr_name``.
         :param tree_node: The current tree node instance.
         :return The quote author name, or an empty string.
         """
@@ -53,6 +53,7 @@ class QuoteTagOptions(TagOptions):
         :return The quote source link URL (not sanitized), or an empty string.
         """
         quote_link = tree_node.attrs.get(self.link_attr_name, '')
+        # TODO Add relative-absolute URL conversion
         return sanitize_url(quote_link)
 
     def get_quote_date(self, tree_node):
@@ -76,13 +77,15 @@ class QuoteTagOptions(TagOptions):
         except ValueError:
             return None
 
-    def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
+    def render_html(self, tree_node, inner_html, force_rel_nofollow=True, **kwargs):
         """
         Callback function for rendering HTML.
-        :param force_rel_nofollow: Ignored.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_html: Inner HTML of this tree node.
-        :return Rendered HTML of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_html: The inner HTML of this tree node.
+        :param force_rel_nofollow: If set to ``True``, all links in the rendered HTML will have the atribute
+        "rel=nofollow" to avoid search engines to scrawl them (default ``True``).
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
         """
 
         # Get the author name
@@ -95,10 +98,7 @@ class QuoteTagOptions(TagOptions):
             # Craft source link if any, and handle force_rel_nofollow
             src_link = self.get_quote_link(tree_node)
             if src_link:
-                if force_rel_nofollow:
-                    extra_attrs = ' rel="nofollow"'
-                else:
-                    extra_attrs = ''
+                extra_attrs = ' rel="nofollow"' if force_rel_nofollow else ''
                 author_html = '<a href="%s"%s>%s</a>' % (src_link, extra_attrs, author_html)
 
             # Get and craft the source date
@@ -116,12 +116,13 @@ class QuoteTagOptions(TagOptions):
         # Render the quote
         return '<blockquote>%s%s</blockquote>\n' % (inner_html, extra_html)
 
-    def render_text(self, tree_node, inner_text):
+    def render_text(self, tree_node, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_text: Inner text of this tree node.
-        :return Rendered text of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_text: The inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered text of this node.
         """
 
         # Craft the quote content
@@ -137,7 +138,6 @@ class QuoteTagOptions(TagOptions):
             # Add source link
             src_link = self.get_quote_link(tree_node)
             if src_link:
-                # FIXME Avoid HTML encoding in render_text
                 author_text = '%s (%s)' % (author_text, src_link)
 
             # Add source date
@@ -154,33 +154,21 @@ class QuoteTagOptions(TagOptions):
         lines.append('')
         return '\n'.join(lines)
 
-    def render_skcode(self, tree_node, inner_skcode):
+    def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
         """
-        Callback function for rendering SkCode.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
+        Getter function for retrieving all attributes of this node required for rendering SkCode.
+        :param tree_node: The tree node to be rendered.
+        :param inner_skcode: The inner SkCode of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return A dictionary of all attributes required for rendering SkCode and the tag value
+        attribute name for the shortcut syntax (if required).
         """
-
-        # Get the author name
+        # Get all attributes
         author_name = self.get_quote_author_name(tree_node)
-        if author_name:
-            extra_attrs = ' %s=%s' % (self.author_attr_name,
-                                      escape_attrvalue(author_name))
-        else:
-            extra_attrs = ''
-
-        # Get the source link
         src_link = self.get_quote_link(tree_node)
-        if src_link:
-            extra_attrs += ' %s=%s' % (self.link_attr_name,
-                                       escape_attrvalue(src_link))
-
-        # Get the source date
         src_date = self.get_quote_date(tree_node)
-        if src_date is not None:
-            extra_attrs += ' %s="%d"' % (self.date_attr_name,
-                                         calendar.timegm(src_date.timetuple()))
-
-        node_name = tree_node.name
-        return '[%s%s]%s[/%s]' % (node_name, extra_attrs, inner_skcode, node_name)
+        return {
+                   self.author_attr_name: author_name,
+                   self.link_attr_name: src_link,
+                   self.date_attr_name: calendar.timegm(src_date.timetuple())
+               }, None

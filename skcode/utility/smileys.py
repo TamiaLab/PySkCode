@@ -5,9 +5,8 @@ SkCode smileys replacement utility code.
 import re
 from html import escape as escape_html
 
-from .walketree import walk_tree_for_cls
 
-
+# Default emoticons map
 DEFAULT_EMOTICONS_MAP = (
 
     ('<3', 'heart.png'),
@@ -108,8 +107,10 @@ DEFAULT_EMOTICONS_MAP = (
 
     ('x)', 'dizzy.png'),
     ('x-)', 'dizzy.png'),
+    ('xD', 'dizzy.png'),
     ('X)', 'dizzy.png'),
     ('X-)', 'dizzy.png'),
+    ('XD', 'dizzy.png'),
     (':dizzy:', 'dizzy.png'),
 
     ('*\\0/*', 'victory.png'),
@@ -148,6 +149,7 @@ DEFAULT_EMOTICONS_MAP = (
     ('-___-', 'neutral.png'),
     (':|', 'neutral.png'),
     (':-|', 'neutral.png'),
+    ('T_T', 'neutral.png'),
     (':neutral:', 'neutral.png'),
 
     (':?', 'confused.png'),
@@ -231,21 +233,39 @@ DEFAULT_EMOTICONS_MAP = (
     (':death:', 'death.png'),
 )
 
+# Document attribute name for storing the emoticons map
+EMOTICONS_MAP_ATTR_NAME = 'EMOTICONS_MAP'
+
+# Document attribute name for storing the emoticons detection regex
+EMOTICONS_REGEX_ATTR_NAME = 'EMOTICONS_REGEX'
+
+# Document attribute name for storing the emoticons base URL
+EMOTICONS_BASE_URL_ATTR_NAME = 'EMOTICONS_BASE_URL'
+
+# Document attribute name for storing the emoticons HTML class
+EMOTICONS_HTML_CLASS_ATTR_NAME = 'EMOTICONS_HTML_CLASS'
+
 
 def setup_smileys_replacement(document_tree, base_url, emoticons_map=DEFAULT_EMOTICONS_MAP, html_class='emoticons'):
     """
-    Setup the document for cosmetics replacement.
-    :param document_tree: The document tree instance.
-    :param emoticons_map: A list of tuple with two values (emoticon_text, emoticon_filename).
-    :param base_url: The base url for all emoticon images. Can also be a callable for dynamic paths.
+    Setup the document for emoticons replacement.
+    :param document_tree: The document tree instance to be setup.
+    :param emoticons_map: A tuple of tuple with two values ``(emoticon_text, emoticon_filename)``.
+    :param base_url: The base URL for all emoticon images. Can also be a callable for dynamic paths.
     :param html_class: The HTML class to be assigned to each emoticons img tag (optional).
     """
+    assert document_tree, "Document tree is mandatory."
+    assert document_tree.is_root, "Document tree must be a root tree node instance."
+    assert base_url, "Base URL is mandatory."
 
     # Craft the emoticons regex
-    emoticons_regex = '(^|\s+)(?P<emoticon>%s)(\s+|$)' % '|'.join([re.escape(escape_html(e)) for e, _ in emoticons_map])
+    emoticons_regex = r'(^|\s+)(?P<emoticon>%s)(\s+|$)' % '|'.join([re.escape(escape_html(e)) for e, _ in emoticons_map])
     emoticons_regex = re.compile(emoticons_regex)
 
     # Turn emoticons map into a dictionary
+    # Note: use escape_html(k) as key because at rendering, when the ``do_smileys_replacement`` routine is called
+    # emoticons are already HTML-encoded. As we need to inject HTML code for img, we can't do the replacement when
+    # the emoticons are in plain text.
     emoticons_map = {escape_html(k): v for k, v in emoticons_map}
 
     # Turn base_url into a callable
@@ -253,34 +273,36 @@ def setup_smileys_replacement(document_tree, base_url, emoticons_map=DEFAULT_EMO
         base_path = base_url if base_url.endswith('/') else base_url + '/'
         base_url = lambda x: base_path + x
 
-    # Inject options in all tree node requiring them
-    for tree_node in walk_tree_for_cls(document_tree, object):
-        if getattr(tree_node.opts, 'inject_smileys_options', False):
-            setattr(tree_node.opts, 'emoticons_map', emoticons_map)
-            setattr(tree_node.opts, 'emoticons_regex', emoticons_regex)
-            setattr(tree_node.opts, 'emoticons_base_url', base_url)
-            setattr(tree_node.opts, 'emoticons_html_class', html_class)
+    # Store all emoticons related options
+    document_tree.attrs[EMOTICONS_MAP_ATTR_NAME] = emoticons_map
+    document_tree.attrs[EMOTICONS_REGEX_ATTR_NAME] = emoticons_regex
+    document_tree.attrs[EMOTICONS_BASE_URL_ATTR_NAME] = base_url
+    document_tree.attrs[EMOTICONS_HTML_CLASS_ATTR_NAME] = html_class
 
 
-def do_smileys_replacement(input_text, options):
+def do_smileys_replacement(root_tree_node, input_text):
     """
     Do all smileys replacement.
+    :param root_tree_node: The root tree node.
     :param input_text: The input text to be processed.
-    :param options: The current tag options class (used as storage class by the ``setup_cosmetics_replacement`` function).
     :return: The string with all cosmetics replacement done.
     """
 
-    # Get the cosmetics map from the options container
-    emoticons_map = getattr(options, 'emoticons_map', {})
-    emoticons_regex = getattr(options, 'emoticons_regex', None)
-    base_url = getattr(options, 'emoticons_base_url', None)
-    html_class = getattr(options, 'emoticons_html_class', None)
+    # Shortcut if not text
+    if not input_text:
+        return ''
 
-    # Test parameters
+    # Get all emoticons related options
+    emoticons_map = root_tree_node.attrs.get(EMOTICONS_MAP_ATTR_NAME, {})
+    emoticons_regex = root_tree_node.attrs.get(EMOTICONS_REGEX_ATTR_NAME, None)
+    base_url = root_tree_node.attrs.get(EMOTICONS_BASE_URL_ATTR_NAME, None)
+    html_class = root_tree_node.attrs.get(EMOTICONS_HTML_CLASS_ATTR_NAME, None)
+
+    # Only do replacement if configured for
     if not emoticons_map or not emoticons_regex or not base_url:
         return input_text
 
-    # Process all cosmetics
+    # Process all emoticons
     def _handle_match(matchobj):
         emoticon = matchobj.group('emoticon')
         if emoticon in emoticons_map:

@@ -6,7 +6,6 @@ from html import escape as escape_html
 from html import unescape as unescape_html_entities
 
 from .base import TagOptions
-from ..tools import escape_attrvalue
 
 
 class AcronymTagOptions(TagOptions):
@@ -21,9 +20,9 @@ class AcronymTagOptions(TagOptions):
     def get_acronym_title(self, tree_node):
         """
         Get the title for this acronym.
-        The title can be set by setting the acronym_title_attr_name attribute of the tag or simply
+        The title can be set by setting the ``acronym_title_attr_name`` attribute of the tag or simply
         by setting the tag name attribute.
-        The lookup order is: tag name (first), acronym_title_attr_name.
+        The lookup order is: tag name (first), ``acronym_title_attr_name``.
         :param tree_node: The current tree node instance.
         :return The acronym title if set, or an empty string.
         """
@@ -32,41 +31,37 @@ class AcronymTagOptions(TagOptions):
             abbr_title = tree_node.attrs.get(self.acronym_title_attr_name, '')
         return unescape_html_entities(abbr_title)
 
-    def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
+    def render_html(self, tree_node, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param force_rel_nofollow: Ignored.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_html: Inner HTML of this tree node.
-        :return Rendered HTML of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_html: The inner HTML of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
         """
         abbr_title = self.get_acronym_title(tree_node)
-        if not abbr_title:
-            return inner_html
-        else:
-            return '<abbr title="%s">%s</abbr>' % (escape_html(abbr_title), inner_html)
+        return '<abbr title="%s">%s</abbr>' % (escape_html(abbr_title), inner_html) if abbr_title else inner_html
 
-    def render_text(self, tree_node, inner_text):
+    def render_text(self, tree_node, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_text: Inner text of this tree node.
-        :return Rendered text of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_text: The inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered text of this node.
         """
         abbr_title = self.get_acronym_title(tree_node)
-        if not abbr_title:
-            return inner_text
-        else:
-            return '%s (%s)' % (inner_text, abbr_title)
+        return '%s (%s)' % (inner_text, abbr_title) if abbr_title else inner_text
 
-    def render_skcode(self, tree_node, inner_skcode):
+    def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
         """
-        Callback function for rendering SkCode.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
+        Getter function for retrieving all attributes of this node required for rendering SkCode.
+        :param tree_node: The tree node to be rendered.
+        :param inner_skcode: The inner SkCode of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return A dictionary of all attributes required for rendering SkCode and the tag value
+        attribute name for the shortcut syntax (if required).
         """
-        node_name = tree_node.name
-        abbr_title = self.get_acronym_title(tree_node)
-        return '[%s %s=%s]%s[/%s]' % (node_name, self.acronym_title_attr_name,
-                                      escape_attrvalue(abbr_title), inner_skcode, node_name)
+        return {
+                   self.acronym_title_attr_name: self.get_acronym_title(tree_node)
+               }, self.acronym_title_attr_name

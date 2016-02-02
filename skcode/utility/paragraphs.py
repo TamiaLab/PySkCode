@@ -2,14 +2,13 @@
 SkCode auto paragraphs utility code.
 """
 
-from ..etree import TreeNode
 from ..tags import TagOptions
 from ..treebuilder import (TEXT_NODE_NAME,
                            NEWLINE_NODE_NAME)
 
 
 # Paragraph node type
-PARAGRAPH_NODE_NAME = 'paragraph'
+PARAGRAPH_NODE_NAME = '_paragraph'
 
 
 class ParagraphTagOptions(TagOptions):
@@ -18,31 +17,33 @@ class ParagraphTagOptions(TagOptions):
     # HTML class for the paragraph
     html_text_class = 'text-justify'
 
-    def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
+    def render_html(self, tree_node, inner_html, **kwargs):
         """
-        Callback function for rendering HTML. Wrap inner HTML into paragraph.
-        :param force_rel_nofollow: Ignored.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_html: Inner HTML of this tree node.
-        :return Rendered HTML of this node.
+        Callback function for rendering HTML.
+        :param tree_node: The tree node to be rendered.
+        :param inner_html: The inner HTML of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
         """
         return '<p class="%s">%s</p>\n' % (self.html_text_class, inner_html)
 
-    def render_text(self, tree_node, inner_text):
+    def render_text(self, tree_node, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_text: Inner text of this tree node.
-        :return Rendered text of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_text: The inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered text of this node.
         """
         return '%s\n\n' % inner_text.strip()
 
-    def render_skcode(self, tree_node, inner_skcode):
+    def render_skcode(self, tree_node, inner_skcode, **kwargs):
         """
         Callback function for rendering SkCode.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_skcode: The inner SkCode of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered SkCode of this node.
         """
         return '%s\n\n' % inner_skcode.strip()
 
@@ -54,6 +55,7 @@ def make_paragraphs(tree_node,
     :param tree_node: Tree node to be processed.
     :param paragraph_node_opts: Node options for all created paragraph nodes.
     """
+    assert tree_node, "The tree node instance is mandatory."
 
     # Process all children first
     for child_node in tree_node.children:
@@ -110,9 +112,7 @@ def make_paragraphs(tree_node,
 
             # Create a new paragraph if necessary
             if cur_paragraph is None:
-                cur_paragraph = TreeNode(tree_node,
-                                         PARAGRAPH_NODE_NAME,
-                                         paragraph_node_opts)
+                cur_paragraph = tree_node.new_child(PARAGRAPH_NODE_NAME, paragraph_node_opts, append=False)
 
             # Move the node into the paragraph
             child_node.parent = cur_paragraph

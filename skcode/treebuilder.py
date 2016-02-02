@@ -3,7 +3,6 @@ SkCode AST tree builder code.
 """
 
 from .etree import (RootTreeNode,
-                    ROOT_NODE_NAME,
                     TEXT_NODE_NAME,
                     NEWLINE_NODE_NAME)
 from .tags import (RootTagOptions,
@@ -35,37 +34,41 @@ def parse_skcode(text,
     Parse the given text as a SkCode formatted document.
     Return the resulting document tree (DOM-like parser).
     :param text: The input text to be parsed.
-    :param recognized_tags: Dictionary {tag_name: options} containing all valid tags declarations.
-    :param opening_tag_ch: The opening tag char (must be one char long)
-    :param closing_tag_ch: The closing tag char (must be one char long)
-    :param allow_tagvalue_attr: Set to True to allow the BBcode ``tagname=tagvalue`` syntax shortcut (default True).
-    :param allow_self_closing_tags: Set to True to allow self closing tags syntax (default True).
-    :param root_node_opts: Node options for the root node.
-    :param text_node_opts: Node options for all text nodes.
-    :param erroneous_text_node_opts: Node options for all erroneous text nodes.
-    :param newline_node_opts: Node options for all newlines.
-    :param drop_unrecognized: If set to True, any unknown tag will be drop (default to False).
-    :param texturize_unclosed_tags: If set, unclosed tag will be turn into erroneous text node.
-    :param drop_erroneous: If set, erroneous nodes during sanitation will be drop instead of being unwrapped.
-    :param max_nesting_depth: Maximum nesting depth, set to zero to disable (default to 16).
+    :param recognized_tags: A dictionary ``{tag_name: options}`` containing all valid tags declarations.
+    :param opening_tag_ch: The opening tag char (must be one char long exactly, default '[').
+    :param closing_tag_ch: The closing tag char (must be one char long exactly, default ']').
+    :param allow_tagvalue_attr: Set to ``True`` to allow the BBcode ``tagname=tagvalue`` syntax shortcut
+    (default ``True``).
+    :param allow_self_closing_tags: Set to ``True`` to allow the self closing tags syntax (default ``True``).
+    :param root_node_opts: The node options class for the root node.
+    :param text_node_opts: The node options class for all text nodes.
+    :param erroneous_text_node_opts: The node options class for all erroneous text nodes.
+    :param newline_node_opts: The node options class for all newlines.
+    :param drop_unrecognized: If set to ``True``, any unknown tag will be drop (default ``False``).
+    :param texturize_unclosed_tags: If set to ``True``, unclosed tag will be turn into erroneous text node
+    (default ``False``).
+    :param drop_erroneous: If set to ``True``, erroneous nodes during sanitation will be drop instead of being
+    unwrapped (default ``False``).
+    :param max_nesting_depth: The maximum nesting depth (default to 16). Set to zero to disable (not recommended,
+    Denial-Of-Service are possible is nesting depth is not limited).
     :return The resulting document tree at the end of the parsing stage.
     """
+    assert opening_tag_ch, "The opening tag character is mandatory."
     assert len(opening_tag_ch) == 1, "Opening tag character must be one char long exactly."
+    assert closing_tag_ch, "The closing tag character is mandatory."
     assert len(closing_tag_ch) == 1, "Closing tag character must be one char long exactly."
     assert root_node_opts, "Root node options is mandatory."
     assert text_node_opts, "Text node options is mandatory."
     assert erroneous_text_node_opts, "Erroneous text node options is mandatory."
     assert newline_node_opts, "Newline node options is mandatory."
+    assert max_nesting_depth >= 0, "Maximum nesting depth must be greater or equal than zero."
 
-    # Anti oops
-    assert ROOT_NODE_NAME not in recognized_tags, \
-        'The "%s" tag is reserved for internal use only.' % ROOT_NODE_NAME
-    assert TEXT_NODE_NAME not in recognized_tags, \
-        'The "%s" tag is reserved for internal use only.' % TEXT_NODE_NAME
-    assert NEWLINE_NODE_NAME not in recognized_tags, \
-        'The "%s" tag is reserved for internal use only.' % NEWLINE_NODE_NAME
+    # Avoid reserved tag names in the ``recognized_tags`` dictionary.
+    for tag_name in recognized_tags.keys():
+        if tag_name.startswith('_'):
+            raise ValueError('Tag names starting with an underscore are reserved for internal use only.')
 
-    # Init parser
+    # Initialize the parser
     root_tree_node = tree_node = RootTreeNode(root_node_opts)
     swallow_next_newline = False
     cur_nesting_depth = 0
@@ -77,7 +80,7 @@ def parse_skcode(text,
     if not text:
         return root_tree_node
 
-    # Tokenize the text
+    # Tokenize the input text
     for token in tokenize_tag(text,
                               opening_tag_ch, closing_tag_ch,
                               allow_tagvalue_attr, allow_self_closing_tags):
@@ -103,6 +106,9 @@ def parse_skcode(text,
                 # Append the raw source to the node until closing tag found
                 tree_node.content += token_source
                 continue
+
+        # The ``if`` below must be an ``if`` and not an ``elif`` because we need to parse
+        # the closing tag of the DATA block when received.
 
         # Handle unrecognized tags
         if tag_name and tag_name not in recognized_tags:
@@ -143,7 +149,7 @@ def parse_skcode(text,
         elif token_type == TOKEN_OPEN_TAG:
 
             # Handle nesting depth limit
-            if cur_nesting_depth >= max_nesting_depth:
+            if max_nesting_depth and cur_nesting_depth >= max_nesting_depth:
 
                 # Tag cannot be open, fallback as (erroneous) text
                 tree_node.new_child(TEXT_NODE_NAME, erroneous_text_node_opts,
@@ -199,7 +205,8 @@ def parse_skcode(text,
                 tree_node = tree_node.parent
 
                 # Update nesting depth limit
-                cur_nesting_depth -= 1
+                if cur_nesting_depth:
+                    cur_nesting_depth -= 1
         
         elif token_type == TOKEN_SELF_CLOSE_TAG:
 
@@ -232,42 +239,40 @@ def parse_skcode(text,
             tree_node = tree_node.parent
 
     # Perform sanity check and post-parsing processing
-    _sanitize_tree(root_tree_node, erroneous_text_node_opts, drop_erroneous)
-    _postprocess_tree(root_tree_node, root_tree_node)
+    _sanitize_tree(root_tree_node, erroneous_text_node_opts, drop_erroneous, [])
+    _post_process_tree(root_tree_node)
 
     # Return the resulting AST
     return root_tree_node
 
 
-def _sanitize_tree(cur_tree_node, erroneous_text_node_opts, drop_erroneous):
+def _sanitize_tree(tree_node, erroneous_text_node_opts, drop_erroneous, breadcrumb):
     """
-    Recursive method for sanitizing the given tree node.
-    :param cur_tree_node: Current tree node.
-    :param erroneous_text_node_opts: Erroneous text node options to use.
-    :param drop_erroneous: Set to True if erroneous node should be dropped instead of unwrapped.
+    Recursive method for sanitizing the given tree node and children recursively.
+    :param tree_node: The tree node to be sanitized.
+    :param erroneous_text_node_opts: The node options class to be used for erroneous text.
+    :param drop_erroneous: Set to ``True`` if erroneous nodes should be dropped instead of being unwrapped.
+    :param breadcrumb: The current breadcrumb of parent nodes.
     """
 
-    # Down to top visit order (depth-first algorithm)
-    for child_node in cur_tree_node.children:
-        _sanitize_tree(child_node, erroneous_text_node_opts, drop_erroneous)
+    # Down to top visit order (depth-first algorithm) with breadcrumb
+    for child_node in tree_node.children:
+        _sanitize_tree(child_node, erroneous_text_node_opts, drop_erroneous, breadcrumb + [child_node])
 
     # Sanitize the node
-    cur_tree_node.opts.sanitize_node(cur_tree_node,
-                                     erroneous_text_node_opts,
-                                     drop_erroneous)
+    tree_node.opts.sanitize_node(tree_node, breadcrumb, erroneous_text_node_opts, drop_erroneous)
 
 
-def _postprocess_tree(cur_tree_node, root_tree_node):
+def _post_process_tree(tree_node):
     """
-    Recursive method for post-processing the given tree node.
-    :param cur_tree_node: Current tree node.
-    :param root_tree_node: Root tree node instance (for document level information storage).
+    Recursive method for post-processing the given tree node and children recursively.
+    :param tree_node: The tree node to be post-processed.
     """
 
     # Post-process the node
-    go_down = cur_tree_node.opts.postprocess_node(cur_tree_node, root_tree_node)
+    go_down = tree_node.opts.post_process_node(tree_node)
 
     # Go down if allowed
     if go_down:
-        for child_node in cur_tree_node.children:
-            _postprocess_tree(child_node, root_tree_node)
+        for child_node in tree_node.children:
+            _post_process_tree(child_node)

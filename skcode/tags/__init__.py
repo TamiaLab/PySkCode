@@ -30,22 +30,23 @@ from .figures import (FigureDeclarationTagOptions,
                       FigureCaptionTagOptions)
 from .footnotes import (FootnoteDeclarationTagOptions,
                         FootnoteReferenceTagOptions)
-from .textformating import (BoldTextTagOptions,
-                            ItalicTextTagOptions,
-                            StrikeTextTagOptions,
-                            UnderlineTextTagOptions,
-                            SubscriptTextTagOptions,
-                            SupscriptTextTagOptions,
-                            PreTextTagOptions,
-                            CiteTextTagOptions,
-                            InlineCodeTextTagOptions,
-                            InlineSpoilerTextTagOptions,
-                            KeyboardTextTagOptions,
-                            HighlightTextTagOptions,
-                            SmallTextTagOptions)
+from .textformatting import (BoldTextTagOptions,
+                             ItalicTextTagOptions,
+                             StrikeTextTagOptions,
+                             UnderlineTextTagOptions,
+                             SubscriptTextTagOptions,
+                             SupscriptTextTagOptions,
+                             PreTextTagOptions,
+                             CiteTextTagOptions,
+                             InlineCodeTextTagOptions,
+                             InlineSpoilerTextTagOptions,
+                             KeyboardTextTagOptions,
+                             HighlightTextTagOptions,
+                             SmallTextTagOptions)
 from .textalign import (CenterTextTagOptions,
                         LeftTextTagOptions,
-                        RightTextTagOptions)
+                        RightTextTagOptions,
+                        JustifyTextTagOptions)
 from .textdirection import (DirectionTextTagOptions,
                             FixedDirectionTextTagOptions,
                             TEXT_DIR_LEFT_TO_RIGHT,
@@ -112,7 +113,7 @@ DEFAULT_RECOGNIZED_TAGS = {
     'note': FixedAlertBoxTagOptions(ALERT_TYPE_NOTE),
     'question': FixedAlertBoxTagOptions(ALERT_TYPE_QUESTION),
 
-    # --- Text formating
+    # --- Text formatting
     'b': BoldTextTagOptions(),
     'bold': BoldTextTagOptions(),
     'strong': BoldTextTagOptions(),
@@ -151,6 +152,7 @@ DEFAULT_RECOGNIZED_TAGS = {
     'center': CenterTextTagOptions(),
     'left': LeftTextTagOptions(),
     'right': RightTextTagOptions(),
+    'justify': JustifyTextTagOptions(),
 
     # --- Text direction
     'bdo': DirectionTextTagOptions(),
@@ -216,7 +218,7 @@ DEFAULT_RECOGNIZED_TAGS = {
     'fn': FootnoteDeclarationTagOptions(),
     'fnref': FootnoteReferenceTagOptions(),
 
-    # --- Acronymes
+    # --- Acronyms
     'abbr': AcronymTagOptions(),
     'acronym': AcronymTagOptions(),
 

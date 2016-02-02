@@ -3,7 +3,6 @@ SkCode text direction tag definitions code.
 """
 
 from .base import TagOptions
-from ..tools import escape_attrvalue
 
 
 # Text directions
@@ -44,9 +43,9 @@ class DirectionTextTagOptions(TagOptions):
     def get_text_direction(self, tree_node):
         """
         Get the text direction.
-        The text direction can be set by setting the text_direction_attr_name attribute of the tag or simply
+        The text direction can be set by setting the ``text_direction_attr_name`` attribute of the tag or simply
         by setting the tag name attribute.
-        The lookup order is: tag name (first), text_direction_attr_name.
+        The lookup order is: tag name (first), ``text_direction_attr_name``.
         :param tree_node: The current tree node instance.
         :return The text direction of this block of text, or the default one.
         """
@@ -62,23 +61,24 @@ class DirectionTextTagOptions(TagOptions):
         else:
             return self.default_text_direction
 
-    def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
+    def render_html(self, tree_node, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param force_rel_nofollow: If set, all links in the rendered HTML will have "rel=nofollow" (default to True).
-        :param tree_node: Current tree node to be rendered.
-        :param inner_html: Inner HTML of this tree node.
-        :return Rendered HTML of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_html: The inner HTML of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
         """
         text_direction = self.get_text_direction(tree_node)
         return '<bdo dir="%s">%s</bdo>' % (self.bdo_html_attr_value_map[text_direction], inner_html)
 
-    def render_text(self, tree_node, inner_text):
+    def render_text(self, tree_node, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_text: Inner text of this tree node.
-        :return Rendered text of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_text: The inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered text of this node.
         """
         text_direction = self.get_text_direction(tree_node)
         if text_direction == TEXT_DIR_RIGHT_TO_LEFT:
@@ -86,18 +86,20 @@ class DirectionTextTagOptions(TagOptions):
         else:
             return inner_text
 
-    def render_skcode(self, tree_node, inner_skcode):
+    def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
         """
-        Callback function for rendering SkCode.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
+        Getter function for retrieving all attributes of this node required for rendering SkCode.
+        :param tree_node: The tree node to be rendered.
+        :param inner_skcode: The inner SkCode of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return A dictionary of all attributes required for rendering SkCode and the tag value
+        attribute name for the shortcut syntax (if required).
         """
         text_direction = self.get_text_direction(tree_node)
         text_direction = self.reverse_text_direction_map[text_direction]
-        node_name = tree_node.name
-        return '[%s %s=%s]%s[/%s]' % (node_name, self.text_direction_attr_name,
-                                      escape_attrvalue(text_direction), inner_skcode, node_name)
+        return {
+                   self.text_direction_attr_name: text_direction
+               }, self.text_direction_attr_name
 
 
 class FixedDirectionTextTagOptions(DirectionTextTagOptions):
@@ -109,6 +111,7 @@ class FixedDirectionTextTagOptions(DirectionTextTagOptions):
         :param text_direction: Text direction to use.
         :param kwargs: Keyword arguments for super constructor.
         """
+        assert text_direction, "The text direction is mandatory."
         super(FixedDirectionTextTagOptions, self).__init__(**kwargs)
         self.text_direction = text_direction
 
@@ -116,16 +119,17 @@ class FixedDirectionTextTagOptions(DirectionTextTagOptions):
         """
         Get the text direction.
         :param tree_node: The current tree node instance.
-        :return The text direction as set in __init__.
+        :return The text direction as set in ``__init__``.
         """
         return self.text_direction
 
-    def render_skcode(self, tree_node, inner_skcode):
+    def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
         """
-        Callback function for rendering SkCode.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
+        Getter function for retrieving all attributes of this node required for rendering SkCode.
+        :param tree_node: The tree node to be rendered.
+        :param inner_skcode: The inner SkCode of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return A dictionary of all attributes required for rendering SkCode and the tag value
+        attribute name for the shortcut syntax (if required).
         """
-        node_name = tree_node.name
-        return '[%s]%s[/%s]' % (node_name, inner_skcode, node_name)
+        return {}, None

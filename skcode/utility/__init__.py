@@ -2,10 +2,8 @@
 SkCode utilities library.
 """
 
-# Auto paragraphs utilities
-from .paragraphs import (PARAGRAPH_NODE_NAME,
-                         ParagraphTagOptions,
-                         make_paragraphs)
+# Auto paragraphs utility
+from .paragraphs import make_paragraphs
 
 # Cosmetics replacement utility
 from .cosmetics import setup_cosmetics_replacement
@@ -13,7 +11,8 @@ from .cosmetics import setup_cosmetics_replacement
 # Smileys replacement utility
 from .smileys import setup_smileys_replacement
 
-# TODO replace links utility
+# Relative to absolute URLs utility
+from .relative_urls import setup_relative_urls_conversion
 
 # Footnotes utilities
 from .footnotes import (extract_footnotes,
@@ -26,6 +25,8 @@ from .acronyms import extract_acronyms
 # Titles utilities
 from .titles import (extract_titles,
                      make_titles_hierarchy,
-                     make_auto_title_ids)
+                     make_auto_title_ids,
+                     render_titles_hierarchy_html,
+                     render_titles_hierarchy_text)
 
 # TODO extract figures utility, plus auto ID generation

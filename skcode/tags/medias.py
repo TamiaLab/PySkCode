@@ -2,6 +2,8 @@
 SkCode medias tag definitions code.
 """
 
+import posixpath
+
 from urllib.parse import (urlsplit,
                           parse_qs,
                           quote_plus)
@@ -10,8 +12,7 @@ from html import escape as escape_html
 from html import unescape as unescape_html_entities
 
 from .base import TagOptions
-from ..tools import (escape_attrvalue,
-                     sanitize_url)
+from ..tools import sanitize_url
 
 
 class ImageTagOptions(TagOptions):
@@ -39,6 +40,7 @@ class ImageTagOptions(TagOptions):
         :return The image source link URL (not sanitized).
         """
         src_link = tree_node.get_raw_content().strip()
+        # TODO Add relative-absolute URL conversion
         return sanitize_url(src_link, allowed_schemes=self.allowed_schemes)
 
     def get_alt_text(self, tree_node):
@@ -78,28 +80,21 @@ class ImageTagOptions(TagOptions):
         except ValueError:
             return 0
 
-    def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
+    def render_html(self, tree_node, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param force_rel_nofollow: If set, all links in the rendered HTML will have "rel=nofollow" (default to True).
-        :param tree_node: Current tree node to be rendered.
-        :param inner_html: Inner HTML of this tree node.
-        :return Rendered HTML of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_html: The inner HTML of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
         """
 
         # Get the image source link
         src_link = self.get_image_src_link(tree_node)
 
-        # Shortcut if no source link
-        if not src_link:
-            return ''
-
         # Get the alternative text
         alt_text = self.get_alt_text(tree_node)
-        if alt_text:
-            extra_attrs = ' alt="%s"' % escape_html(alt_text)
-        else:
-            extra_attrs = ''
+        extra_attrs = ' alt="%s"' % escape_html(alt_text) if alt_text else ''
 
         # Get the image width
         img_width = self.get_img_width(tree_node)
@@ -114,12 +109,13 @@ class ImageTagOptions(TagOptions):
         # Render the image
         return '<img src="%s"%s />' % (src_link, extra_attrs)
 
-    def render_text(self, tree_node, inner_text):
+    def render_text(self, tree_node, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_text: Inner text of this tree node.
-        :return Rendered text of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_text: The inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered text of this node.
         """
 
         # Get the image source link
@@ -131,47 +127,27 @@ class ImageTagOptions(TagOptions):
 
         # Get the alternative text
         alt_text = self.get_alt_text(tree_node)
-        if alt_text:
-            return '%s (%s)' % (src_link, alt_text)
-        else:
-            return src_link
+        return '%s (%s)' % (src_link, alt_text) if alt_text else src_link
 
-    def render_skcode(self, tree_node, inner_skcode):
+    def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
         """
-        Callback function for rendering SkCode.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
+        Getter function for retrieving all attributes of this node required for rendering SkCode.
+        :param tree_node: The tree node to be rendered.
+        :param inner_skcode: The inner SkCode of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return A dictionary of all attributes required for rendering SkCode and the tag value
+        attribute name for the shortcut syntax (if required).
         """
 
-        # Get the image source link
-        src_link = self.get_image_src_link(tree_node)
-
-        # Shortcut if no source link
-        if not src_link:
-            return inner_skcode
-
-        # Get the alternative text
+        # Get all attributes
         alt_text = self.get_alt_text(tree_node)
-        if alt_text:
-            extra_attrs = ' %s=%s' % (self.alt_attr_name,
-                                      escape_attrvalue(alt_text))
-        else:
-            extra_attrs = ''
-
-        # Get the image width
         img_width = self.get_img_width(tree_node)
-        if img_width:
-            extra_attrs += ' %s="%d"' % (self.width_attr_name, img_width)
-
-        # Get the image height
         img_height = self.get_img_height(tree_node)
-        if img_height:
-            extra_attrs += ' %s="%d"' % (self.height_attr_name, img_height)
-
-        # Render the image
-        node_name = tree_node.name
-        return '[%s%s]%s[/%s]' % (node_name, extra_attrs, src_link, node_name)
+        return {
+                   self.alt_attr_name: alt_text,
+                   self.width_attr_name: img_width,
+                   self.height_attr_name: img_height
+               }, None
 
 
 class YoutubeTagOptions(TagOptions):
@@ -184,10 +160,30 @@ class YoutubeTagOptions(TagOptions):
     default_iframe_height = 315
 
     # Allowed Youtube domains
-    allowed_domains = ('www.youtube.com', 'youtube.com')
+    allowed_domains = (
+        'www.youtube.com',
+        'youtube.com',
+        'youtu.be',
+    )
 
     # Youtube video ID query arg name
     video_id_query_arg_name = 'v'
+
+    # Special cases, when ID is in path
+    video_id_in_path_domains = {
+        'youtu.be',
+    }
+
+    # HTML template
+    integration_html_template = """<div class="embed-container center-block">
+        <div class="embed-video">
+            <iframe width="%(width)d" height="%(height)d" src="https://www.youtube.com/embed/%(video_id)s" frameborder="0" allowfullscreen="true"></iframe>
+        </div>
+    </div>
+    """
+
+    # Text link
+    text_link_format = 'https://youtu.be/%s'
 
     def get_youtube_video_id(self, tree_node):
         """
@@ -215,73 +211,61 @@ class YoutubeTagOptions(TagOptions):
         if netloc not in self.allowed_domains:
             return ''
 
-        # Check for bad url query
-        if not query:
-            return ''
+        # Video ID in query
+        if netloc not in self.video_id_in_path_domains:
 
-        # Get the video ID
-        query_args = parse_qs(query)
-        video_id = query_args.get(self.video_id_query_arg_name, None)
+            # Check for bad url query
+            if not query:
+                return ''
 
-        # Query args return a list of values
-        if not video_id:
-            return ''
+            # Get the video ID
+            query_args = parse_qs(query)
+            video_id = query_args.get(self.video_id_query_arg_name, None)
+
+            # Query args return a list of values
+            return video_id[0].strip() if video_id else ''
+
+        # Video ID in path
         else:
-            return video_id[0].strip()
 
-    def render_html(self, tree_node, inner_html, force_rel_nofollow=True):
+            # Check for bad url path
+            if not path or not path.startswith('/'):
+                return ''
+
+            # Get the video ID
+            video_id = posixpath.basename(path)
+
+            # Query args return a list of values
+            return video_id.strip() if video_id else ''
+
+    def render_html(self, tree_node, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param force_rel_nofollow: If set, all links in the rendered HTML will have "rel=nofollow" (default to True).
-        :param tree_node: Current tree node to be rendered.
-        :param inner_html: Inner HTML of this tree node.
-        :return Rendered HTML of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_html: The inner HTML of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
         """
 
         # Get the video ID
         video_id = self.get_youtube_video_id(tree_node)
 
         # Render the iframe
-        if video_id:
-            return '<iframe width="%d" height="%d" ' \
-                   'src="https://www.youtube.com/embed/%s" ' \
-                   'frameborder="0" allowfullscreen></iframe>' % (self.default_iframe_width,
-                                                                  self.default_iframe_height,
-                                                                  quote_plus(video_id))
-        else:
-            return inner_html
+        return self.integration_html_template % {
+            'width': self.default_iframe_width,
+            'height': self.default_iframe_height,
+            'video_id': quote_plus(video_id)
+        } if video_id else inner_html
 
-    def render_text(self, tree_node, inner_text):
+    def render_text(self, tree_node, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_text: Inner text of this tree node.
-        :return Rendered text of this node.
+        :param tree_node: The tree node to be rendered.
+        :param inner_text: The inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered text of this node.
         """
 
         # Get the video ID
         video_id = self.get_youtube_video_id(tree_node)
-
-        # Render the video link
-        if video_id:
-            return 'https://www.youtube.com/watch?v=%s' % quote_plus(video_id)
-        else:
-            return inner_text
-
-    def render_skcode(self, tree_node, inner_skcode):
-        """
-        Callback function for rendering SkCode.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :return Rendered SkCode of this node.
-        """
-
-        # Get the video ID
-        video_id = self.get_youtube_video_id(tree_node)
-
-        # Render the video tag
-        if video_id:
-            node_name = tree_node.name
-            return '[%s]https://www.youtube.com/watch?v=%s[/%s]' % (node_name, quote_plus(video_id), node_name)
-        else:
-            return inner_skcode
+        return self.text_link_format % quote_plus(video_id) if video_id else inner_text
