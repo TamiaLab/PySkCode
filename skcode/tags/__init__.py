@@ -185,7 +185,7 @@ DEFAULT_RECOGNIZED_TAGS = {
     'figcaption': FigureCaptionTagOptions(),
 
     # --- Lists
-    'list': ListTagOptions(),  # TODO better text version
+    'list': ListTagOptions(),
     'ul': UnorderedListTagOptions(),
     'ol': OrderedListTagOptions(),
     'li': ListElementTagOptions(),
@@ -195,12 +195,12 @@ DEFAULT_RECOGNIZED_TAGS = {
     'task': TodoTaskTagOptions(),
 
     # --- Definitions lists
-    'dl': DefinitionListTagOptions(),  # TODO better text version
+    'dl': DefinitionListTagOptions(),
     'dt': DefinitionListTermTagOptions(),
     'dd': DefinitionListTermDefinitionTagOptions(),
     
     # --- Tables
-    'table': TableTagOptions(),  # TODO text version
+    'table': TableTagOptions(),
     'tr': TableRowTagOptions(),
     'th': TableHeaderCellTagOptions(),
     'td': TableCellTagOptions(),
