@@ -1,3 +1,3 @@
 """
-Tests suite module for tags of the SkCode project.
+Tests suites module for all tags of the SkCode project.
 """
