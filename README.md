@@ -53,14 +53,14 @@ print(render_to_html(document))
 - Nothing hard-coded, you can choose how any stage of the code should work.
 - Made to be extensible and clean, all parts of the code does not form an horrible monolithic spaghetti monster like other BBCode parser.
 - DOM-like parser, you can post-process the document tree and add your own sauce if necessary.
-- Useful toolkit of post-parsing utilities included, like auto-paragraph utility, summary extractor and more. **work in progress**
+- Useful toolkit of post-parsing utilities included, like auto-paragraph utility, summary extractor and more.
 - Sanitation of nested tag included out-the-box on per tag rules basis. **work in progress**
-- Smileys and cosmetics replacement. **work in progress**
+- Smileys and cosmetics replacement.
 - User-proof settings by default. Import and play.
 
 ### Implemented BBCode tags and syntax
 
-The ``DEFAULT_RECOGNIZED_TAGS`` dictionnary include the following definitions:
+The ``DEFAULT_RECOGNIZED_TAGS`` dictionary include the following definitions:
 
 N.B. Some tags included by default require CSS to work. If you're using Bootstrap for CSS you're already ready to go.
 
