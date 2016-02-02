@@ -16,10 +16,10 @@ TOKEN_SELF_CLOSE_TAG = 4
 def tokenize_newline(data):
     """
     Given a string that does not contain any tags, this function will
-    yield a list of TOKEN_NEWLINE and TOKEN_DATA tokens in such way
+    yield a list of ``TOKEN_NEWLINE`` and ``TOKEN_DATA`` tokens in such way
     that if you concatenate their data, you will have the original string.
-    N.B. Newline must have been normalized to \n before calling this function.
-    :param data: Input data string to be tokenized.
+    N.B. Newline must have been normalized to ``\n`` before calling this function.
+    :param data: Input data string to be tokenize.
     """
     lines = data.split('\n')
     last_line_num = len(lines) - 1
@@ -30,16 +30,18 @@ def tokenize_newline(data):
             yield TOKEN_NEWLINE, None, None, '\n'
 
 
-def tokenize_tag(text, opening_tag_ch, closing_tag_ch,
+def tokenize_tag(text, opening_tag_ch='[', closing_tag_ch=']',
                  allow_tagvalue_attr=True, allow_self_closing_tags=True):
     """
     Split the given text into tokens (generator function).
-    :param text: The input text to be tokenized.
-    :param opening_tag_ch: The opening tag char (must be one char long).
-    :param closing_tag_ch: The closing tag char (must be one char long).
-    :param allow_tagvalue_attr: Set to True to allow the BBcode ``tagname=tagvalue`` syntax shortcut (default True).
-    :param allow_self_closing_tags: Set to True to allow self closing tags syntax (default True).
+    :param text: The input text to be tokenize.
+    :param opening_tag_ch: The opening tag char (must be one char long, default '[').
+    :param closing_tag_ch: The closing tag char (must be one char long, default ']').
+    :param allow_tagvalue_attr: Set to ``True`` to allow the BBcode ``tagname=tagvalue`` syntax shortcut
+    (default ``True``).
+    :param allow_self_closing_tags: Set to ``True`` to allow the self closing tags syntax (default ``True``).
     """
+    assert text, "No text input given (mandatory)."
     assert len(opening_tag_ch) == 1, "Opening tag character must be one char long exactly."
     assert len(closing_tag_ch) == 1, "Closing tag character must be one char long exactly."
 
