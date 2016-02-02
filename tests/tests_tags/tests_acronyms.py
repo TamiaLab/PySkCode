@@ -135,3 +135,19 @@ class AcronymsTagTestCase(unittest.TestCase):
         tree_node = root_tree_node.new_child('acronym', opts, attrs={'title': 'As Soon As Possible'})
         expected_result = ({'title': 'As Soon As Possible'}, 'title')
         self.assertEqual(expected_result, opts.get_skcode_attributes(tree_node, 'ASAP'))
+
+    def test_get_skcode_attributes_without_title(self):
+        """ Test the ``get_skcode_attributes`` used for SkCode rendering without title. """
+        opts = AcronymTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('acronym', opts, attrs={})
+        expected_result = ({'title': ''}, 'title')
+        self.assertEqual(expected_result, opts.get_skcode_attributes(tree_node, 'ASAP'))
+
+    def test_get_skcode_attributes_with_html_entities(self):
+        """ Test the ``get_skcode_attributes`` used for SkCode rendering with HTML entities in title. """
+        opts = AcronymTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('acronym', opts, attrs={'title': '<As Soon As Possible>'})
+        expected_result = ({'title': '<As Soon As Possible>'}, 'title')
+        self.assertEqual(expected_result, opts.get_skcode_attributes(tree_node, 'ASAP'))
