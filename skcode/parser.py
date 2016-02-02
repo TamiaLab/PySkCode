@@ -1,10 +1,12 @@
 """
-SkCode tag parser code.
+SkCode tag parsing code.
 """
 
 # Character charsets
-WHITESPACE_CHARSET = frozenset(' \t')
-IDENTIFIER_CHARSET = frozenset('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY0123456789')
+WHITESPACE_CHARSET = frozenset(' \t\r\n')
+IDENTIFIER_CHARSET = frozenset('abcdefghijklmnopqrstuvwxyz'
+                               'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+                               '0123456789_')
 
 
 def skip_nb_char_then_whitespaces(text, offset, nb_char_to_skip=0):
@@ -98,9 +100,8 @@ def get_attribute_value(text, offset, ch, closing_tag_ch):
                 offset += 1
                 ch = text[offset]
 
-                # Only the quoting char can be escaped
-                # FIXME Maybe the backslash need to be escaped too? (need brainstorming)
-                if ch != quoting_ch:
+                # Only the quoting char and the backslash char can be escaped
+                if ch != quoting_ch and ch != '\\':
                     attr_value += '\\'
                 
             # Store the char
@@ -135,25 +136,27 @@ def get_attribute_value(text, offset, ch, closing_tag_ch):
     return attr_value.strip(), offset, ch
 
 
-def parse_tag(text, start_offset, opening_tag_ch, closing_tag_ch,
+def parse_tag(text, start_offset=0, opening_tag_ch='[', closing_tag_ch=']',
               allow_tagvalue_attr=True, allow_self_closing_tags=True):
     """
     Parse the text starting at ``start_offset`` to extract a valid tag, if any.
     Return the tag name, the ``is_closing_tag`` and ``is_self_closing_tag`` flags,
-    the tag attributes (as dict) and the offset just after the end of the tag.
+    the tag attributes (as a dictionary) and the offset just after the end of the tag.
     If something goes wrong (malformed tag, unexpected end-of-file, etc.) an exception
     of type``IndexError`` (unexpected end-of-file) or ``ValueError`` (malformed tag) is raised.
     :param text: The input text.
-    :param start_offset: The offset in the input text to start with.
-    :param opening_tag_ch: The opening tag char (must be one char long).
-    :param closing_tag_ch: The closing tag char (must be one char long).
-    :param allow_tagvalue_attr: Set to True to allow the BBcode ``tagname=tagvalue`` syntax shortcut (default True).
-    :param allow_self_closing_tags: Set to True to allow self closing tags syntax (default True).
-    :return A tuple (tag_name, is_closing_tag, is_self_closing_tag, tag_attrs, offset + 1) on success, or an
-    exception on error (see possible exception in the docstring).
+    :param start_offset: The offset in the input text to start with (default 0).
+    :param opening_tag_ch: The opening tag char (must be one char long, default '[').
+    :param closing_tag_ch: The closing tag char (must be one char long, default ']').
+    :param allow_tagvalue_attr: Set to ``True`` to allow the BBcode ``tagname=tagvalue`` syntax shortcut
+    (default ``True``).
+    :param allow_self_closing_tags: Set to ``True`` to allow the self closing tags syntax (default ``True``).
+    :return A tuple ``(tag_name, is_closing_tag, is_self_closing_tag, tag_attrs, offset + 1)`` on success, or an
+    exception on error (see possible exception in the docstring above).
     """
 
     # Fail if the  first char is not the opening tag char
+    assert text, "No text input given (mandatory)."
     assert start_offset >= 0, "Starting offset must be greater or equal to zero."
     assert start_offset < len(text), "Starting offset must be lower than the size of the text."
     assert len(opening_tag_ch) == 1, "Opening tag character must be one char long exactly."
@@ -249,9 +252,6 @@ def parse_tag(text, start_offset, opening_tag_ch, closing_tag_ch,
 
             # Attribute without value
             tag_attrs[attr_name] = ''
-
-            # Process next attribute
-            continue
 
     # Handle self closing tag
     if ch == '/':
