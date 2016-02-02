@@ -215,7 +215,7 @@ class CodeBlockTagOptions(TagOptions):
         else:
             # Source code only
             figure_extra = '<a id="%s"></a>\n' % figure_id if figure_id else ''
-            return '%s%s\n' % (figure_extra, source_code)
+            return '%s%s' % (figure_extra, source_code)
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
@@ -278,7 +278,7 @@ class CodeBlockTagOptions(TagOptions):
         return {
                    self.language_attr_name: language_name,
                    self.hl_lines_attr_name: ','.join(str(line) for line in hl_lines),
-                   self.line_start_num_attr_name: linenostart,
+                   self.line_start_num_attr_name: str(linenostart),
                    self.filename_attr_name: src_filename,
                    self.source_link_attr_name: src_link_url,
                    self.figure_id_attr_name: figure_id
