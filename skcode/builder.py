@@ -41,7 +41,7 @@ def build_tag_str(tag_name, attrs=None, content='',
     # Handle the ``tagname=tagvalue`` shortcut syntax
     if allow_tagvalue_attr and tagvalue_attr_name in attrs:
         tag_value = attrs.pop(tagvalue_attr_name)
-        tag_value = '=' + escape_attrvalue(tag_value)
+        tag_value = '=' + escape_attrvalue(tag_value) if tag_value or tagvalue_attr_name in non_ignored_empty_attrs else ''
     else:
         tag_value = ''
 
