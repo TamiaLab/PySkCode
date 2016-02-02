@@ -1,5 +1,5 @@
 """
-PySkCode, Python implementation of a full-featured BBCode syntax parser library.
+PySkCode, a Python implementation of a full-featured BBCode syntax parser library.
 """
 
 # Package information
@@ -7,7 +7,7 @@ __author__ = "Fabien Batteix (@skywodd)"
 __copyright__ = "Copyright 2016, TamiaLab"
 __credits__ = ["Fabien Batteix", "TamiaLab"]
 __license__ = "GPLv3"
-__version__ = "1.0.7"
+__version__ = "2.0.0"
 __maintainer__ = "Fabien Batteix"
 __email__ = "fabien.batteix@tamialab.fr"
 __status__ = "Development"  # "Production"
