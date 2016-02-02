@@ -4,8 +4,7 @@ SkCode acronyms tag test code.
 
 import unittest
 
-from skcode.etree import (RootTreeNode,
-                          TreeNode)
+from skcode.etree import RootTreeNode
 from skcode.tags import (RootTagOptions,
                          AcronymTagOptions,
                          DEFAULT_RECOGNIZED_TAGS)
