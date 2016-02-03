@@ -229,7 +229,7 @@ class YoutubeTagOptions(TagOptions):
                 return ''
 
             # Get the video ID
-            video_id = posixpath.basename(path)
+            video_id = posixpath.basename(path.rstrip('/'))
 
             # Query args return a list of values
             return video_id.strip() if video_id else ''
