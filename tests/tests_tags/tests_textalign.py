@@ -4,16 +4,24 @@ SkCode text align tags test code.
 
 import unittest
 
-from skcode.etree import TreeNode
+from skcode.etree import RootTreeNode
 from skcode.tags.textalign import TextAlignBaseTagOptions
-from skcode.tags import (CenterTextTagOptions,
+from skcode.tags import (RootTagOptions,
+                         CenterTextTagOptions,
                          LeftTextTagOptions,
                          RightTextTagOptions,
+                         JustifyTextTagOptions,
                          DEFAULT_RECOGNIZED_TAGS)
 
 
 class TextAlignTagsTestCase(unittest.TestCase):
     """ Tests suite for text align tags module. """
+
+    def test_assertion_constructor(self):
+        """ Test assertion at ``__init__`` """
+        with self.assertRaises(AssertionError) as e:
+            TextAlignBaseTagOptions('')
+        self.assertEqual('The text alignment is mandatory.', str(e.exception))
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
         """ Test the presence of the tag and aliases in the dictionary of default recognized tags. """
@@ -23,6 +31,8 @@ class TextAlignTagsTestCase(unittest.TestCase):
         self.assertIsInstance(DEFAULT_RECOGNIZED_TAGS['left'], LeftTextTagOptions)
         self.assertIn('right', DEFAULT_RECOGNIZED_TAGS)
         self.assertIsInstance(DEFAULT_RECOGNIZED_TAGS['right'], RightTextTagOptions)
+        self.assertIn('justify', DEFAULT_RECOGNIZED_TAGS)
+        self.assertIsInstance(DEFAULT_RECOGNIZED_TAGS['justify'], JustifyTextTagOptions)
 
     def test_tag_constant_values(self):
         """ Test tag constants. """
@@ -36,56 +46,36 @@ class TextAlignTagsTestCase(unittest.TestCase):
         self.assertTrue(opts.close_inlines)
         self.assertFalse(opts.make_paragraphs_here)
 
-    def test_render_html_center(self):
+    def test_render_html(self):
         """ Test the ``render_html`` method. """
-        opts = CenterTextTagOptions()
-        tree_node = TreeNode(None, 'center', opts)
-        self.assertEqual('<p class="text-center">test</p>\n', opts.render_html(tree_node, 'test'))
+        opts = TextAlignBaseTagOptions('custom')
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('center', opts)
+        self.assertEqual('<p class="text-custom">test</p>\n', opts.render_html(tree_node, 'test'))
 
-    def test_render_html_left(self):
-        """ Test the ``render_html`` method. """
-        opts = LeftTextTagOptions()
-        tree_node = TreeNode(None, 'left', opts)
-        self.assertEqual('<p class="text-left">test</p>\n', opts.render_html(tree_node, 'test'))
-
-    def test_render_html_right(self):
-        """ Test the ``render_html`` method. """
-        opts = RightTextTagOptions()
-        tree_node = TreeNode(None, 'right', opts)
-        self.assertEqual('<p class="text-right">test</p>\n', opts.render_html(tree_node, 'test'))
-
-    def test_render_text_center(self):
+    def test_render_text(self):
         """ Test the ``render_text`` method. """
-        opts = CenterTextTagOptions()
-        tree_node = TreeNode(None, 'center', opts)
+        opts = TextAlignBaseTagOptions('custom')
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('center', opts)
         self.assertEqual('test', opts.render_text(tree_node, 'test'))
 
-    def test_render_text_left(self):
-        """ Test the ``render_text`` method. """
-        opts = LeftTextTagOptions()
-        tree_node = TreeNode(None, 'left', opts)
-        self.assertEqual('test', opts.render_text(tree_node, 'test'))
+    def test_center_subclass(self):
+        """ Test the center subclass """
+        self.assertTrue(issubclass(CenterTextTagOptions, TextAlignBaseTagOptions))
+        self.assertEqual('center', CenterTextTagOptions().text_alignment)
 
-    def test_render_text_right(self):
-        """ Test the ``render_text`` method. """
-        opts = RightTextTagOptions()
-        tree_node = TreeNode(None, 'right', opts)
-        self.assertEqual('test', opts.render_text(tree_node, 'test'))
+    def test_left_subclass(self):
+        """ Test the left subclass """
+        self.assertTrue(issubclass(LeftTextTagOptions, TextAlignBaseTagOptions))
+        self.assertEqual('left', LeftTextTagOptions().text_alignment)
 
-    def test_render_skcode_center(self):
-        """ Test the ``render_skcode`` method. """
-        opts = CenterTextTagOptions()
-        tree_node = TreeNode(None, 'center', opts)
-        self.assertEqual('[center]test[/center]', opts.render_skcode(tree_node, 'test'))
+    def test_right_subclass(self):
+        """ Test the right subclass """
+        self.assertTrue(issubclass(RightTextTagOptions, TextAlignBaseTagOptions))
+        self.assertEqual('right', RightTextTagOptions().text_alignment)
 
-    def test_render_skcode_left(self):
-        """ Test the ``render_skcode`` method. """
-        opts = LeftTextTagOptions()
-        tree_node = TreeNode(None, 'left', opts)
-        self.assertEqual('[left]test[/left]', opts.render_skcode(tree_node, 'test'))
-
-    def test_render_skcode_right(self):
-        """ Test the ``render_skcode`` method. """
-        opts = RightTextTagOptions()
-        tree_node = TreeNode(None, 'right', opts)
-        self.assertEqual('[right]test[/right]', opts.render_skcode(tree_node, 'test'))
+    def test_justify_subclass(self):
+        """ Test the justify subclass """
+        self.assertTrue(issubclass(JustifyTextTagOptions, TextAlignBaseTagOptions))
+        self.assertEqual('justify', JustifyTextTagOptions().text_alignment)
