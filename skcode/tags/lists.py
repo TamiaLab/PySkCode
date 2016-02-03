@@ -358,10 +358,10 @@ class ListElementTagOptions(TagOptions):
         :return The rendered text of this node.
         """
         bullet = self.get_list_bullet(tree_node)
-        indent = ' ' * (len(bullet) + 1)
+        indent = ' ' * len(bullet)
         lines = []
         is_first_line = True
-        for line in inner_text.splitlines():
+        for line in inner_text.strip().splitlines():
             if is_first_line:
                 is_first_line = False
                 lines.append('%s %s' % (bullet, line))
