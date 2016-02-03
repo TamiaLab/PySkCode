@@ -86,13 +86,9 @@ class TableCellTagOptions(TagOptions):
         # If set, turn the string into an int
         try:
             user_colspan = int(user_colspan)
-            if user_colspan < 1:
-                user_colspan = 1
+            return user_colspan if user_colspan > 1 else 1
         except ValueError:
-            user_colspan = 1
-
-        # Return the result
-        return user_colspan
+            return 1
 
     def get_cell_rowspan(self, tree_node):
         """
@@ -111,13 +107,9 @@ class TableCellTagOptions(TagOptions):
         # If set, turn the string into an int
         try:
             user_rowspan = int(user_rowspan)
-            if user_rowspan < 1:
-                user_rowspan = 1
+            return user_rowspan if user_rowspan > 1 else 1
         except ValueError:
-            user_rowspan = 1
-
-        # Return the result
-        return user_rowspan
+            return 1
 
     def get_html_extra_attrs(self, tree_node):
         """
@@ -173,8 +165,8 @@ class TableCellTagOptions(TagOptions):
         colspan = self.get_cell_colspan(tree_node)
         rowspan = self.get_cell_rowspan(tree_node)
         return {
-                   self.colspan_attr_name: colspan if colspan != 1 else '',
-                   self.rowspan_attr_name: rowspan if rowspan != 1 else ''
+                   self.colspan_attr_name: str(colspan) if colspan != 1 else '',
+                   self.rowspan_attr_name: str(rowspan) if rowspan != 1 else ''
                }, None
 
 
