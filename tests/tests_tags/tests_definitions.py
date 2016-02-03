@@ -4,14 +4,15 @@ SkCode definitions tag test code.
 
 import unittest
 
-from skcode.etree import TreeNode
-from skcode.tags import (DefinitionListTagOptions,
+from skcode.etree import RootTreeNode
+from skcode.tags import (RootTagOptions,
+                         DefinitionListTagOptions,
                          DefinitionListTermTagOptions,
                          DefinitionListTermDefinitionTagOptions,
                          DEFAULT_RECOGNIZED_TAGS)
 
 
-class DefinitionListsTagtestCase(unittest.TestCase):
+class DefinitionListsTagTestCase(unittest.TestCase):
     """ Tests suite for the definition lists tag module. """
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
@@ -34,7 +35,8 @@ class DefinitionListsTagtestCase(unittest.TestCase):
     def test_html_rendering(self):
         """ Test HTML rendering. """
         opts = DefinitionListTagOptions()
-        tree_node = TreeNode(None, 'dl', opts)
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('dl', opts)
         rendered_output = opts.render_html(tree_node, 'test')
         expected_output = '<dl>test</dl>\n'
         self.assertEqual(expected_output, rendered_output)
@@ -42,21 +44,14 @@ class DefinitionListsTagtestCase(unittest.TestCase):
     def test_text_rendering(self):
         """ Test text rendering. """
         opts = DefinitionListTagOptions()
-        tree_node = TreeNode(None, 'dl', opts)
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('dl', opts)
         rendered_output = opts.render_text(tree_node, 'test')
         expected_output = 'test'
         self.assertEqual(expected_output, rendered_output)
 
-    def test_skcode_rendering(self):
-        """ Test SkCode rendering. """
-        opts = DefinitionListTagOptions()
-        tree_node = TreeNode(None, 'dl', opts)
-        rendered_output = opts.render_skcode(tree_node, 'test')
-        expected_output = '[dl]test[/dl]'
-        self.assertEqual(expected_output, rendered_output)
 
-
-class DefinitionTermsTagtestCase(unittest.TestCase):
+class DefinitionTermsTagTestCase(unittest.TestCase):
     """ Tests suite for the definition terms tag module. """
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
@@ -79,7 +74,8 @@ class DefinitionTermsTagtestCase(unittest.TestCase):
     def test_html_rendering(self):
         """ Test HTML rendering. """
         opts = DefinitionListTermTagOptions()
-        tree_node = TreeNode(None, 'dt', opts)
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('dt', opts)
         rendered_output = opts.render_html(tree_node, 'test')
         expected_output = '<dt>test</dt>\n'
         self.assertEqual(expected_output, rendered_output)
@@ -87,21 +83,23 @@ class DefinitionTermsTagtestCase(unittest.TestCase):
     def test_text_rendering(self):
         """ Test text rendering. """
         opts = DefinitionListTermTagOptions()
-        tree_node = TreeNode(None, 'dt', opts)
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('dt', opts)
         rendered_output = opts.render_text(tree_node, 'test')
         expected_output = 'test : '
         self.assertEqual(expected_output, rendered_output)
 
-    def test_skcode_rendering(self):
-        """ Test SkCode rendering. """
+    def test_text_rendering_trailing_whitespaces(self):
+        """ Test text rendering with trailing whitespaces. """
         opts = DefinitionListTermTagOptions()
-        tree_node = TreeNode(None, 'dt', opts)
-        rendered_output = opts.render_skcode(tree_node, 'test')
-        expected_output = '[dt]test[/dt]'
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('dt', opts)
+        rendered_output = opts.render_text(tree_node, '  foo bar   ')
+        expected_output = 'foo bar : '
         self.assertEqual(expected_output, rendered_output)
 
 
-class DefinitionsTagtestCase(unittest.TestCase):
+class DefinitionsTagTestCase(unittest.TestCase):
     """ Tests suite for the definitions tag module. """
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
@@ -124,7 +122,8 @@ class DefinitionsTagtestCase(unittest.TestCase):
     def test_html_rendering(self):
         """ Test HTML rendering. """
         opts = DefinitionListTermDefinitionTagOptions()
-        tree_node = TreeNode(None, 'dd', opts)
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('dd', opts)
         rendered_output = opts.render_html(tree_node, 'test')
         expected_output = '<dd>test</dd>\n'
         self.assertEqual(expected_output, rendered_output)
@@ -132,15 +131,17 @@ class DefinitionsTagtestCase(unittest.TestCase):
     def test_text_rendering(self):
         """ Test text rendering. """
         opts = DefinitionListTermDefinitionTagOptions()
-        tree_node = TreeNode(None, 'dd', opts)
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('dd', opts)
         rendered_output = opts.render_text(tree_node, 'test')
         expected_output = 'test'
         self.assertEqual(expected_output, rendered_output)
 
-    def test_skcode_rendering(self):
-        """ Test SkCode rendering. """
+    def test_text_rendering_trailing_whitespaces(self):
+        """ Test text rendering with trailing whitespaces. """
         opts = DefinitionListTermDefinitionTagOptions()
-        tree_node = TreeNode(None, 'dd', opts)
-        rendered_output = opts.render_skcode(tree_node, 'test')
-        expected_output = '[dd]test[/dd]'
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('dd', opts)
+        rendered_output = opts.render_text(tree_node, '  foo bar   ')
+        expected_output = 'foo bar'
         self.assertEqual(expected_output, rendered_output)
