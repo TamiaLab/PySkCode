@@ -4,9 +4,10 @@ SkCode text colors tags test code.
 
 import unittest
 
-from skcode.etree import TreeNode
+from skcode.etree import RootTreeNode
 from skcode.tags.textcolors import RGB_COLOR_RE
-from skcode.tags import (ColorTextTagOptions,
+from skcode.tags import (RootTagOptions,
+                         ColorTextTagOptions,
                          FixedColorTextTagOptions,
                          DEFAULT_RECOGNIZED_TAGS)
 
@@ -64,43 +65,57 @@ class TextColorTagsTestCase(unittest.TestCase):
     def test_get_color_value_with_hex_code(self):
         """ Test the ``get_color_value`` method. """
         opts = ColorTextTagOptions()
-        tree_node = TreeNode(None, 'color', opts, attrs={'color': '#FFFFFF'})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('color', opts, attrs={'color': '#FFFFFF'})
         color = opts.get_color_value(tree_node)
-        self.assertEqual('#FFFFFF', color)
+        self.assertEqual('#ffffff', color)
 
     def test_get_color_value_with_named_color(self):
         """ Test the ``get_color_value`` method. """
         opts = ColorTextTagOptions()
-        tree_node = TreeNode(None, 'color', opts, attrs={'color': 'black'})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('color', opts, attrs={'color': 'black'})
+        color = opts.get_color_value(tree_node)
+        self.assertEqual('black', color)
+
+    def test_get_color_value_with_named_color_uppercase(self):
+        """ Test the ``get_color_value`` method (ignore case). """
+        opts = ColorTextTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('color', opts, attrs={'color': 'BLAck'})
         color = opts.get_color_value(tree_node)
         self.assertEqual('black', color)
 
     def test_get_color_value_with_no_value(self):
         """ Test the ``get_color_value`` method. """
         opts = ColorTextTagOptions()
-        tree_node = TreeNode(None, 'color', opts, attrs={})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('color', opts, attrs={})
         color = opts.get_color_value(tree_node)
         self.assertEqual('', color)
 
     def test_get_color_value_with_invalid_color(self):
         """ Test the ``get_color_value`` method. """
         opts = ColorTextTagOptions()
-        tree_node = TreeNode(None, 'color', opts, attrs={'color': 'foobar'})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('color', opts, attrs={'color': 'foobar'})
         color = opts.get_color_value(tree_node)
         self.assertEqual('', color)
 
     def test_render_html(self):
         """ Test the ``render_html`` method with a valid color. """
         opts = ColorTextTagOptions()
-        tree_node = TreeNode(None, 'color', opts, attrs={'color': '#FFFFFF'})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('color', opts, attrs={'color': '#FFFFFF'})
         output_result = opts.render_html(tree_node, 'Hello World!')
-        expected_result = '<span style="color: #FFFFFF">Hello World!</span>'
+        expected_result = '<span style="color: #ffffff">Hello World!</span>'
         self.assertEqual(expected_result, output_result)
 
     def test_render_html_with_invalid_color(self):
         """ Test the ``render_html`` method with an invalid color. """
         opts = ColorTextTagOptions()
-        tree_node = TreeNode(None, 'color', opts, attrs={'color': 'foobar'})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('color', opts, attrs={'color': 'foobar'})
         output_result = opts.render_html(tree_node, 'Hello World!')
         expected_result = 'Hello World!'
         self.assertEqual(expected_result, output_result)
@@ -108,25 +123,28 @@ class TextColorTagsTestCase(unittest.TestCase):
     def test_render_text(self):
         """ Test the ``render_text`` method with a valid color. """
         opts = ColorTextTagOptions()
-        tree_node = TreeNode(None, 'color', opts, attrs={'color': '#FFFFFF'})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('color', opts, attrs={'color': '#FFFFFF'})
         output_result = opts.render_text(tree_node, 'Hello World!')
         expected_result = 'Hello World!'
         self.assertEqual(expected_result, output_result)
 
-    def test_render_skcode(self):
-        """ Test the ``render_skcode`` method with a valid color. """
+    def test_get_skcode_attributes(self):
+        """ Test the ``get_skcode_attributes`` method with a valid color. """
         opts = ColorTextTagOptions()
-        tree_node = TreeNode(None, 'color', opts, attrs={'color': '#FFFFFF'})
-        output_result = opts.render_skcode(tree_node, 'Hello World!')
-        expected_result = '[color="#FFFFFF"]Hello World![/color]'
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('color', opts, attrs={'color': '#FFFFFF'})
+        output_result = opts.get_skcode_attributes(tree_node, 'Hello World!')
+        expected_result = ({'color': '#ffffff'}, 'color')
         self.assertEqual(expected_result, output_result)
 
-    def test_render_skcode_with_invalid_color(self):
-        """ Test the ``render_skcode`` method with an invalid color. """
+    def test_get_skcode_attributes_with_invalid_color(self):
+        """ Test the ``get_skcode_attributes`` method with an invalid color. """
         opts = ColorTextTagOptions()
-        tree_node = TreeNode(None, 'color', opts, attrs={'color': 'foobar'})
-        output_result = opts.render_skcode(tree_node, 'Hello World!')
-        expected_result = 'Hello World!'
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('color', opts, attrs={'color': 'foobar'})
+        output_result = opts.get_skcode_attributes(tree_node, 'Hello World!')
+        expected_result = ({'color': ''}, 'color')
         self.assertEqual(expected_result, output_result)
 
 
@@ -166,11 +184,15 @@ class FixedTextColorTagsTestCase(unittest.TestCase):
     def test_get_color_value(self):
         """ Test the ``get_color_value`` method. """
         opts = FixedColorTextTagOptions('test')
-        self.assertEqual('test', opts.get_color_value(None))
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('color', opts, attrs={'color': '#FFFFFF'})
+        self.assertEqual('test', opts.get_color_value(tree_node))
 
-    def test_render_skcode(self):
-        opts = FixedColorTextTagOptions('black')
-        tree_node = TreeNode(None, 'black', opts)
-        output_result = opts.render_skcode(tree_node, 'Hello World!')
-        expected_result = '[black]Hello World![/black]'
+    def test_get_skcode_attributes(self):
+        """ Test the ``get_skcode_attributes`` method with a valid color. """
+        opts = FixedColorTextTagOptions('test')
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('color', opts, attrs={})
+        output_result = opts.get_skcode_attributes(tree_node, 'Hello World!')
+        expected_result = ({}, None)
         self.assertEqual(expected_result, output_result)
