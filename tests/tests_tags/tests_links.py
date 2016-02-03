@@ -12,6 +12,7 @@ from skcode.tags import (RootTagOptions,
                          AnchorTagOptions,
                          GoToAnchorTagOptions,
                          DEFAULT_RECOGNIZED_TAGS)
+from skcode.utility.relative_urls import setup_relative_urls_conversion
 
 
 class UrlLinksTagTestCase(unittest.TestCase):
@@ -97,7 +98,19 @@ class UrlLinksTagTestCase(unittest.TestCase):
         tree_node = root_tree_node.new_child('url', opts, attrs={'url': 'http://example.com/'})
         with unittest.mock.patch('skcode.tags.links.sanitize_url') as mock_sanitize_url:
             opts.get_target_link(tree_node)
-        mock_sanitize_url.assert_called_once_with('http://example.com/')
+        mock_sanitize_url.assert_called_once_with('http://example.com/',
+                                                  absolute_base_url='', convert_relative_to_absolute=False)
+
+    def test_get_target_link_call_sanitize_url_with_relative_url_conversion(self):
+        """ Test if the ``get_target_link`` call the ``sanitize_url`` method on the url. """
+        opts = UrlLinkTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        setup_relative_urls_conversion(root_tree_node, 'http://example.com/')
+        tree_node = root_tree_node.new_child('url', opts, attrs={'url': 'http://example.com/'})
+        with unittest.mock.patch('skcode.tags.links.sanitize_url') as mock_sanitize_url:
+            opts.get_target_link(tree_node)
+        mock_sanitize_url.assert_called_once_with('http://example.com/',
+                                                  absolute_base_url='http://example.com/', convert_relative_to_absolute=True)
 
     def test_render_html(self):
         """ Test the ``render_html`` method. """

@@ -11,6 +11,7 @@ from skcode.etree import RootTreeNode
 from skcode.tags import (RootTagOptions,
                          QuoteTagOptions,
                          DEFAULT_RECOGNIZED_TAGS)
+from skcode.utility.relative_urls import setup_relative_urls_conversion
 
 
 class QuotesTagTestCase(unittest.TestCase):
@@ -108,7 +109,19 @@ class QuotesTagTestCase(unittest.TestCase):
         tree_node = root_tree_node.new_child('quote', opts, attrs={'link': 'https://github.com/TamiaLab/PySkCode'})
         with unittest.mock.patch('skcode.tags.quotes.sanitize_url') as mock_sanitize_url:
             opts.get_quote_link(tree_node)
-        mock_sanitize_url.assert_called_once_with('https://github.com/TamiaLab/PySkCode')
+        mock_sanitize_url.assert_called_once_with('https://github.com/TamiaLab/PySkCode',
+                                                  absolute_base_url='', convert_relative_to_absolute=False)
+
+    def test_get_quote_link_call_sanitize_url_with_relative_url_conversion(self):
+        opts = QuoteTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        setup_relative_urls_conversion(root_tree_node, 'http://example.com/')
+        tree_node = root_tree_node.new_child('quote', opts, attrs={'link': 'https://github.com/TamiaLab/PySkCode'})
+        with unittest.mock.patch('skcode.tags.quotes.sanitize_url') as mock_sanitize_url:
+            opts.get_quote_link(tree_node)
+        mock_sanitize_url.assert_called_once_with('https://github.com/TamiaLab/PySkCode',
+                                                  absolute_base_url='http://example.com/',
+                                                  convert_relative_to_absolute=True)
 
     def test_get_quote_date(self):
         """ Test the ``get_quote_date`` when the "date" attribute is set. """

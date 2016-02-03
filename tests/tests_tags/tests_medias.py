@@ -10,6 +10,7 @@ from skcode.tags import (RootTagOptions,
                          ImageTagOptions,
                          YoutubeTagOptions,
                          DEFAULT_RECOGNIZED_TAGS)
+from skcode.utility.relative_urls import setup_relative_urls_conversion
 
 
 class ImagesTagTestCase(unittest.TestCase):
@@ -60,7 +61,21 @@ class ImagesTagTestCase(unittest.TestCase):
         with unittest.mock.patch('skcode.tags.medias.sanitize_url') as mock_sanitize_url:
             opts.get_image_src_link(tree_node)
         mock_sanitize_url.assert_called_once_with('http://example.com/image.jpg',
-                                                  allowed_schemes=opts.allowed_schemes)
+                                                  allowed_schemes=opts.allowed_schemes,
+                                                  absolute_base_url='', convert_relative_to_absolute=False)
+
+    def test_get_image_src_link_called_sanitize_with_relative_url_conversion(self):
+        """ Test the ``get_image_src_link`` method call the ``sanitize_url`` method. """
+        opts = ImageTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        setup_relative_urls_conversion(root_tree_node, 'http://example.com/')
+        tree_node = root_tree_node.new_child('img', opts, attrs={}, content='http://example.com/image.jpg')
+        with unittest.mock.patch('skcode.tags.medias.sanitize_url') as mock_sanitize_url:
+            opts.get_image_src_link(tree_node)
+        mock_sanitize_url.assert_called_once_with('http://example.com/image.jpg',
+                                                  allowed_schemes=opts.allowed_schemes,
+                                                  absolute_base_url='http://example.com/',
+                                                  convert_relative_to_absolute=True)
 
     def test_get_alt_text(self):
         """ Test the ``get_alt_text`` method. """
