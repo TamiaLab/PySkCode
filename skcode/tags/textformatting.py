@@ -113,8 +113,12 @@ class InlineCodeTextTagOptions(TagOptions):
 class InlineSpoilerTextTagOptions(InlineWrappingTagOptions):
     """ Inline spoiler text tag options container class. """
 
+    # CSS class name for the ``span`` element
+    css_class_name = 'ispoiler'
+
     def __init__(self, **kwargs):
-        super(InlineSpoilerTextTagOptions, self).__init__('<span class="ispoiler">%s</span>', **kwargs)
+        css_class_name = kwargs.get('css_class_name', self.css_class_name)
+        super(InlineSpoilerTextTagOptions, self).__init__('<span class="{}">%s</span>'.format(css_class_name), **kwargs)
 
 
 class KeyboardTextTagOptions(InlineWrappingTagOptions):
