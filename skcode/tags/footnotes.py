@@ -71,7 +71,7 @@ class FootnoteDeclarationTagOptions(TagOptions):
         if not footnote_id:
             footnote_id = tree_node.attrs.get(self.footnote_id_attr_name, '')
         if not footnote_id and use_auto_generated_id:
-            footnote_id = self.get_footnote_id_from_counter(root_tree_node, tree_node)
+            footnote_id = self.get_footnote_id_from_counter(tree_node, root_tree_node)
         return slugify(footnote_id)
 
     def get_footnote_ref_id(self, footnote_id):
@@ -100,7 +100,7 @@ class FootnoteDeclarationTagOptions(TagOptions):
         """
 
         # Get the footnote ID
-        footnote_id = self.get_footnote_id(tree_node.root_tree_node, tree_node)
+        footnote_id = self.get_footnote_id(tree_node, tree_node.root_tree_node)
 
         # Render the footnote
         return '<a id="%s" href="#%s"><sup>[%s]</sup></a>' % (
@@ -119,7 +119,7 @@ class FootnoteDeclarationTagOptions(TagOptions):
         """
 
         # Get the footnote ID
-        footnote_id = self.get_footnote_id(tree_node.root_tree_node, tree_node)
+        footnote_id = self.get_footnote_id(tree_node, tree_node.root_tree_node)
 
         # Render the footnote
         return '[^%s]' % footnote_id
@@ -135,7 +135,7 @@ class FootnoteDeclarationTagOptions(TagOptions):
         """
 
         # Get the footnote ID
-        footnote_id = self.get_footnote_id(tree_node.root_tree_node, tree_node, use_auto_generated_id=False)
+        footnote_id = self.get_footnote_id(tree_node, tree_node.root_tree_node, use_auto_generated_id=False)
         return {
                    self.footnote_id_attr_name: footnote_id
                }, self.footnote_id_attr_name
@@ -178,7 +178,7 @@ class FootnoteReferenceTagOptions(TagOptions):
         # Get the footnote ID
         footnote_id = self.get_footnote_id(tree_node)
         return '<a href="#%s"><sup>[%s]</sup></a>' % (
-            self.get_footnote_ref_id(footnote_id), footnote_id) if footnote_id else ''
+            self.get_footnote_ref_id(footnote_id), footnote_id) if footnote_id else inner_html
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
