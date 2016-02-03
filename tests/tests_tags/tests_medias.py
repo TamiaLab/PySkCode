@@ -451,7 +451,7 @@ class YoutubeVideosTagTestCase(unittest.TestCase):
         """ Test the ``get_youtube_video_id`` method with a invalid youtube link. """
         opts = YoutubeTagOptions()
         root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('youtube', opts, content='https://youtu.be/')
+        tree_node = root_tree_node.new_child('youtube', opts, content='https://youtu.be')
         video_id = opts.get_youtube_video_id(tree_node)
         self.assertEqual('', video_id)
 
