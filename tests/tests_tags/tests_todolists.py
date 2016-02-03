@@ -4,8 +4,9 @@ SkCode TO.DO lists tag test code.
 
 import unittest
 
-from skcode.etree import TreeNode
-from skcode.tags import (TodoListTagOptions,
+from skcode.etree import RootTreeNode
+from skcode.tags import (RootTagOptions,
+                         TodoListTagOptions,
                          TodoTaskTagOptions,
                          DEFAULT_RECOGNIZED_TAGS)
 
@@ -33,7 +34,8 @@ class TodoListsTagTestCase(unittest.TestCase):
     def test_render_html(self):
         """ Test the ``render_html`` method. """
         opts = TodoListTagOptions()
-        tree_node = TreeNode(None, 'todolist', opts)
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('todolist', opts)
         output_result = opts.render_html(tree_node, 'test')
         expected_result = '<ul>test</ul>\n'
         self.assertEqual(expected_result, output_result)
@@ -41,18 +43,10 @@ class TodoListsTagTestCase(unittest.TestCase):
     def test_render_text(self):
         """ Test the ``render_text`` method. """
         opts = TodoListTagOptions()
-        tree_node = TreeNode(None, 'todolist', opts)
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('todolist', opts)
         output_result = opts.render_text(tree_node, 'test')
         expected_result = '-- TODO LIST --\ntest\n'
-        self.assertEqual(expected_result, output_result)
-
-    def test_render_skcode(self):
-        """ Test the ``render_skcode`` method. """
-        """ Test the ``render_text`` method. """
-        opts = TodoListTagOptions()
-        tree_node = TreeNode(None, 'todolist', opts)
-        output_result = opts.render_skcode(tree_node, 'test')
-        expected_result = '[todolist]test[/todolist]'
         self.assertEqual(expected_result, output_result)
 
 
@@ -83,31 +77,36 @@ class TodoListTasksTagTestCase(unittest.TestCase):
     def test_get_is_done_task_flag_with_done_attribute_set(self):
         """ Test the ``get_is_done_task_flag`` method with the "done" attribute set. """
         opts = TodoTaskTagOptions()
-        tree_node = TreeNode(None, 'task', opts, attrs={'done': ''})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('task', opts, attrs={'done': ''})
         self.assertTrue(opts.get_is_done_task_flag(tree_node))
 
     def test_get_is_done_task_flag_with_tagname_value_set(self):
         """ Test the ``get_is_done_task_flag`` method with the tag name attribute set. """
         opts = TodoTaskTagOptions()
-        tree_node = TreeNode(None, 'task', opts, attrs={'task': 'done'})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('task', opts, attrs={'task': 'done'})
         self.assertTrue(opts.get_is_done_task_flag(tree_node))
 
     def test_get_is_done_task_flag_with_tagname_value_set_to_unknown_value(self):
         """ Test the ``get_is_done_task_flag`` method with the tag name attribute set to an unknown value. """
         opts = TodoTaskTagOptions()
-        tree_node = TreeNode(None, 'task', opts, attrs={'task': 'johndoe'})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('task', opts, attrs={'task': 'johndoe'})
         self.assertFalse(opts.get_is_done_task_flag(tree_node))
 
     def test_get_is_done_task_flag_without_value_set(self):
         """ Test the ``get_is_done_task_flag`` method without the done flag set. """
         opts = TodoTaskTagOptions()
-        tree_node = TreeNode(None, 'task', opts)
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('task', opts)
         self.assertFalse(opts.get_is_done_task_flag(tree_node))
 
     def test_render_html(self):
         """ Test the ``render_html`` method. """
         opts = TodoTaskTagOptions()
-        tree_node = TreeNode(None, 'task', opts)
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('task', opts)
         output_result = opts.render_html(tree_node, 'test')
         expected_result = '<li class="task_pending">test</li>\n'
         self.assertEqual(expected_result, output_result)
@@ -115,7 +114,8 @@ class TodoListTasksTagTestCase(unittest.TestCase):
     def test_render_html_is_done(self):
         """ Test the ``render_html`` method with a "done" task. """
         opts = TodoTaskTagOptions()
-        tree_node = TreeNode(None, 'task', opts, attrs={'done': ''})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('task', opts, attrs={'done': ''})
         output_result = opts.render_html(tree_node, 'test')
         expected_result = '<li class="task_done">test</li>\n'
         self.assertEqual(expected_result, output_result)
@@ -123,31 +123,44 @@ class TodoListTasksTagTestCase(unittest.TestCase):
     def test_render_text(self):
         """ Test the ``render_text`` method. """
         opts = TodoTaskTagOptions()
-        tree_node = TreeNode(None, 'task', opts)
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('task', opts)
         output_result = opts.render_text(tree_node, 'test\ntest2\n')
+        expected_result = '[ ] test\n    test2\n'
+        self.assertEqual(expected_result, output_result)
+
+    def test_render_text_trailing_whitespaces(self):
+        """ Test the ``render_text`` method. """
+        opts = TodoTaskTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('task', opts)
+        output_result = opts.render_text(tree_node, '    test\ntest2\n    ')
         expected_result = '[ ] test\n    test2\n'
         self.assertEqual(expected_result, output_result)
 
     def test_render_text_is_done(self):
         """ Test the ``render_text`` method with a "done" task. """
         opts = TodoTaskTagOptions()
-        tree_node = TreeNode(None, 'task', opts, attrs={'done': ''})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('task', opts, attrs={'done': ''})
         output_result = opts.render_text(tree_node, 'test\ntest2\n')
         expected_result = '[x] test\n    test2\n'
         self.assertEqual(expected_result, output_result)
 
-    def test_render_skcode(self):
-        """ Test the ``render_skcode`` method. """
+    def test_get_skcode_attributes(self):
+        """ Test the ``get_skcode_attributes`` method. """
         opts = TodoTaskTagOptions()
-        tree_node = TreeNode(None, 'task', opts)
-        output_result = opts.render_skcode(tree_node, 'test')
-        expected_result = '[task]test[/task]'
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('task', opts)
+        output_result = opts.get_skcode_attributes(tree_node, 'test')
+        expected_result = ({}, None)
         self.assertEqual(expected_result, output_result)
 
-    def test_render_skcode_is_done(self):
-        """ Test the ``render_skcode`` method with a "done" task. """
+    def test_get_skcode_attributes_is_done(self):
+        """ Test the ``get_skcode_attributes`` method with a "done" task. """
         opts = TodoTaskTagOptions()
-        tree_node = TreeNode(None, 'task', opts, attrs={'done': ''})
-        output_result = opts.render_skcode(tree_node, 'test')
-        expected_result = '[task done]test[/task]'
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('task', opts, attrs={'done': ''})
+        output_result = opts.get_skcode_attributes(tree_node, 'test')
+        expected_result = ({'done': None}, None)
         self.assertEqual(expected_result, output_result)
