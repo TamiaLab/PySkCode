@@ -29,4 +29,5 @@ from .titles import (extract_titles,
                      render_titles_hierarchy_html,
                      render_titles_hierarchy_text)
 
-# TODO extract figures utility, plus auto ID generation
+# figures utilities
+from .figures import extract_figures
