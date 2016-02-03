@@ -34,7 +34,8 @@ def build_tag_str(tag_name, attrs=None, content='',
     if standalone:
         assert not content, "Standalone tags cannot have content."
 
-    # Handle default values for ``tagvalue_attr_name`` and ``non_ignored_empty_attrs``
+    # Handle default values
+    attrs = attrs or {}
     tagvalue_attr_name = tagvalue_attr_name or tag_name
     non_ignored_empty_attrs = non_ignored_empty_attrs or ()
 
