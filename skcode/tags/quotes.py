@@ -170,5 +170,5 @@ class QuoteTagOptions(TagOptions):
         return {
                    self.author_attr_name: author_name,
                    self.link_attr_name: src_link,
-                   self.date_attr_name: calendar.timegm(src_date.timetuple())
-               }, None
+                   self.date_attr_name: str(calendar.timegm(src_date.timetuple())) if src_date else ''
+               }, self.author_attr_name
