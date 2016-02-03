@@ -10,6 +10,7 @@ from html import unescape as unescape_html_entities
 
 from .base import TagOptions
 from ..tools import sanitize_url
+from ..utility.relative_urls import get_relative_url_base
 
 
 class QuoteTagOptions(TagOptions):
@@ -53,8 +54,10 @@ class QuoteTagOptions(TagOptions):
         :return The quote source link URL (not sanitized), or an empty string.
         """
         quote_link = tree_node.attrs.get(self.link_attr_name, '')
-        # TODO Add relative-absolute URL conversion
-        return sanitize_url(quote_link)
+        relative_url_base = get_relative_url_base(tree_node.root_tree_node)
+        return sanitize_url(quote_link,
+                            convert_relative_to_absolute=bool(relative_url_base),
+                            absolute_base_url=relative_url_base)
 
     def get_quote_date(self, tree_node):
         """

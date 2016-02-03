@@ -13,6 +13,7 @@ from html import unescape as unescape_html_entities
 
 from .base import TagOptions
 from ..tools import sanitize_url
+from ..utility.relative_urls import get_relative_url_base
 
 
 class ImageTagOptions(TagOptions):
@@ -40,8 +41,10 @@ class ImageTagOptions(TagOptions):
         :return The image source link URL (not sanitized).
         """
         src_link = tree_node.get_raw_content().strip()
-        # TODO Add relative-absolute URL conversion
-        return sanitize_url(src_link, allowed_schemes=self.allowed_schemes)
+        relative_url_base = get_relative_url_base(tree_node.root_tree_node)
+        return sanitize_url(src_link, allowed_schemes=self.allowed_schemes,
+                            convert_relative_to_absolute=bool(relative_url_base),
+                            absolute_base_url=relative_url_base)
 
     def get_alt_text(self, tree_node):
         """

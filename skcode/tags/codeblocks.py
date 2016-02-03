@@ -14,6 +14,7 @@ from pygments.util import ClassNotFound
 from .base import TagOptions
 from ..tools import (sanitize_url,
                      slugify)
+from ..utility.relative_urls import get_relative_url_base
 
 
 class CodeBlockTagOptions(TagOptions):
@@ -141,8 +142,10 @@ class CodeBlockTagOptions(TagOptions):
         :return: The source URL of the current code block, or an empty string.
         """
         src_link_url = tree_node.attrs.get(self.source_link_attr_name, '')
-        # TODO Add relative-absolute URL conversion
-        return sanitize_url(src_link_url)
+        relative_url_base = get_relative_url_base(tree_node.root_tree_node)
+        return sanitize_url(src_link_url,
+                            convert_relative_to_absolute=bool(relative_url_base),
+                            absolute_base_url=relative_url_base)
 
     def get_figure_id(self, tree_node):
         """
