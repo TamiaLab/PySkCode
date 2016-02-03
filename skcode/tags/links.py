@@ -119,7 +119,7 @@ class EmailLinkTagOptions(TagOptions):
         :return The target email address.
         """
         if self.is_email_inside_tag_content(tree_node):
-            email_address = tree_node.get_raw_content()
+            email_address = tree_node.get_raw_content().strip()
         else:
             email_address = tree_node.attrs.get(tree_node.name, '')
         return sanitize_url(email_address,
