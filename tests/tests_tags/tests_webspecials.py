@@ -4,8 +4,9 @@ SkCode web oriented tag test code.
 
 import unittest
 
-from skcode.etree import TreeNode
-from skcode.tags import (HorizontalLineTagOptions,
+from skcode.etree import RootTreeNode
+from skcode.tags import (RootTagOptions,
+                         HorizontalLineTagOptions,
                          LineBreakTagOptions,
                          DEFAULT_RECOGNIZED_TAGS)
 
@@ -40,12 +41,6 @@ class HorizontalLineTagTestCase(unittest.TestCase):
         opts = HorizontalLineTagOptions()
         self.assertEqual('----------\n', opts.render_text(None, ''))
 
-    def test_render_skcode(self):
-        """ Test the ``render_skcode`` method. """
-        opts = HorizontalLineTagOptions()
-        tree_node = TreeNode(None, 'hr', opts)
-        self.assertEqual('[hr]', opts.render_skcode(tree_node, ''))
-
 
 class LineBreakTagTestCase(unittest.TestCase):
     """ Tests suite for the line break tag module. """
@@ -76,9 +71,3 @@ class LineBreakTagTestCase(unittest.TestCase):
         """ Test the ``render_text`` method. """
         opts = LineBreakTagOptions()
         self.assertEqual('\n', opts.render_text(None, ''))
-
-    def test_render_skcode(self):
-        """ Test the ``render_skcode`` method. """
-        opts = LineBreakTagOptions()
-        tree_node = TreeNode(None, 'br', opts)
-        self.assertEqual('[br]', opts.render_skcode(tree_node, ''))
