@@ -60,9 +60,7 @@ class ImageTagOptions(TagOptions):
         """
         try:
             width = int(tree_node.attrs.get(self.width_attr_name, 0))
-            if width <= 0:
-                return 0
-            return width
+            return width if width > 0 else 0
         except ValueError:
             return 0
 
@@ -74,9 +72,7 @@ class ImageTagOptions(TagOptions):
         """
         try:
             height = int(tree_node.attrs.get(self.height_attr_name, 0))
-            if height <= 0:
-                return 0
-            return height
+            return height if height > 0 else 0
         except ValueError:
             return 0
 
