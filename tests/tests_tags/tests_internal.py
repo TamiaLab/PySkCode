@@ -4,7 +4,7 @@ SkCode internal tag test code.
 
 import unittest
 
-from skcode.etree import TreeNode
+from skcode.etree import RootTreeNode
 from skcode.tags import (RootTagOptions,
                          TextTagOptions,
                          ErroneousTextTagOptions,
@@ -30,19 +30,22 @@ class RootTagTestCase(unittest.TestCase):
     def test_render_html(self):
         """ Test the ``render_html`` method. """
         opts = RootTagOptions()
-        output_result = opts.render_html(None, 'test')
+        root_tree_node = RootTreeNode(opts)
+        output_result = opts.render_html(root_tree_node, 'test')
         self.assertEqual('test', output_result)
 
     def test_render_text(self):
         """ Test the ``render_text`` method. """
         opts = RootTagOptions()
-        output_result = opts.render_text(None, 'test')
+        root_tree_node = RootTreeNode(opts)
+        output_result = opts.render_text(root_tree_node, 'test')
         self.assertEqual('test', output_result)
 
     def test_render_skcode(self):
         """ Test the ``render_skcode`` method. """
         opts = RootTagOptions()
-        output_result = opts.render_skcode(None, 'test')
+        root_tree_node = RootTreeNode(opts)
+        output_result = opts.render_skcode(root_tree_node, 'test')
         self.assertEqual('test', output_result)
 
 
@@ -64,55 +67,82 @@ class TextTagTestCase(unittest.TestCase):
     def test_render_html(self):
         """ Test the ``render_html`` method. """
         opts = TextTagOptions()
-        tree_node = TreeNode(None, 'test', opts, content='test')
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('test', opts, content='test')
         output_result = opts.render_html(tree_node, '')
         self.assertEqual('test', output_result)
 
     def test_render_html_with_html_entities(self):
         """ Test the ``render_html`` method with HTML entities. """
         opts = TextTagOptions()
-        tree_node = TreeNode(None, 'test', opts, content='<test>')
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('test', opts, content='<test>')
         output_result = opts.render_html(tree_node, '')
         self.assertEqual('&lt;test&gt;', output_result)
 
     def test_render_html_with_encoded_html_entities(self):
         """ Test the ``render_html`` method with encoded HTML entities. """
         opts = TextTagOptions()
-        tree_node = TreeNode(None, 'test', opts, content='&lt;test&gt;')
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('test', opts, content='&lt;test&gt;')
         output_result = opts.render_html(tree_node, '')
         self.assertEqual('&lt;test&gt;', output_result)
 
     def test_render_text(self):
         """ Test the ``render_text`` method. """
         opts = TextTagOptions()
-        tree_node = TreeNode(None, 'test', opts, content='test')
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('test', opts, content='test')
         output_result = opts.render_text(tree_node, '')
         self.assertEqual('test', output_result)
 
     def test_render_text_with_html_entities(self):
         """ Test the ``render_text`` method with HTML entities. """
         opts = TextTagOptions()
-        tree_node = TreeNode(None, 'test', opts, content='&lt;test&gt;')
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('test', opts, content='<test>')
+        output_result = opts.render_text(tree_node, '')
+        self.assertEqual('<test>', output_result)
+
+    def test_render_text_with_encoded_html_entities(self):
+        """ Test the ``render_text`` method with encoded HTML entities. """
+        opts = TextTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('test', opts, content='&lt;test&gt;')
         output_result = opts.render_text(tree_node, '')
         self.assertEqual('<test>', output_result)
 
     def test_render_skcode(self):
         """ Test the ``render_skcode`` method. """
         opts = TextTagOptions()
-        tree_node = TreeNode(None, 'test', opts, content='test')
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('test', opts, content='test')
         output_result = opts.render_skcode(tree_node, '')
         self.assertEqual('test', output_result)
 
     def test_render_skcode_with_html_entities(self):
         """ Test the ``render_skcode`` method with HTML entities. """
         opts = TextTagOptions()
-        tree_node = TreeNode(None, 'test', opts, content='&lt;test&gt;')
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('test', opts, content='<test>')
+        output_result = opts.render_skcode(tree_node, '')
+        self.assertEqual('<test>', output_result)
+
+    def test_render_skcode_with_encoded_html_entities(self):
+        """ Test the ``render_skcode`` method with encoded HTML entities. """
+        opts = TextTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('test', opts, content='&lt;test&gt;')
         output_result = opts.render_skcode(tree_node, '')
         self.assertEqual('<test>', output_result)
 
 
 class ErroneousTextTagTestCase(unittest.TestCase):
     """ Tests suite for the erroneous text tag module. """
+
+    def test_subclassing(self):
+        """ Test super class """
+        self.assertTrue(issubclass(ErroneousTextTagOptions, TextTagOptions))
 
     def test_tag_constant_values(self):
         """ Test tag constants. """
@@ -129,21 +159,24 @@ class ErroneousTextTagTestCase(unittest.TestCase):
     def test_render_html(self):
         """ Test the ``render_html`` method. """
         opts = ErroneousTextTagOptions()
-        tree_node = TreeNode(None, 'test', opts, content='test')
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('test', opts, content='test')
         output_result = opts.render_html(tree_node, '')
         self.assertEqual('<span style="font-weight: bold; color: red;">test</span>', output_result)
 
     def test_render_html_with_html_entities(self):
         """ Test the ``render_html`` method with HTML entities. """
         opts = ErroneousTextTagOptions()
-        tree_node = TreeNode(None, 'test', opts, content='<test>')
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('test', opts, content='<test>')
         output_result = opts.render_html(tree_node, '')
         self.assertEqual('<span style="font-weight: bold; color: red;">&lt;test&gt;</span>', output_result)
 
     def test_render_html_with_encoded_html_entities(self):
         """ Test the ``render_html`` method with encoded HTML entities. """
         opts = ErroneousTextTagOptions()
-        tree_node = TreeNode(None, 'test', opts, content='&lt;test&gt;')
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('test', opts, content='&lt;test&gt;')
         output_result = opts.render_html(tree_node, '')
         self.assertEqual('<span style="font-weight: bold; color: red;">&lt;test&gt;</span>', output_result)
 
@@ -166,17 +199,23 @@ class NewlineTagTestCase(unittest.TestCase):
     def test_render_html(self):
         """ Test the ``render_html`` method. """
         opts = NewlineTagOptions()
-        self.assertEqual('\n', opts.render_html(None, ''))
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('test', opts)
+        self.assertEqual('\n', opts.render_html(tree_node, ''))
 
     def test_render_text(self):
         """ Test the ``render_text`` method. """
         opts = NewlineTagOptions()
-        self.assertEqual(' ', opts.render_text(None, ''))
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('test', opts)
+        self.assertEqual(' ', opts.render_text(tree_node, ''))
 
     def test_render_skcode(self):
         """ Test the ``render_skcode`` method. """
         opts = NewlineTagOptions()
-        self.assertEqual('\n', opts.render_skcode(None, ''))
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('test', opts)
+        self.assertEqual('\n', opts.render_skcode(tree_node, ''))
 
 
 class HardNewlineTagTestCase(unittest.TestCase):
@@ -197,14 +236,20 @@ class HardNewlineTagTestCase(unittest.TestCase):
     def test_render_html(self):
         """ Test the ``render_html`` method. """
         opts = HardNewlineTagOptions()
-        self.assertEqual('<br>\n', opts.render_html(None, ''))
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('test', opts)
+        self.assertEqual('<br>\n', opts.render_html(tree_node, ''))
 
     def test_render_text(self):
         """ Test the ``render_text`` method. """
         opts = HardNewlineTagOptions()
-        self.assertEqual('\n', opts.render_text(None, ''))
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('test', opts)
+        self.assertEqual('\n', opts.render_text(tree_node, ''))
 
     def test_render_skcode(self):
         """ Test the ``render_skcode`` method. """
         opts = HardNewlineTagOptions()
-        self.assertEqual('\n', opts.render_text(None, ''))
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('test', opts)
+        self.assertEqual('\n', opts.render_text(tree_node, ''))
