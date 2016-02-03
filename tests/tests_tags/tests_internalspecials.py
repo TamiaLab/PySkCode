@@ -4,12 +4,13 @@ SkCode specials tag test code.
 
 import unittest
 
-from skcode.etree import TreeNode
-from skcode.tags import (NoParseTagOptions,
+from skcode.etree import RootTreeNode
+from skcode.tags import (RootTagOptions,
+                         NoParseTagOptions,
                          DEFAULT_RECOGNIZED_TAGS)
 
 
-class NoParseTagtestCase(unittest.TestCase):
+class NoParseTagTestCase(unittest.TestCase):
     """ Tests suite for the special "no parse" tag module. """
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
@@ -34,7 +35,8 @@ class NoParseTagtestCase(unittest.TestCase):
     def test_html_rendering(self):
         """ Test HTML rendering. """
         opts = NoParseTagOptions()
-        tree_node = TreeNode(None, 'noparse', opts, content='[u]... some text[/u]')
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('noparse', opts, content='[u]... some text[/u]')
         rendered_output = opts.render_html(tree_node, '')
         expected_output = '[u]... some text[/u]'
         self.assertEqual(expected_output, rendered_output)
@@ -42,7 +44,8 @@ class NoParseTagtestCase(unittest.TestCase):
     def test_html_rendering_with_html_entities(self):
         """ Test HTML rendering with HTML entities. """
         opts = NoParseTagOptions()
-        tree_node = TreeNode(None, 'noparse', opts, content='[u]... <some text>[/u]')
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('noparse', opts, content='[u]... <some text>[/u]')
         rendered_output = opts.render_html(tree_node, '')
         expected_output = '[u]... &lt;some text&gt;[/u]'
         self.assertEqual(expected_output, rendered_output)
@@ -50,7 +53,8 @@ class NoParseTagtestCase(unittest.TestCase):
     def test_html_rendering_with_encoded_html_entities(self):
         """ Test HTML rendering with encoded HTML entities. """
         opts = NoParseTagOptions()
-        tree_node = TreeNode(None, 'noparse', opts, content='[u]... &lt;some text&gt;[/u]')
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('noparse', opts, content='[u]... &lt;some text&gt;[/u]')
         rendered_output = opts.render_html(tree_node, '')
         expected_output = '[u]... &lt;some text&gt;[/u]'
         self.assertEqual(expected_output, rendered_output)
@@ -58,31 +62,53 @@ class NoParseTagtestCase(unittest.TestCase):
     def test_text_rendering(self):
         """ Test text rendering. """
         opts = NoParseTagOptions()
-        tree_node = TreeNode(None, 'noparse', opts, content='[u]... some text[/u]')
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('noparse', opts, content='[u]... some text[/u]')
         rendered_output = opts.render_text(tree_node, '')
         expected_output = '[u]... some text[/u]'
         self.assertEqual(expected_output, rendered_output)
 
     def test_text_rendering_with_html_entities(self):
-        """ Test text rendering with encoded HTML entities. """
+        """ Test text rendering with HTML entities. """
         opts = NoParseTagOptions()
-        tree_node = TreeNode(None, 'noparse', opts, content='[u]... &lt;some text&gt;[/u]')
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('noparse', opts, content='[u]... <some text>[/u]')
         rendered_output = opts.render_text(tree_node, '')
         expected_output = '[u]... <some text>[/u]'
         self.assertEqual(expected_output, rendered_output)
 
-    def test_skcode_rendering(self):
-        """ Test SkCode rendering. """
+    def test_text_rendering_with_encoded_html_entities(self):
+        """ Test text rendering with encoded HTML entities. """
         opts = NoParseTagOptions()
-        tree_node = TreeNode(None, 'noparse', opts, content='[u]... some text[/u]')
-        rendered_output = opts.render_skcode(tree_node, '')
-        expected_output = '[noparse][u]... some text[/u][/noparse]'
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('noparse', opts, content='[u]... &lt;some text&gt;[/u]')
+        rendered_output = opts.render_text(tree_node, '')
+        expected_output = '[u]... <some text>[/u]'
         self.assertEqual(expected_output, rendered_output)
 
-    def test_skcode_rendering_with_html_entities(self):
-        """ Test SkCode rendering with encoded HTML entities. """
+    def test_get_skcode_inner_content(self):
+        """ Test the ``get_skcode_inner_content`` method. """
         opts = NoParseTagOptions()
-        tree_node = TreeNode(None, 'noparse', opts, content='[u]... &lt;some text&gt;[/u]')
-        rendered_output = opts.render_skcode(tree_node, '')
-        expected_output = '[noparse][u]... <some text>[/u][/noparse]'
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('noparse', opts, content='[u]... some text[/u]')
+        rendered_output = opts.get_skcode_inner_content(tree_node, '')
+        expected_output = '[u]... some text[/u]'
+        self.assertEqual(expected_output, rendered_output)
+
+    def test_get_skcode_inner_content_with_html_entities(self):
+        """ Test the ``get_skcode_inner_content`` method with HTML entities. """
+        opts = NoParseTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('noparse', opts, content='[u]... &lt;some text&gt;[/u]')
+        rendered_output = opts.get_skcode_inner_content(tree_node, '')
+        expected_output = '[u]... <some text>[/u]'
+        self.assertEqual(expected_output, rendered_output)
+
+    def test_get_skcode_inner_content_with_encoded_html_entities(self):
+        """ Test the ``get_skcode_inner_content`` method with encoded HTML entities. """
+        opts = NoParseTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('noparse', opts, content='[u]... &lt;some text&gt;[/u]')
+        rendered_output = opts.get_skcode_inner_content(tree_node, '')
+        expected_output = '[u]... <some text>[/u]'
         self.assertEqual(expected_output, rendered_output)
