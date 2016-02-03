@@ -4,12 +4,13 @@ SkCode electronic tag test code.
 
 import unittest
 
-from skcode.etree import TreeNode
-from skcode.tags import (NotNotationTagOptions,
+from skcode.etree import RootTreeNode
+from skcode.tags import (RootTagOptions,
+                         NotNotationTagOptions,
                          DEFAULT_RECOGNIZED_TAGS)
 
 
-class NotNotationTagtestCase(unittest.TestCase):
+class NotNotationTagTestCase(unittest.TestCase):
     """ Tests suite for the NOT notation tag module. """
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
@@ -32,7 +33,8 @@ class NotNotationTagtestCase(unittest.TestCase):
     def test_html_rendering(self):
         """ Test HTML rendering. """
         opts = NotNotationTagOptions()
-        tree_node = TreeNode(None, 'not', opts)
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('not', opts)
         rendered_output = opts.render_html(tree_node, 'RESET')
         expected_output = '<span style="text-decoration:overline; text-transform: uppercase;">RESET</span>'
         self.assertEqual(expected_output, rendered_output)
@@ -40,7 +42,8 @@ class NotNotationTagtestCase(unittest.TestCase):
     def test_text_rendering(self):
         """ Test text rendering. """
         opts = NotNotationTagOptions()
-        tree_node = TreeNode(None, 'not', opts)
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('not', opts)
         rendered_output = opts.render_text(tree_node, 'RESET')
         expected_output = '/RESET'
         self.assertEqual(expected_output, rendered_output)
@@ -48,15 +51,8 @@ class NotNotationTagtestCase(unittest.TestCase):
     def test_text_rendering_auto_upper(self):
         """ Test text rendering. """
         opts = NotNotationTagOptions()
-        tree_node = TreeNode(None, 'not', opts)
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('not', opts)
         rendered_output = opts.render_text(tree_node, 'reset')
         expected_output = '/RESET'
-        self.assertEqual(expected_output, rendered_output)
-
-    def test_skcode_rendering(self):
-        """ Test SkCode rendering. """
-        opts = NotNotationTagOptions()
-        tree_node = TreeNode(None, 'not', opts)
-        rendered_output = opts.render_skcode(tree_node, 'RESET')
-        expected_output = '[not]RESET[/not]'
         self.assertEqual(expected_output, rendered_output)
