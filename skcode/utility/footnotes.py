@@ -59,7 +59,7 @@ def render_footnotes_html(footnotes,
         footnote_id = footnote_node.opts.get_footnote_id(footnote_node, footnote_node.root_tree_node)
 
         # Craft the footnote declaration HTML
-        footnote_declaration_html = '<a id="%(refid)s" href="#%(backrefid)s"><sup>[%(fnid)s]</sup></a> ' % {
+        footnote_declaration_html = '<a id="%(refid)s" href="#%(backrefid)s"><sup>[%(fnid)s]</sup></a>' % {
             'refid': footnote_node.opts.get_footnote_ref_id(footnote_id),
             'backrefid': footnote_node.opts.get_footnote_backref_id(footnote_id),
             'fnid': footnote_id
