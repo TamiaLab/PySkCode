@@ -53,9 +53,10 @@ class DirectionTextTagOptions(TagOptions):
         # Get the user input
         user_text_direction = tree_node.attrs.get(tree_node.name, '')
         if not user_text_direction:
-            user_text_direction = tree_node.attrs.get(self.text_direction_attr_name, self.default_text_direction)
+            user_text_direction = tree_node.attrs.get(self.text_direction_attr_name, '')
 
         # Remap the supplied value
+        user_text_direction = user_text_direction.lower()
         if user_text_direction in self.text_direction_map:
             return self.text_direction_map[user_text_direction]
         else:
