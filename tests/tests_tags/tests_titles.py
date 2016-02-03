@@ -5,13 +5,23 @@ SkCode titles tag test code.
 import unittest
 from unittest import mock
 
-from skcode.etree import TreeNode
-from skcode.tags import (TitleTagOptions,
+from skcode.etree import RootTreeNode
+from skcode.tags import (RootTagOptions,
+                         TitleTagOptions,
                          DEFAULT_RECOGNIZED_TAGS)
 
 
 class TitlesTagTestCase(unittest.TestCase):
     """ Tests suite for the titles tag module. """
+
+    def test_assertions_constructor(self):
+        """ Test assertions at ``__init__`` """
+        with self.assertRaises(AssertionError) as e:
+            TitleTagOptions(0)
+        self.assertEqual('Title level must be between zero and 6 (included).', str(e.exception))
+        with self.assertRaises(AssertionError) as e:
+            TitleTagOptions(7)
+        self.assertEqual('Title level must be between zero and 6 (included).', str(e.exception))
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
         """ Test the presence of the tag and aliases in the dictionary of default recognized tags. """
@@ -57,43 +67,49 @@ class TitlesTagTestCase(unittest.TestCase):
     def test_get_permalink_slug_with_tagname_set(self):
         """ Test the ``get_permalink_slug`` when the tag name attribute is set. """
         opts = TitleTagOptions(1)
-        tree_node = TreeNode(None, 'h1', opts, attrs={'h1': 'test'})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('h1', opts, attrs={'h1': 'test'})
         permalink_slug = opts.get_permalink_slug(tree_node)
         self.assertEqual('test', permalink_slug)
 
     def test_get_permalink_slug_with_id_set(self):
         """ Test the ``get_permalink_slug`` when the "id" attribute is set. """
         opts = TitleTagOptions(1)
-        tree_node = TreeNode(None, 'h1', opts, attrs={'id': 'test'})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('h1', opts, attrs={'id': 'test'})
         permalink_slug = opts.get_permalink_slug(tree_node)
         self.assertEqual('test', permalink_slug)
 
     def test_get_permalink_slug_with_id_and_tagname_set(self):
         """ Test the ``get_permalink_slug`` when the tag name and "id" attribute is set. """
         opts = TitleTagOptions(1)
-        tree_node = TreeNode(None, 'h1', opts, attrs={'h1': 'test2', 'id': 'test'})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('h1', opts, attrs={'h1': 'test', 'id': 'test2'})
         permalink_slug = opts.get_permalink_slug(tree_node)
-        self.assertEqual('test2', permalink_slug)
+        self.assertEqual('test', permalink_slug)
 
     def test_get_permalink_slug_without_value(self):
         """ Test the ``get_permalink_slug`` when no value is set. """
         opts = TitleTagOptions(1)
-        tree_node = TreeNode(None, 'h1', opts, attrs={})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('h1', opts, attrs={})
         permalink_slug = opts.get_permalink_slug(tree_node)
         self.assertEqual('', permalink_slug)
 
     def test_get_permalink_slug_call_slugify(self):
         """ Test the ``get_permalink_slug`` method call the ``slugify`` function. """
         opts = TitleTagOptions(1)
-        tree_node = TreeNode(None, 'h1', opts, attrs={'id': 'test'})
-        with unittest.mock.patch('skcode.tags.titles.slugify') as mock:
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('h1', opts, attrs={'id': 'test'})
+        with unittest.mock.patch('skcode.tags.titles.slugify') as mock_slugify:
             opts.get_permalink_slug(tree_node)
-        mock.assert_called_once_with('test')
+        mock_slugify.assert_called_once_with('test')
 
     def test_render_html_with_permalink(self):
         """ Test the ``render_html`` when the "id" attribute is set. """
         opts = TitleTagOptions(1)
-        tree_node = TreeNode(None, 'h1', opts, attrs={'id': 'test'})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('h1', opts, attrs={'id': 'test'})
         output_result = opts.render_html(tree_node, 'Hello World!')
         expected_result = '<h1><a id="test">Hello World!</a></h1>\n'
         self.assertEqual(expected_result, output_result)
@@ -101,7 +117,8 @@ class TitlesTagTestCase(unittest.TestCase):
     def test_render_html_without_permalink(self):
         """ Test the ``render_html`` when the "id" attribute is not set. """
         opts = TitleTagOptions(1)
-        tree_node = TreeNode(None, 'h1', opts, attrs={})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('h1', opts, attrs={})
         output_result = opts.render_html(tree_node, 'Hello World!')
         expected_result = '<h1>Hello World!</h1>\n'
         self.assertEqual(expected_result, output_result)
@@ -109,7 +126,8 @@ class TitlesTagTestCase(unittest.TestCase):
     def test_render_text_with_permalink(self):
         """ Test the ``render_text`` when the "id" attribute is set. """
         opts = TitleTagOptions(1)
-        tree_node = TreeNode(None, 'h1', opts, attrs={'id': 'test'})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('h1', opts, attrs={'id': 'test'})
         output_result = opts.render_text(tree_node, 'Hello World!')
         expected_result = '#[test] Hello World!\n'
         self.assertEqual(expected_result, output_result)
@@ -117,23 +135,26 @@ class TitlesTagTestCase(unittest.TestCase):
     def test_render_text_without_permalink(self):
         """ Test the ``render_text`` when the "id" attribute is not set. """
         opts = TitleTagOptions(1)
-        tree_node = TreeNode(None, 'h1', opts, attrs={})
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('h1', opts, attrs={})
         output_result = opts.render_text(tree_node, 'Hello World!')
         expected_result = '# Hello World!\n'
         self.assertEqual(expected_result, output_result)
 
-    def test_render_skcode_with_permalink(self):
-        """ Test the ``render_skcode`` when the "id" attribute is set. """
+    def test_get_skcode_attributes_with_permalink(self):
+        """ Test the ``get_skcode_attributes`` when the "id" attribute is set. """
         opts = TitleTagOptions(1)
-        tree_node = TreeNode(None, 'h1', opts, attrs={'id': 'test'})
-        output_result = opts.render_skcode(tree_node, 'Hello World!')
-        expected_result = '[h1 id="test"]Hello World![/h1]'
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('h1', opts, attrs={'id': 'test'})
+        output_result = opts.get_skcode_attributes(tree_node, 'Hello World!')
+        expected_result = ({'id': 'test'}, 'id')
         self.assertEqual(expected_result, output_result)
 
-    def test_render_skcode_without_permalink(self):
-        """ Test the ``render_skcode`` when the "id" attribute is not set. """
+    def test_get_skcode_attributes_without_permalink(self):
+        """ Test the ``get_skcode_attributes`` when the "id" attribute is not set. """
         opts = TitleTagOptions(1)
-        tree_node = TreeNode(None, 'h1', opts, attrs={})
-        output_result = opts.render_skcode(tree_node, 'Hello World!')
-        expected_result = '[h1]Hello World![/h1]'
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('h1', opts, attrs={})
+        output_result = opts.get_skcode_attributes(tree_node, 'Hello World!')
+        expected_result = ({'id': ''}, 'id')
         self.assertEqual(expected_result, output_result)
