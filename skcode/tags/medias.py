@@ -141,8 +141,8 @@ class ImageTagOptions(TagOptions):
         img_height = self.get_img_height(tree_node)
         return {
                    self.alt_attr_name: alt_text,
-                   self.width_attr_name: img_width,
-                   self.height_attr_name: img_height
+                   self.width_attr_name: str(img_width) if img_width > 0 else '',
+                   self.height_attr_name: str(img_height) if img_height > 0 else ''
                }, None
 
 
