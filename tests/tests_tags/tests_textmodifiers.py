@@ -4,9 +4,10 @@ SkCode text modifier tags test code.
 
 import unittest
 
-from skcode.etree import TreeNode
+from skcode.etree import RootTreeNode
 from skcode.tags.textmodifiers import TextModifierBaseTagOptions
-from skcode.tags import (LowerCaseTextTagOptions,
+from skcode.tags import (RootTagOptions,
+                         LowerCaseTextTagOptions,
                          UpperCaseTextTagOptions,
                          CapitalizeTextTagOptions,
                          DEFAULT_RECOGNIZED_TAGS)
@@ -39,59 +40,48 @@ class TextModifierTagsTestCase(unittest.TestCase):
     def test_render_html_lowercase(self):
         """ Test the ``render_html`` method. """
         opts = LowerCaseTextTagOptions()
-        tree_node = TreeNode(None, 'lowercase', opts)
-        self.assertEqual('<p class="text-lowercase">test</p>\n', opts.render_html(tree_node, 'test'))
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('lowercase', opts)
+        self.assertEqual('<span class="text-lowercase">test</span>\n', opts.render_html(tree_node, 'test'))
 
     def test_render_html_uppercase(self):
         """ Test the ``render_html`` method. """
         opts = UpperCaseTextTagOptions()
-        tree_node = TreeNode(None, 'uppercase', opts)
-        self.assertEqual('<p class="text-uppercase">test</p>\n', opts.render_html(tree_node, 'test'))
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('uppercase', opts)
+        self.assertEqual('<span class="text-uppercase">test</span>\n', opts.render_html(tree_node, 'test'))
 
-    def test_render_html_capitilize(self):
+    def test_render_html_capitalize(self):
         """ Test the ``render_html`` method. """
         opts = CapitalizeTextTagOptions()
-        tree_node = TreeNode(None, 'capitalize', opts)
-        self.assertEqual('<p class="text-capitalize">test</p>\n', opts.render_html(tree_node, 'test'))
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('capitalize', opts)
+        self.assertEqual('<span class="text-capitalize">test</span>\n', opts.render_html(tree_node, 'test'))
 
     def test_render_text_lowercase(self):
         """ Test the ``render_text`` method. """
         opts = LowerCaseTextTagOptions()
-        tree_node = TreeNode(None, 'lowercase', opts)
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('lowercase', opts)
         self.assertEqual('test', opts.render_text(tree_node, 'teST'))
 
     def test_render_text_uppercase(self):
         """ Test the ``render_text`` method. """
         opts = UpperCaseTextTagOptions()
-        tree_node = TreeNode(None, 'uppercase', opts)
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('uppercase', opts)
         self.assertEqual('TEST', opts.render_text(tree_node, 'teST'))
 
-    def test_render_text_capitilize(self):
+    def test_render_text_capitalize(self):
         """ Test the ``render_text`` method. """
         opts = CapitalizeTextTagOptions()
-        tree_node = TreeNode(None, 'capitalize', opts)
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('capitalize', opts)
         self.assertEqual('Test', opts.render_text(tree_node, 'test'))
 
     def test_render_text_unknown_modifier(self):
         """ Test the ``render_text`` method. """
         opts = TextModifierBaseTagOptions('unknown')
-        tree_node = TreeNode(None, 'unknown', opts)
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('unknown', opts)
         self.assertEqual('teST', opts.render_text(tree_node, 'teST'))
-
-    def test_render_skcode_lowercase(self):
-        """ Test the ``render_skcode`` method. """
-        opts = LowerCaseTextTagOptions()
-        tree_node = TreeNode(None, 'lowercase', opts)
-        self.assertEqual('[lowercase]test[/lowercase]', opts.render_skcode(tree_node, 'test'))
-
-    def test_render_skcode_uppercase(self):
-        """ Test the ``render_skcode`` method. """
-        opts = UpperCaseTextTagOptions()
-        tree_node = TreeNode(None, 'uppercase', opts)
-        self.assertEqual('[uppercase]test[/uppercase]', opts.render_skcode(tree_node, 'test'))
-
-    def test_render_skcode_capitilize(self):
-        """ Test the ``render_skcode`` method. """
-        opts = CapitalizeTextTagOptions()
-        tree_node = TreeNode(None, 'capitalize', opts)
-        self.assertEqual('[capitalize]test[/capitalize]', opts.render_skcode(tree_node, 'test'))
