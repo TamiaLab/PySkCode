@@ -180,6 +180,14 @@ class ErroneousTextTagTestCase(unittest.TestCase):
         output_result = opts.render_html(tree_node, '')
         self.assertEqual('<span style="font-weight: bold; color: red;">&lt;test&gt;</span>', output_result)
 
+    def test_render_text(self):
+        """ Test the ``render_text`` method. """
+        opts = ErroneousTextTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('test', opts, content='test')
+        output_result = opts.render_text(tree_node, '')
+        self.assertEqual('test', output_result)
+
 
 class NewlineTagTestCase(unittest.TestCase):
     """ Tests suite for the newline tag module. """
@@ -252,4 +260,4 @@ class HardNewlineTagTestCase(unittest.TestCase):
         opts = HardNewlineTagOptions()
         root_tree_node = RootTreeNode(RootTagOptions())
         tree_node = root_tree_node.new_child('test', opts)
-        self.assertEqual('\n', opts.render_text(tree_node, ''))
+        self.assertEqual('\n', opts.render_skcode(tree_node, ''))
