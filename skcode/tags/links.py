@@ -242,7 +242,7 @@ class AnchorTagOptions(TagOptions):
         :param kwargs: Extra keyword arguments for rendering.
         :return The inner content for SkCode rendering.
         """
-        return self.get_anchor_id(tree_node)
+        return self.get_anchor_id(tree_node) or inner_skcode
 
 
 class GoToAnchorTagOptions(TagOptions):

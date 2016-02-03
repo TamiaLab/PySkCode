@@ -202,4 +202,4 @@ class FootnoteReferenceTagOptions(TagOptions):
         :return The inner content for SkCode rendering.
         Default implementation return the ``inner_skcode`` value.
         """
-        return self.get_footnote_id(tree_node)
+        return self.get_footnote_id(tree_node) or inner_skcode
