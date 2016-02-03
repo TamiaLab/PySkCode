@@ -75,7 +75,6 @@ class FootnotesUtilityTagTestCase(unittest.TestCase):
         a4 = document_tree.new_child('footnote', CustomFootnoteDeclarationTagOption())
         a4.new_child('_text', TextTagOptions(), content='Line 4')
         footnotes = [a1, a2, a3, a4]
-        print(render_footnotes_html(footnotes))
         self.assertEqual("""<div class="footnotes">
 <p class="footnotes-details">
 <a id="footnote-1" href="#footnote-backref-1"><sup>[1]</sup></a>
