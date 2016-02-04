@@ -56,6 +56,8 @@ def make_paragraphs(tree_node,
     :param paragraph_node_opts: Node options for all created paragraph nodes.
     """
     assert tree_node, "The tree node instance is mandatory."
+    assert type(paragraph_node_opts).__name__ != 'type', \
+        "The ``paragraph_node_opts`` parameter must be an instance of a class, not the class type itself."
 
     # Process all children first
     for child_node in tree_node.children:
