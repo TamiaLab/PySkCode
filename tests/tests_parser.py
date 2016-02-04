@@ -429,12 +429,8 @@ class TagParserTestCase(unittest.TestCase):
     def test_error(self):
         """ Error handling tests. """
         for text, excepted_exception in self.FAIL_TESTS:
-            try:
-                with self.assertRaises(excepted_exception, msg=text):
-                    parse_tag(text, 0, opening_tag_ch='[', closing_tag_ch=']')
-            except:
-                print('Exception during test:', text)
-                raise
+            with self.assertRaises(excepted_exception, msg=text):
+                parse_tag(text, 0, opening_tag_ch='[', closing_tag_ch=']')
 
     def test_html_compatibility_mode(self):
         """ Test if the HTML retro-compatibility mode work as expected. """
@@ -445,8 +441,3 @@ class TagParserTestCase(unittest.TestCase):
         """ Test if the HTML retro-compatibility mode work as expected (without allowing XHTML-like tags). """
         with self.assertRaises(ValueError):
             parse_tag('[tagname/]', 0, opening_tag_ch='[', closing_tag_ch=']', allow_self_closing_tags=False)
-
-
-# Run test suite
-if __name__ == '__main__':
-    unittest.main()

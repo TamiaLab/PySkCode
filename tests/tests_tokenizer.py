@@ -70,8 +70,3 @@ class TokenizerTestCase(unittest.TestCase):
         for text, excepted_result in self.PASS_TESTS:
             result = tuple(tokenize_tag(text, opening_tag_ch='[', closing_tag_ch=']'))
             self.assertEqual(result, excepted_result, msg=text)
-
-
-# Run test suite
-if __name__ == '__main__':
-    unittest.main()
