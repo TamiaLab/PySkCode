@@ -205,7 +205,7 @@ def debug_print_ast(tree_node, ident_level=0, expected_parent=None, print_fnct=p
                                                 repr(tree_node.content),
                                                 len(tree_node.children),
                                                 tree_node.opts.__class__.__name__),
-               '!! Parent mismatch !! ' if tree_node.parent != expected_parent else '')
+               '!! Parent mismatch !!' if tree_node.parent != expected_parent else '')
 
     # Process all children
     for child_node in tree_node.children:
