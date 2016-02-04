@@ -34,7 +34,7 @@ setup(
     classifiers=[
         'Environment :: Console',
         'Intended Audience :: Developers',
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Operating System :: OS Independent',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Programming Language :: Python',

@@ -10,7 +10,7 @@ __license__ = "GPLv3"
 __version__ = "2.0.0"
 __maintainer__ = "Fabien Batteix"
 __email__ = "fabien.batteix@tamialab.fr"
-__status__ = "Development"  # "Production"
+__status__ = "Production"
 
 
 # User friendly imports
