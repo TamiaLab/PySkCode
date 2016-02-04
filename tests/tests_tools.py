@@ -6,34 +6,58 @@ import unittest
 
 from skcode.tools import (escape_attrvalue,
                           sanitize_url,
-                          slugify,
-                          unique_slugify)
+                          slugify)
 
 
 class ToolsTestCase(unittest.TestCase):
     """ Test suite for the tools module. """
 
-    def test_escape_attrvalue_with_single_quote(self):
+    def test_escape_attr_value_with_single_quote(self):
         """ Test the ``escape_attrvalue`` method with a string containing a single quote. """
         output = escape_attrvalue("test'test")
         self.assertEqual('"test\'test"', output)
 
-    def test_escape_attrvalue_with_double_quote(self):
+    def test_escape_attr_value_with_double_quote(self):
         """ Test the ``escape_attrvalue`` method with a string containing a double quote. """
         output = escape_attrvalue('test"test')
         self.assertEqual("'test\"test'", output)
 
-    def test_escape_attrvalue_with_single_and_double_quotes(self):
+    def test_escape_attr_value_with_single_and_double_quotes(self):
         """ Test the ``escape_attrvalue`` method with a string containing a single and a double quote. """
         output = escape_attrvalue("""test'test"test""")
         self.assertEqual('"test\'test\\"test"', output)
 
-    def test_escape_attrvalue_with_no_quote(self):
+    def test_escape_attr_value_with_single_and_double_quotes_and_backslash(self):
+        """ Test the ``escape_attrvalue`` method with a string containing a single and a double quote. """
+        output = escape_attrvalue("""test'test\\"test""")
+        self.assertEqual('"test\'test\\\\\\"test"', output)
+
+    def test_escape_attr_value_with_no_quote(self):
         """ Test the ``escape_attrvalue`` method with a string containing no quote. """
         output = escape_attrvalue('test')
         self.assertEqual('"test"', output)
 
     # -----
+
+    def test_sanitize_url_assertions(self):
+        """ Test the assertions of the ``sanitize_url`` method. """
+        with self.assertRaises(AssertionError) as e:
+            sanitize_url('https://github.com/TamiaLab/PySkCode', default_scheme='')
+        self.assertEqual('A default scheme is mandatory to avoid XSS.', str(e.exception))
+
+        with self.assertRaises(AssertionError) as e:
+            sanitize_url('https://github.com/TamiaLab/PySkCode', allowed_schemes=())
+        self.assertEqual('You need to allow at least one scheme to get a result.', str(e.exception))
+
+        with self.assertRaises(AssertionError) as e:
+            sanitize_url('https://github.com/TamiaLab/PySkCode',
+                         force_default_scheme=True, force_remove_scheme=True)
+        self.assertEqual('You cannot force the default scheme and also force-remove the scheme.', str(e.exception))
+
+        with self.assertRaises(AssertionError) as e:
+            sanitize_url('https://github.com/TamiaLab/PySkCode',
+                         convert_relative_to_absolute=True, absolute_base_url='')
+        self.assertEqual('The absolute base URL is required for the relative-to-absolute conversion.', str(e.exception))
 
     def test_sanitize_url(self):
         """ Test the ``sanitize_url`` method with a valid URL. """
@@ -60,8 +84,8 @@ class ToolsTestCase(unittest.TestCase):
         output = sanitize_url('https://[github.com/TamiaLab/PySkCode')
         self.assertEqual('', output)
 
-    def test_sanitize_url_with_scheme_not_in_whitelist(self):
-        """ Test the ``sanitize_url`` method with an URL and a scheme not in whitelist. """
+    def test_sanitize_url_with_scheme_not_in_white_list(self):
+        """ Test the ``sanitize_url`` method with an URL and a scheme not in white list. """
         output = sanitize_url('https://github.com/TamiaLab/PySkCode', allowed_schemes=('http',))
         self.assertEqual('', output)
 
@@ -74,6 +98,11 @@ class ToolsTestCase(unittest.TestCase):
         """ Test the ``sanitize_url`` method with a non local URL and without a scheme. """
         output = sanitize_url('github.com/TamiaLab/PySkCode', default_scheme='https')
         self.assertEqual('https://github.com/TamiaLab/PySkCode', output)
+
+    def test_sanitize_url_with_non_local_url_without_scheme_disabled(self):
+        """ Test the ``sanitize_url`` method with a non local URL and without a scheme. """
+        output = sanitize_url('github.com/TamiaLab/PySkCode', default_scheme='https', fix_non_local_urls=False)
+        self.assertEqual('github.com/TamiaLab/PySkCode', output)
 
     def test_sanitize_url_with_only_domain_name(self):
         """ Test the ``sanitize_url`` method with onyl a domain name. """
@@ -113,8 +142,31 @@ class ToolsTestCase(unittest.TestCase):
                               "P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC")
         self.assertEqual('', output)
 
+    def test_sanitize_url_with_local_url_absolute_conversion(self):
+        """ Test the ``sanitize_url`` method with a local URL without a scheme and absolute conversion set. """
+        output = sanitize_url('/TamiaLab/PySkCode',
+                              convert_relative_to_absolute=True,
+                              absolute_base_url='https://github.com')
+        self.assertEqual('https://github.com/TamiaLab/PySkCode', output)
+
     # -----
 
-    # TODO def test_slugify
+    def test_slugify_no_value(self):
+        """ Test the ``slugify`` method without value. """
+        output = slugify('')
+        self.assertEqual('', output)
 
-    # TODO def test_unique_slugify
+    def test_slugify_no_value_trailing_whitespaces(self):
+        """ Test the ``slugify`` method without value. """
+        output = slugify('      ')
+        self.assertEqual('', output)
+
+    def test_slugify(self):
+        """ Test the ``slugify`` method. """
+
+        # Cloned from Django tests suite
+        output = slugify(' Jack & Jill like numbers 1,2,3 and 4 and silly characters ?%.$!/')
+        self.assertEqual('jack-jill-like-numbers-123-and-4-and-silly-characters', output)
+
+        output = slugify("Un \xe9l\xe9phant \xe0 l'or\xe9e du bois")
+        self.assertEqual('un-elephant-a-loree-du-bois', output)
