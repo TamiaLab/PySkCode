@@ -63,6 +63,15 @@ def parse_skcode(text,
     assert newline_node_opts, "Newline node options is mandatory."
     assert max_nesting_depth >= 0, "Maximum nesting depth must be greater or equal than zero."
 
+    assert type(root_node_opts).__name__ != 'type', \
+        "The ``root_node_opts`` parameter must be an instance of a class, not the class type itself."
+    assert type(text_node_opts).__name__ != 'type', \
+        "The ``text_node_opts`` parameter must be an instance of a class, not the class type itself."
+    assert type(erroneous_text_node_opts).__name__ != 'type', \
+        "The ``erroneous_text_node_opts`` parameter must be an instance of a class, not the class type itself."
+    assert type(newline_node_opts).__name__ != 'type', \
+        "The ``newline_node_opts`` parameter must be an instance of a class, not the class type itself."
+
     # Avoid reserved tag names in the ``recognized_tags`` dictionary.
     for tag_name in recognized_tags.keys():
         if tag_name.startswith('_'):
