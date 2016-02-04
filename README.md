@@ -1,7 +1,5 @@
 # SkCode - BBcode parser implementation for Python 3.4
-## By Fabien Batteix (alias Skywodd)
-
-**Current project stage: in active development, not for stable/production yet.** 
+## By Fabien Batteix (alias Skywodd) 
 
 ### Overview
 
