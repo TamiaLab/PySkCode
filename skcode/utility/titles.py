@@ -91,7 +91,7 @@ def make_titles_hierarchy(titles, level=1):
 
     # Recursion stop condition
     if not titles:
-        return []
+        return
 
     # Current titles group
     parent_title = None
