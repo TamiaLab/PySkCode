@@ -216,7 +216,7 @@ def render_titles_hierarchy_html(title_groups,
     return '\n'.join(output)
 
 
-def _recursive_render_titles_text(title_groups, output, indent=0):
+def _recursive_render_titles_text(title_groups, output, indent=1):
     """
     Recursive helper for text rendering of titles summary.
     :param title_groups: List of two elements: ``[title, subtitles (another list)]``.
