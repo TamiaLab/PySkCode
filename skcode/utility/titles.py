@@ -37,7 +37,6 @@ def make_titles_hierarchy(titles, level=1):
     """
     Turn a flat list of titles into a hierarchical nested set of titles and sub titles.
     Handle incorrectly nested title levels by using a best-effort algorithm.
-    This function is a generator, inner sets are also generators.
 
     Example of input titles list (semantic code, not actual code):
         Title(id, level)
@@ -91,13 +90,14 @@ def make_titles_hierarchy(titles, level=1):
 
     # Recursion stop condition
     if not titles:
-        return
+        return []
 
     # Current titles group
     parent_title = None
     subtitles = []
 
     # For each title
+    result = []
     for title in titles:
 
         # Get the title level
@@ -106,13 +106,13 @@ def make_titles_hierarchy(titles, level=1):
         # If level match current target level
         if title_level == level:
 
-            # Yield any currently available subtitles
+            # Process any currently available subtitles
             if subtitles and parent_title is not None:
-                yield parent_title, make_titles_hierarchy(subtitles, level + 1)
+                result.append((parent_title, make_titles_hierarchy(subtitles, level + 1)))
             elif subtitles and parent_title is None:
-                yield from make_titles_hierarchy(subtitles, level + 1)
+                result.extend(make_titles_hierarchy(subtitles, level + 1))
             elif parent_title is not None:
-                yield parent_title, []
+                result.append((parent_title, []))
 
             # Reset the current titles group
             parent_title = title
@@ -123,13 +123,16 @@ def make_titles_hierarchy(titles, level=1):
             # Add title to the current group
             subtitles.append(title)
 
-    # Yield remaining titles
+    # Process remaining titles
     if subtitles and parent_title is not None:
-        yield parent_title, make_titles_hierarchy(subtitles, level + 1)
+        result.append((parent_title, make_titles_hierarchy(subtitles, level + 1)))
     elif subtitles and parent_title is None:
-        yield from make_titles_hierarchy(subtitles, level + 1)
+        result.extend(make_titles_hierarchy(subtitles, level + 1))
     elif parent_title is not None:
-        yield parent_title, []
+        result.append((parent_title, []))
+
+    # Return the result
+    return result
 
 
 def make_auto_title_ids(document_tree,

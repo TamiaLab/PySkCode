@@ -99,13 +99,6 @@ class TitlesUtilityTagTestCase(unittest.TestCase):
         n = document_tree.new_child('title', TitleTagOptions(2))
         titles = [a, b, c, d, e, f, g, h, i, j, k, l, m, n]
         titles_hierarchy = make_titles_hierarchy(titles)
-
-        def _recur_list(titles_grp):
-            result = []
-            for title, subtitles in titles_grp:
-                result.append((title, _recur_list(subtitles)))
-            return result
-
         self.assertEqual([
             (a, [
                 (b, [])
@@ -127,7 +120,7 @@ class TitlesUtilityTagTestCase(unittest.TestCase):
                     (m, [])
                 ]), (n, [])
             ])
-        ], _recur_list(titles_hierarchy))
+        ], titles_hierarchy)
 
     def test_render_titles_hierarchy_html_no_titles(self):
         """ Test the ``render_titles_hierarchy_html`` utility. """
