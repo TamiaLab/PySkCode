@@ -28,6 +28,7 @@ DEFAULT_EMOTICONS_MAP = (
     ('=]', 'smile.png'),
     ('=)', 'smile.png'),
     (':]', 'smile.png'),
+    ('^^', 'smile.png'),
     (':smile:', 'smile.png'),
 
     ("':)", 'sweat_smile.png'),
@@ -306,8 +307,9 @@ def do_smileys_replacement(root_tree_node, input_text):
     def _handle_match(matchobj):
         emoticon = matchobj.group('emoticon')
         if emoticon in emoticons_map:
-            extra_class = ' class="%s"' % html_class if html_class else ''
-            img = '<img src="%s" alt="%s"%s>' % (base_url(emoticons_map[emoticon]), emoticon, extra_class)
+            extra_class = ' class="{}"'.format(html_class) if html_class else ''
+            img = '<img src="{url}" alt="{alt}"{extra}>'.format(url=base_url(emoticons_map[emoticon]),
+                                                                alt=emoticon, extra=extra_class)
             return matchobj.group(1) + img + matchobj.group(3)
         else:
             return matchobj.group(0)
