@@ -169,9 +169,9 @@ def _recursive_render_titles_html(title_groups, output, li_class_name, a_class_n
     :param a_class_name: The CSS class name for the ``a`` element.
     :param ul_class_name: The CSS class name for the ``ul`` element.
     """
-    li_class = ' class="%s"' % li_class_name if li_class_name else ''
-    a_class = ' class="%s"' % a_class_name if a_class_name else ''
-    ul_class = ' class="%s"' % ul_class_name if ul_class_name else ''
+    li_class = ' class="{}"'.format(li_class_name) if li_class_name else ''
+    a_class = ' class="{}"'.format(a_class_name) if a_class_name else ''
+    ul_class = ' class="{}"'.format(ul_class_name) if ul_class_name else ''
 
     # Process all titles
     for title, subtitles in title_groups:
@@ -180,10 +180,12 @@ def _recursive_render_titles_html(title_groups, output, li_class_name, a_class_n
         title_id = title.opts.get_permalink_slug(title)
 
         # Output the HTML list element for this title
-        output.append('<li%s>' % li_class)
-        output.append('<a href="#%s"%s>%s</a>' % (title_id, a_class, escape_html(title.get_raw_content())))
+        output.append('<li{}>'.format(li_class))
+        output.append('<a href="#{title_id}"{extra}>{title}</a>'.format(title_id=title_id,
+                                                                        extra=a_class,
+                                                                        title=escape_html(title.get_raw_content())))
         if subtitles:
-            output.append('<ul%s>' % ul_class)
+            output.append('<ul{}>'.format(ul_class))
             _recursive_render_titles_html(subtitles, output, li_class_name, a_class_name, ul_class_name)
             output.append('</ul>')
         output.append('</li>')
@@ -204,14 +206,14 @@ def render_titles_hierarchy_html(title_groups,
     'titles-summary-subentry').
     :return: The title hierarchy as an HTML summary.
     """
-    root_ul_class = ' class="%s"' % root_ul_class_name if root_ul_class_name else ''
+    root_ul_class = ' class="{}"'.format(root_ul_class_name) if root_ul_class_name else ''
 
     # Shortcut for empty summary
     if not title_groups:
         return ''
 
     # Recursive build of the summary
-    output = ['<ul%s>' % root_ul_class]
+    output = ['<ul{}>'.format(root_ul_class)]
     _recursive_render_titles_html(title_groups, output, li_class_name, a_class_name, ul_class_name)
     output.append('</ul>')
 
@@ -229,7 +231,7 @@ def _recursive_render_titles_text(title_groups, output, indent=1):
     for title, subtitles in title_groups:
 
         # Output the text for this title
-        output.append('%s %s' % ('#' * indent, title.get_raw_content().strip()))
+        output.append('{indent} {title}'.format(indent='#' * indent, title=title.get_raw_content().strip()))
         _recursive_render_titles_text(subtitles, output, indent + 1)
 
 

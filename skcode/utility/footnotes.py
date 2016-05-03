@@ -50,7 +50,7 @@ def render_footnotes_html(footnotes,
         return ''
 
     # Output HTML
-    html_output = ['<div class="%s">' % wrapping_div_class_name]
+    html_output = ['<div class="{class_name}">'.format(class_name=wrapping_div_class_name)]
 
     # For each footnote
     for footnote_node in footnotes:
@@ -59,17 +59,16 @@ def render_footnotes_html(footnotes,
         footnote_id = footnote_node.opts.get_footnote_id(footnote_node, footnote_node.root_tree_node)
 
         # Craft the footnote declaration HTML
-        footnote_declaration_html = '<a id="%(refid)s" href="#%(backrefid)s"><sup>[%(fnid)s]</sup></a>' % {
-            'refid': footnote_node.opts.get_footnote_ref_id(footnote_id),
-            'backrefid': footnote_node.opts.get_footnote_backref_id(footnote_id),
-            'fnid': footnote_id
-        }
+        footnote_declaration_html = '<a id="{refid}" href="#{backrefid}"><sup>[{fnid}]</sup></a>'.format(
+            refid=footnote_node.opts.get_footnote_ref_id(footnote_id),
+            backrefid=footnote_node.opts.get_footnote_backref_id(footnote_id),
+            fnid=footnote_id)
 
         # Render the footnote
         footnote_html = render_inner_html(footnote_node, **kwargs)
 
         # Add the footnote HTML to the output
-        html_output.append('<p class="%s">' % wrapping_p_class_name)
+        html_output.append('<p class="{class_name}">'.format(class_name=wrapping_p_class_name))
         html_output.append(footnote_declaration_html)
         html_output.append(footnote_html)
         html_output.append('</p>')
