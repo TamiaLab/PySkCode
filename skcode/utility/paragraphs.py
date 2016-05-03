@@ -17,6 +17,9 @@ class ParagraphTagOptions(TagOptions):
     # HTML class for the paragraph
     html_text_class = 'text-justify'
 
+    # HTML template for the rendering
+    html_render_template = '<p class="{class_name}">{inner_html}</p>\n'
+
     def render_html(self, tree_node, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
@@ -25,7 +28,7 @@ class ParagraphTagOptions(TagOptions):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-        return '<p class="%s">%s</p>\n' % (self.html_text_class, inner_html)
+        return self.html_render_template.format(class_name=self.html_text_class, inner_html=inner_html)
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
