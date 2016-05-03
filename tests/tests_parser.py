@@ -418,6 +418,14 @@ class TagParserTestCase(unittest.TestCase):
 
         # Malformed self closing tag
         ('[/test /]', ValueError),
+
+        # Malformed unquote value (real world mistake)
+        ('[test=value[', ValueError),
+        ('[test=value[foobar[/url]', ValueError),
+        ('[test=value[ foobar[/url]', ValueError),
+        ('[test key=value[', ValueError),
+        ('[test key=value[foobar[/url]', ValueError),
+        ('[test key=value[ foobar[/url]', ValueError),
     )
 
     def test_functional(self):

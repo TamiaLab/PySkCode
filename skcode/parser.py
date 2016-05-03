@@ -63,19 +63,21 @@ def get_identifier(text, offset, ch):
     return identifier.lower(), offset, ch
 
 
-def get_attribute_value(text, offset, ch, closing_tag_ch):
+def get_attribute_value(text, offset, ch, opening_tag_ch, closing_tag_ch):
     """
     Get the attribute value starting in the text at the given offset.
     Return the attribute value (stripped), the new offset and the current char.
     :param text: The input text.
     :param offset: The current offset in the input text.
     :param ch: The current char.
+    :param opening_tag_ch: The opening tag char.
     :param closing_tag_ch: The closing tag char.
     :return The attribute's value with trailing whitespaces removed, the new offset and the current char.
     """
     assert offset >= 0, "Input text offset must be greater or equal to zero."
     assert ch not in WHITESPACE_CHARSET, "The current char should not be a whitespace, call this function after " \
                                          "skipping any whitespaces."
+    assert len(opening_tag_ch) == 1, "Opening tag character must be one char long exactly."
     assert len(closing_tag_ch) == 1, "Closing tag character must be one char long exactly."
 
     attr_value = ''
@@ -115,15 +117,10 @@ def get_attribute_value(text, offset, ch, closing_tag_ch):
         offset += 1
         ch = text[offset]
 
-        # Check format
-        if ch != closing_tag_ch and ch not in WHITESPACE_CHARSET:
-            raise ValueError('A whitespace is mandatory after the attribute '
-                             'value if not followed by the closing tag char')
-
     else:
 
         # Get raw attribute value
-        while ch != closing_tag_ch and ch not in WHITESPACE_CHARSET:
+        while ch != closing_tag_ch and ch != opening_tag_ch and ch not in WHITESPACE_CHARSET:
 
             # Store the char
             attr_value += ch
@@ -131,6 +128,11 @@ def get_attribute_value(text, offset, ch, closing_tag_ch):
             # Process the next char
             offset += 1
             ch = text[offset]
+
+    # Check format
+    if ch != closing_tag_ch and ch not in WHITESPACE_CHARSET:
+        raise ValueError('A whitespace is mandatory after the attribute '
+                         'value if not followed by the closing tag char')
 
     # Strip the attribute value and return new values
     return attr_value.strip(), offset, ch
@@ -206,7 +208,7 @@ def parse_tag(text, start_offset=0, opening_tag_ch='[', closing_tag_ch=']',
         offset, ch = skip_nb_char_then_whitespaces(text, offset, 1)
 
         # Get the tag value
-        tag_value, offset, ch = get_attribute_value(text, offset, ch, closing_tag_ch)
+        tag_value, offset, ch = get_attribute_value(text, offset, ch, opening_tag_ch, closing_tag_ch)
 
         # Store the tag value
         tag_attrs[tag_name] = tag_value
@@ -238,7 +240,7 @@ def parse_tag(text, start_offset=0, opening_tag_ch='[', closing_tag_ch=']',
             offset, ch = skip_nb_char_then_whitespaces(text, offset, 1)
             
             # Get the attribute value
-            attr_value, offset, ch = get_attribute_value(text, offset, ch, closing_tag_ch)
+            attr_value, offset, ch = get_attribute_value(text, offset, ch, opening_tag_ch, closing_tag_ch)
             
             # Store the tag value
             tag_attrs[attr_name] = attr_value
