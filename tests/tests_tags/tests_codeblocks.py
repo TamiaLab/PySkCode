@@ -230,7 +230,7 @@ class CodeBlockTagOptionsTestCase(unittest.TestCase):
         with unittest.mock.patch('skcode.tags.codeblocks.sanitize_url') as mock_sanitize_url:
             opts.get_source_link_url(tree_node)
         mock_sanitize_url.assert_called_once_with('https://github.com/TamiaLab/PySkCode',
-                                                  absolute_base_url='', convert_relative_to_absolute=False)
+                                                  absolute_base_url='')
 
     def test_get_source_link_url_sanitize_with_relative_url_conversion(self):
         """ Test the ``get_source_link_url`` method call the ``sanitize_url`` function. """
@@ -241,8 +241,7 @@ class CodeBlockTagOptionsTestCase(unittest.TestCase):
         with unittest.mock.patch('skcode.tags.codeblocks.sanitize_url') as mock_sanitize_url:
             opts.get_source_link_url(tree_node)
         mock_sanitize_url.assert_called_once_with('https://github.com/TamiaLab/PySkCode',
-                                                  absolute_base_url='http://example.com/',
-                                                  convert_relative_to_absolute=True)
+                                                  absolute_base_url='http://example.com/')
 
     def test_get_source_link_url_without_value(self):
         """ Test the ``get_source_link_url`` method with the "src" attribute not set. """

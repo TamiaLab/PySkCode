@@ -111,7 +111,7 @@ class QuotesTagTestCase(unittest.TestCase):
         with unittest.mock.patch('skcode.tags.quotes.sanitize_url') as mock_sanitize_url:
             opts.get_quote_link(tree_node)
         mock_sanitize_url.assert_called_once_with('https://github.com/TamiaLab/PySkCode',
-                                                  absolute_base_url='', convert_relative_to_absolute=False)
+                                                  absolute_base_url='')
 
     def test_get_quote_link_call_sanitize_url_with_relative_url_conversion(self):
         opts = QuoteTagOptions()
@@ -121,8 +121,7 @@ class QuotesTagTestCase(unittest.TestCase):
         with unittest.mock.patch('skcode.tags.quotes.sanitize_url') as mock_sanitize_url:
             opts.get_quote_link(tree_node)
         mock_sanitize_url.assert_called_once_with('https://github.com/TamiaLab/PySkCode',
-                                                  absolute_base_url='http://example.com/',
-                                                  convert_relative_to_absolute=True)
+                                                  absolute_base_url='http://example.com/')
 
     def test_get_quote_date(self):
         """ Test the ``get_quote_date`` when the "date" attribute is set. """

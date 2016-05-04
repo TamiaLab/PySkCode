@@ -121,7 +121,7 @@ class UrlLinksTagTestCase(unittest.TestCase):
         with unittest.mock.patch('skcode.tags.links.sanitize_url') as mock_sanitize_url:
             opts.get_target_link(tree_node)
         mock_sanitize_url.assert_called_once_with('http://example.com/',
-                                                  absolute_base_url='', convert_relative_to_absolute=False)
+                                                  absolute_base_url='')
 
     def test_get_target_link_call_sanitize_url_with_relative_url_conversion(self):
         """ Test if the ``get_target_link`` call the ``sanitize_url`` method on the url. """
@@ -132,8 +132,7 @@ class UrlLinksTagTestCase(unittest.TestCase):
         with unittest.mock.patch('skcode.tags.links.sanitize_url') as mock_sanitize_url:
             opts.get_target_link(tree_node)
         mock_sanitize_url.assert_called_once_with('http://example.com/',
-                                                  absolute_base_url='http://example.com/',
-                                                  convert_relative_to_absolute=True)
+                                                  absolute_base_url='http://example.com/')
 
     def test_get_link_title_with_title_set(self):
         """ Test the ``get_title_link`` method when the "title" attribute is set. """

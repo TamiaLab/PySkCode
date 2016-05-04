@@ -49,7 +49,6 @@ class ImageTagOptions(TagOptions):
         src_link = tree_node.get_raw_content().strip()
         relative_url_base = get_relative_url_base(tree_node.root_tree_node)
         return sanitize_url(src_link, allowed_schemes=self.allowed_schemes,
-                            convert_relative_to_absolute=bool(relative_url_base),
                             absolute_base_url=relative_url_base)
 
     def get_alt_text(self, tree_node):

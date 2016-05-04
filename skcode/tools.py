@@ -34,7 +34,7 @@ def sanitize_url(url, default_scheme='http',
                  allowed_schemes=('http', 'https', 'ftp', 'ftps', 'mailto'),
                  encode_html_entities=True, force_default_scheme=False,
                  force_remove_scheme=False, fix_non_local_urls=True,
-                 convert_relative_to_absolute=False, absolute_base_url=''):
+                 absolute_base_url=''):
     """
     Sanitize the given URL. Avoid XSS by filtering-out forbidden protocol and characters.
     Allowed protocols by default are: ``http``, ``https``, ``ftp``, ``ftps`` and ``mailto``.
@@ -58,8 +58,6 @@ def sanitize_url(url, default_scheme='http',
     assert len(allowed_schemes) > 0, "You need to allow at least one scheme to get a result."
     assert not (force_default_scheme and
                 force_remove_scheme), "You cannot force the default scheme and also force-remove the scheme."
-    if convert_relative_to_absolute:
-        assert absolute_base_url, "The absolute base URL is required for the relative-to-absolute conversion."
 
     # Shortcut for empty string
     if not url:
@@ -98,7 +96,7 @@ def sanitize_url(url, default_scheme='http',
         scheme = ''
 
     # Build the final URL
-    if netloc or not convert_relative_to_absolute:
+    if netloc or not absolute_base_url:
         result = urlunsplit((scheme, netloc, path, query, fragment))
     else:
         result = urlunsplit(('', '', path, query, fragment))

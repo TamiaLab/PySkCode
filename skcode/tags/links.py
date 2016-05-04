@@ -57,7 +57,6 @@ class UrlLinkTagOptions(TagOptions):
             target_url = tree_node.attrs.get(tree_node.name, '')
         relative_url_base = get_relative_url_base(tree_node.root_tree_node)
         return sanitize_url(target_url,
-                            convert_relative_to_absolute=bool(relative_url_base),
                             absolute_base_url=relative_url_base)
 
     def get_title_link(self, tree_node):

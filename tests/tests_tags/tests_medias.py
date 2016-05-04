@@ -65,7 +65,7 @@ class ImagesTagTestCase(unittest.TestCase):
             opts.get_image_src_link(tree_node)
         mock_sanitize_url.assert_called_once_with('http://example.com/image.jpg',
                                                   allowed_schemes=opts.allowed_schemes,
-                                                  absolute_base_url='', convert_relative_to_absolute=False)
+                                                  absolute_base_url='')
 
     def test_get_image_src_link_called_sanitize_with_relative_url_conversion(self):
         """ Test the ``get_image_src_link`` method call the ``sanitize_url`` method. """
@@ -77,8 +77,7 @@ class ImagesTagTestCase(unittest.TestCase):
             opts.get_image_src_link(tree_node)
         mock_sanitize_url.assert_called_once_with('http://example.com/image.jpg',
                                                   allowed_schemes=opts.allowed_schemes,
-                                                  absolute_base_url='http://example.com/',
-                                                  convert_relative_to_absolute=True)
+                                                  absolute_base_url='http://example.com/')
 
     def test_get_alt_text(self):
         """ Test the ``get_alt_text`` method. """

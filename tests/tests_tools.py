@@ -54,11 +54,6 @@ class ToolsTestCase(unittest.TestCase):
                          force_default_scheme=True, force_remove_scheme=True)
         self.assertEqual('You cannot force the default scheme and also force-remove the scheme.', str(e.exception))
 
-        with self.assertRaises(AssertionError) as e:
-            sanitize_url('https://github.com/TamiaLab/PySkCode',
-                         convert_relative_to_absolute=True, absolute_base_url='')
-        self.assertEqual('The absolute base URL is required for the relative-to-absolute conversion.', str(e.exception))
-
     def test_sanitize_url(self):
         """ Test the ``sanitize_url`` method with a valid URL. """
         output = sanitize_url('https://github.com/TamiaLab/PySkCode')
@@ -145,7 +140,6 @@ class ToolsTestCase(unittest.TestCase):
     def test_sanitize_url_with_local_url_absolute_conversion(self):
         """ Test the ``sanitize_url`` method with a local URL without a scheme and absolute conversion set. """
         output = sanitize_url('/TamiaLab/PySkCode',
-                              convert_relative_to_absolute=True,
                               absolute_base_url='https://github.com')
         self.assertEqual('https://github.com/TamiaLab/PySkCode', output)
 
