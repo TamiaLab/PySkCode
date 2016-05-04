@@ -2,6 +2,8 @@
 SkCode acronym tag definitions code.
 """
 
+import string
+
 from html import escape as escape_html
 from html import unescape as unescape_html_entities
 
@@ -14,8 +16,17 @@ class AcronymTagOptions(TagOptions):
     inline = True
     close_inlines = False
 
+    canonical_tag_name = 'abbr'
+    alias_tag_names = ('acronym', )
+
     # Acronym title attribute name
     acronym_title_attr_name = 'title'
+
+    # HTML template for rendering
+    html_render_template = '<abbr title="{title}">{inner_html}</abbr>'
+
+    # Text template for rendering
+    text_render_template = '{inner_text} ({title})'
 
     def get_acronym_title(self, tree_node):
         """
@@ -40,7 +51,10 @@ class AcronymTagOptions(TagOptions):
         :return The rendered HTML of this node.
         """
         abbr_title = self.get_acronym_title(tree_node)
-        return '<abbr title="%s">%s</abbr>' % (escape_html(abbr_title), inner_html) if abbr_title else inner_html
+        if abbr_title:
+            return self.html_render_template.format(title=escape_html(abbr_title), inner_html=inner_html)
+        else:
+            return inner_html
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
@@ -51,7 +65,12 @@ class AcronymTagOptions(TagOptions):
         :return The rendered text of this node.
         """
         abbr_title = self.get_acronym_title(tree_node)
-        return '%s (%s)' % (inner_text, abbr_title) if abbr_title else inner_text
+        if abbr_title:
+            end_of_str = inner_text[-1] if inner_text[-1] in string.whitespace else ''
+            inner_text = inner_text.rstrip()
+            return self.text_render_template.format(title=abbr_title, inner_text=inner_text) + end_of_str
+        else:
+            return inner_text
 
     def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
         """

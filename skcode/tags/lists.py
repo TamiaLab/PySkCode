@@ -71,6 +71,9 @@ def int_to_alphabet_numerals(value):
 class ListTagOptions(TagOptions):
     """ List tag options container class. """
 
+    canonical_tag_name = 'list'
+    alias_tag_names = ()
+
     # Allowed list types
     allowed_list_types = (
         UNORDERED_LIST_TYPE,
@@ -121,6 +124,15 @@ class ListTagOptions(TagOptions):
         UPPER_ROMAN_LIST_TYPE: 'I',
         LOWER_ROMAN_LIST_TYPE: 'i',
     }
+
+    # HTML template for rendering unordered list
+    html_render_template_ul = '<ul>{inner_html}</ul>\n'
+
+    # HTML template for rendering ordered list
+    html_render_template_ol = '<ol type="{list_type}">{inner_html}</ol>\n'
+
+    # HTML template for rendering ordered list with a custom starting number
+    html_render_template_ol_start_number = '<ol type="{list_type}" start="{list_start}">{inner_html}</ol>\n'
 
     def get_list_type(self, tree_node):
         """
@@ -180,7 +192,7 @@ class ListTagOptions(TagOptions):
 
         # Render the list container
         if list_type == UNORDERED_LIST_TYPE:
-            return '<ul>%s</ul>\n' % inner_html
+            return self.html_render_template_ul.format(inner_html=inner_html)
         else:
 
             # Get list first number
@@ -188,10 +200,12 @@ class ListTagOptions(TagOptions):
 
             # Render the ordered list
             if first_list_number != 1:
-                return '<ol type="%s" start="%d">%s</ol>\n' % (self.html_list_type_lut[list_type],
-                                                               first_list_number, inner_html)
+                return self.html_render_template_ol_start_number.format(list_type=self.html_list_type_lut[list_type],
+                                                                        list_start=first_list_number,
+                                                                        inner_html=inner_html)
             else:
-                return '<ol type="%s">%s</ol>\n' % (self.html_list_type_lut[list_type], inner_html)
+                return self.html_render_template_ol.format(list_type=self.html_list_type_lut[list_type],
+                                                           inner_html=inner_html)
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
@@ -232,6 +246,9 @@ class ListTagOptions(TagOptions):
 class UnorderedListTagOptions(ListTagOptions):
     """ Un-ordered list tag options container class. """
 
+    canonical_tag_name = 'ul'
+    alias_tag_names = ()
+
     def get_list_type(self, tree_node):
         """
         Get the type of this list.
@@ -255,6 +272,9 @@ class UnorderedListTagOptions(ListTagOptions):
 class OrderedListTagOptions(ListTagOptions):
     """ Ordered list tag options container class. """
 
+    canonical_tag_name = 'ol'
+    alias_tag_names = ()
+
     # Allowed list types
     allowed_list_types = (
         NUMERIC_LIST_TYPE,
@@ -271,13 +291,20 @@ class OrderedListTagOptions(ListTagOptions):
 class ListElementTagOptions(TagOptions):
     """ List element tag options container class. """
 
+    same_tag_closes = True
     make_paragraphs_here = True
+
+    canonical_tag_name = 'li'
+    alias_tag_names = ('*', )
 
     # Default parent list type
     default_list_type = UNORDERED_LIST_TYPE
 
     # Base option class of all lists
     base_list_class = ListTagOptions
+
+    # HTML template for rendering
+    html_render_template = '<li>{inner_html}</li>\n'
 
     def get_parent_list_type(self, tree_node):
         """
@@ -347,7 +374,7 @@ class ListElementTagOptions(TagOptions):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-        return '<li>%s</li>\n' % inner_html
+        return self.html_render_template.format(inner_html=inner_html)
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """

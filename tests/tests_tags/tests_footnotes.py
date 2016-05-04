@@ -1,5 +1,5 @@
 """
-SkCode footnotes tag test code.
+SkCode footnotes tag definitions test code.
 """
 
 import unittest
@@ -32,41 +32,44 @@ class FootnoteDeclarationTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertTrue(opts.inline)
         self.assertFalse(opts.close_inlines)
+        self.assertEqual('footnote', opts.canonical_tag_name)
+        self.assertEqual(('fn', ), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
         self.assertEqual('id', opts.footnote_id_attr_name)
         self.assertEqual('footnote-%s', opts.footnote_id_html_format)
         self.assertEqual('footnote-backref-%s', opts.footnote_id_html_format_backref)
         self.assertEqual('_cached_footnote_counter', opts.cached_footnote_counter_attr_name)
-        self.assertEqual('_last_footnote_counter', opts.last_footnote_counter_attr_name)
+        self.assertEqual('<a id="{backward_id}" href="#{forward_id}"><sup>[{footnote_id}]</sup></a>', opts.html_render_template)
+        self.assertEqual('[^{footnote_id}]', opts.text_render_template)
 
     def test_get_footnote_id_from_counter_once(self):
         """ Test the ``get_footnote_id_from_counter`` method by calling it once. """
         opts = FootnoteDeclarationTagOptions()
         root_tree_node = RootTreeNode(RootTagOptions())
         tree_node = root_tree_node.new_child('footnote', opts)
-        self.assertEqual(opts.get_footnote_id_from_counter(tree_node, root_tree_node), '1')
+        self.assertEqual('1', opts.get_footnote_id_from_counter(tree_node, root_tree_node))
 
     def test_get_footnote_id_from_counter_multiple(self):
         """ Test the ``get_footnote_id_from_counter`` method by calling it multiple time. """
         opts = FootnoteDeclarationTagOptions()
         root_tree_node = RootTreeNode(RootTagOptions())
         tree_node = root_tree_node.new_child('footnote', opts)
-        self.assertEqual(opts.get_footnote_id_from_counter(tree_node, root_tree_node), '1')
-        self.assertEqual(opts.get_footnote_id_from_counter(tree_node, root_tree_node), '1')
+        self.assertEqual('1', opts.get_footnote_id_from_counter(tree_node, root_tree_node))
+        self.assertEqual('1', opts.get_footnote_id_from_counter(tree_node, root_tree_node))
 
     def test_get_footnote_id_from_counter_increment(self):
         """ Test the ``get_footnote_id_from_counter`` method by calling it multiple time with different footnote. """
         opts = FootnoteDeclarationTagOptions()
         root_tree_node = RootTreeNode(RootTagOptions())
         tree_node = root_tree_node.new_child('footnote', opts)
-        self.assertEqual(opts.get_footnote_id_from_counter(tree_node, root_tree_node), '1')
-        self.assertEqual(opts.get_footnote_id_from_counter(tree_node, root_tree_node), '1')
+        self.assertEqual('1', opts.get_footnote_id_from_counter(tree_node, root_tree_node))
+        self.assertEqual('1', opts.get_footnote_id_from_counter(tree_node, root_tree_node))
         tree_node_2 = root_tree_node.new_child('footnote', opts)
-        self.assertEqual(opts.get_footnote_id_from_counter(tree_node_2, root_tree_node), '2')
-        self.assertEqual(opts.get_footnote_id_from_counter(tree_node_2, root_tree_node), '2')
+        self.assertEqual('2', opts.get_footnote_id_from_counter(tree_node_2, root_tree_node))
+        self.assertEqual('2', opts.get_footnote_id_from_counter(tree_node_2, root_tree_node))
         tree_node_3 = root_tree_node.new_child('footnote', opts)
-        self.assertEqual(opts.get_footnote_id_from_counter(tree_node_3, root_tree_node), '3')
-        self.assertEqual(opts.get_footnote_id_from_counter(tree_node_3, root_tree_node), '3')
+        self.assertEqual('3', opts.get_footnote_id_from_counter(tree_node_3, root_tree_node))
+        self.assertEqual('3', opts.get_footnote_id_from_counter(tree_node_3, root_tree_node))
 
     def test_get_footnote_id_with_tagname_set(self):
         """ Test the ``get_footnote_id`` method with the tag name set. """
@@ -175,8 +178,12 @@ class FootnoteReferenceTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertTrue(opts.inline)
         self.assertFalse(opts.close_inlines)
+        self.assertEqual('fnref', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
         self.assertEqual('footnote-%s', opts.footnote_id_html_format)
+        self.assertEqual('<a href="#{forward_id}"><sup>[{footnote_id}]</sup></a>', opts.html_render_template)
+        self.assertEqual('[^{footnote_id}]', opts.text_render_template)
 
     def test_get_footnote_id(self):
         """ Test the ``get_footnote_id`` method. """

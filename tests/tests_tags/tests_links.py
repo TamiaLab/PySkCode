@@ -35,7 +35,12 @@ class UrlLinksTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertTrue(opts.inline)
         self.assertFalse(opts.close_inlines)
+        self.assertEqual('url', opts.canonical_tag_name)
+        self.assertEqual(('link', ), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
+        self.assertEqual('nofollow', opts.nofollow_attr_name)
+        self.assertEqual('title', opts.title_attr_name)
+        self.assertEqual('<a href="{src_link}"{extra_args}>{inner_html}</a>', opts.html_render_template)
 
     def test_is_url_inside_tag_content_with_content(self):
         """ Test if the ``is_url_inside_tag_content`` work as expected. """
@@ -58,6 +63,23 @@ class UrlLinksTagTestCase(unittest.TestCase):
         tree_node = root_tree_node.new_child('url', opts,
                                              attrs={'url': 'http://example.com/'}, content='El website')
         self.assertFalse(opts.is_url_inside_tag_content(tree_node))
+
+    def test_get_nofollow_flag_with_flag_set(self):
+        """ Test the ``get_nofollow_flag`` when the "nofollow" attribute is set. """
+        opts = UrlLinkTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('url', opts,
+                                             attrs={'url': 'http://example.com/',
+                                                    'nofollow': ''}, content='El website')
+        self.assertTrue(opts.get_nofollow_flag(tree_node))
+
+    def test_get_nofollow_flag_with_flag_not_set(self):
+        """ Test the ``get_nofollow_flag`` when the "nofollow" attribute is set. """
+        opts = UrlLinkTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('url', opts,
+                                             attrs={'url': 'http://example.com/'}, content='El website')
+        self.assertFalse(opts.get_nofollow_flag(tree_node))
 
     def test_get_target_link_with_tagname_set(self):
         """ Test the ``get_target_link`` when the tag name attribute is set. """
@@ -110,7 +132,26 @@ class UrlLinksTagTestCase(unittest.TestCase):
         with unittest.mock.patch('skcode.tags.links.sanitize_url') as mock_sanitize_url:
             opts.get_target_link(tree_node)
         mock_sanitize_url.assert_called_once_with('http://example.com/',
-                                                  absolute_base_url='http://example.com/', convert_relative_to_absolute=True)
+                                                  absolute_base_url='http://example.com/',
+                                                  convert_relative_to_absolute=True)
+
+    def test_get_link_title_with_title_set(self):
+        """ Test the ``get_title_link`` method when the "title" attribute is set. """
+        opts = UrlLinkTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('url', opts, attrs={'url': 'http://example.com/',
+                                                                 'title': 'test'})
+        title = opts.get_title_link(tree_node)
+        self.assertEqual('test', title)
+
+    def test_get_link_title_with_html_entities(self):
+        """ Test the ``get_title_link`` method with a title containing HTML entities. """
+        opts = UrlLinkTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('url', opts, attrs={'url': 'http://example.com/',
+                                                                 'title': '&lt;test&gt;'})
+        title = opts.get_title_link(tree_node)
+        self.assertEqual('<test>', title)
 
     def test_render_html(self):
         """ Test the ``render_html`` method. """
@@ -121,6 +162,16 @@ class UrlLinksTagTestCase(unittest.TestCase):
         expected_result = '<a href="http://example.com/" rel="nofollow">Link to the example.com website.</a>'
         self.assertEqual(expected_result, output_result)
 
+    def test_render_html_with_title(self):
+        """ Test the ``render_html`` method with a title set. """
+        opts = UrlLinkTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('url', opts, attrs={'url': 'http://example.com/',
+                                                                 'title': 'test'})
+        output_result = opts.render_html(tree_node, 'Link to the example.com website.')
+        expected_result = '<a href="http://example.com/" rel="nofollow" title="test">Link to the example.com website.</a>'
+        self.assertEqual(expected_result, output_result)
+
     def test_render_html_with_nofollow_disabled(self):
         """ Test the ``render_html`` method with force_nofollow disabled. """
         opts = UrlLinkTagOptions()
@@ -128,6 +179,25 @@ class UrlLinksTagTestCase(unittest.TestCase):
         tree_node = root_tree_node.new_child('url', opts, attrs={'url': 'http://example.com/'})
         output_result = opts.render_html(tree_node, 'Link to the example.com website.', force_rel_nofollow=False)
         expected_result = '<a href="http://example.com/">Link to the example.com website.</a>'
+        self.assertEqual(expected_result, output_result)
+
+    def test_render_html_with_nofollow_disabled_and_title(self):
+        """ Test the ``render_html`` method with force_nofollow disabled and a title set. """
+        opts = UrlLinkTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('url', opts, attrs={'url': 'http://example.com/',
+                                                                 'title': 'test'})
+        output_result = opts.render_html(tree_node, 'Link to the example.com website.', force_rel_nofollow=False)
+        expected_result = '<a href="http://example.com/" title="test">Link to the example.com website.</a>'
+        self.assertEqual(expected_result, output_result)
+
+    def test_render_html_with_nofollow_disabled_but_forced(self):
+        """ Test the ``render_html`` method with force_nofollow disabled but forced by attribute. """
+        opts = UrlLinkTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('url', opts, attrs={'url': 'http://example.com/', 'nofollow': ''})
+        output_result = opts.render_html(tree_node, 'Link to the example.com website.', force_rel_nofollow=False)
+        expected_result = '<a href="http://example.com/" rel="nofollow">Link to the example.com website.</a>'
         self.assertEqual(expected_result, output_result)
 
     def test_render_html_with_link_only(self):
@@ -146,6 +216,15 @@ class UrlLinksTagTestCase(unittest.TestCase):
         tree_node = root_tree_node.new_child('url', opts, content='http://example.com/')
         output_result = opts.render_html(tree_node, 'test', force_rel_nofollow=False)
         expected_result = '<a href="http://example.com/">http://example.com/</a>'
+        self.assertEqual(expected_result, output_result)
+
+    def test_render_html_with_nofollow_disabled_but_forced_and_link_only(self):
+        """ Test the ``render_html`` method with only a link and force_nofollow disabled but forced by attribute. """
+        opts = UrlLinkTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('url', opts, attrs={'nofollow': ''}, content='http://example.com/')
+        output_result = opts.render_html(tree_node, 'test', force_rel_nofollow=False)
+        expected_result = '<a href="http://example.com/" rel="nofollow">http://example.com/</a>'
         self.assertEqual(expected_result, output_result)
 
     def test_render_html_with_no_link(self):
@@ -230,7 +309,10 @@ class EmailLinksTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertTrue(opts.inline)
         self.assertFalse(opts.close_inlines)
+        self.assertEqual('email', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
+        self.assertEqual('<a href="mailto:{email_address}"{extra_args}>{inner_html}</a>', opts.html_render_template)
 
     def test_is_email_inside_tag_content_with_content(self):
         """ Test if the ``is_email_inside_tag_content`` work as expected. """
@@ -417,7 +499,10 @@ class AnchorsTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertTrue(opts.inline)
         self.assertFalse(opts.close_inlines)
+        self.assertEqual('anchor', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
+        self.assertEqual('<a id="{anchor_id}"></a>', opts.html_render_template)
 
     def test_get_anchor_id_from_content(self):
         """ Test if the ``get_anchor_id`` method work as expected. """
@@ -509,8 +594,11 @@ class AnchorReferencesTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertTrue(opts.inline)
         self.assertFalse(opts.close_inlines)
+        self.assertEqual('goto', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
         self.assertEqual('id', opts.anchor_id_attr_name)
+        self.assertEqual('<a href="#{anchor_id}">{inner_html}</a>', opts.html_render_template)
 
     def test_get_anchor_id_with_tagname_set(self):
         """ Test if the ``get_anchor_id`` method work as expected. """

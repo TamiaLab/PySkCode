@@ -1,5 +1,5 @@
 """
-SkCode text colors tags test code.
+SkCode coloured text tag definitions test code.
 """
 
 import unittest
@@ -52,15 +52,16 @@ class TextColorTagsTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertTrue(opts.inline)
         self.assertFalse(opts.close_inlines)
+        self.assertEqual('color', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
-        self.assertEqual(opts.known_colors, (
-            'aqua', 'black', 'blue',
-            'fuchsia', 'gray', 'green',
-            'lime', 'maroon', 'navy',
-            'olive', 'orange', 'purple',
-            'red', 'silver', 'teal',
-            'white', 'yellow'
-        ))
+        self.assertEqual(('aqua', 'black', 'blue',
+                          'fuchsia', 'gray', 'green',
+                          'lime', 'maroon', 'navy',
+                          'olive', 'orange', 'purple',
+                          'red', 'silver', 'teal',
+                          'white', 'yellow'), opts.known_colors)
+        self.assertEqual('<span style="color: {color_value}">{inner_html}</span>', opts.html_render_template)
 
     def test_get_color_value_with_hex_code(self):
         """ Test the ``get_color_value`` method. """

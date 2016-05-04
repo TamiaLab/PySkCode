@@ -1,5 +1,5 @@
 """
-SkCode definitions tag test code.
+SkCode definitions list tag definitions code.
 """
 
 import unittest
@@ -12,7 +12,7 @@ from skcode.tags import (RootTagOptions,
                          DEFAULT_RECOGNIZED_TAGS)
 
 
-class DefinitionListsTagTestCase(unittest.TestCase):
+class DefinitionListTagOptionsTestCase(unittest.TestCase):
     """ Tests suite for the definition lists tag module. """
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
@@ -30,7 +30,10 @@ class DefinitionListsTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertFalse(opts.inline)
         self.assertTrue(opts.close_inlines)
+        self.assertEqual('dl', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
+        self.assertEqual('<dl>{inner_html}</dl>\n', opts.render_html_template)
 
     def test_html_rendering(self):
         """ Test HTML rendering. """
@@ -51,7 +54,7 @@ class DefinitionListsTagTestCase(unittest.TestCase):
         self.assertEqual(expected_output, rendered_output)
 
 
-class DefinitionTermsTagTestCase(unittest.TestCase):
+class DefinitionListTermTagOptionsTestCase(unittest.TestCase):
     """ Tests suite for the definition terms tag module. """
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
@@ -69,7 +72,11 @@ class DefinitionTermsTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertFalse(opts.inline)
         self.assertTrue(opts.close_inlines)
+        self.assertEqual('dt', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
+        self.assertEqual('<dt>{inner_html}</dt>\n', opts.render_html_template)
+        self.assertEqual('{inner_text} : ', opts.render_text_template)
 
     def test_html_rendering(self):
         """ Test HTML rendering. """
@@ -99,7 +106,7 @@ class DefinitionTermsTagTestCase(unittest.TestCase):
         self.assertEqual(expected_output, rendered_output)
 
 
-class DefinitionsTagTestCase(unittest.TestCase):
+class DefinitionListTermDefinitionTagOptionsTestCase(unittest.TestCase):
     """ Tests suite for the definitions tag module. """
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
@@ -117,7 +124,10 @@ class DefinitionsTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertFalse(opts.inline)
         self.assertTrue(opts.close_inlines)
+        self.assertEqual('dd', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertTrue(opts.make_paragraphs_here)
+        self.assertEqual('<dd>{inner_html}</dd>\n', opts.render_html_template)
 
     def test_html_rendering(self):
         """ Test HTML rendering. """

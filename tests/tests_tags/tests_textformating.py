@@ -39,6 +39,8 @@ class BoldTextTagTestCase(unittest.TestCase):
         """ Test super class """
         self.assertTrue(issubclass(BoldTextTagOptions, InlineWrappingTagOptions))
         self.assertEqual('<strong>%s</strong>', BoldTextTagOptions().wrapping_format)
+        self.assertEqual('b', BoldTextTagOptions().canonical_tag_name)
+        self.assertEqual(('bold', 'strong'), BoldTextTagOptions().alias_tag_names)
 
 
 class ItalicTextTagTestCase(unittest.TestCase):
@@ -57,6 +59,8 @@ class ItalicTextTagTestCase(unittest.TestCase):
         """ Test super class """
         self.assertTrue(issubclass(ItalicTextTagOptions, InlineWrappingTagOptions))
         self.assertEqual('<em>%s</em>', ItalicTextTagOptions().wrapping_format)
+        self.assertEqual('i', ItalicTextTagOptions().canonical_tag_name)
+        self.assertEqual(('italic', 'em'), ItalicTextTagOptions().alias_tag_names)
 
 
 class StrikeTextTagTestCase(unittest.TestCase):
@@ -75,6 +79,8 @@ class StrikeTextTagTestCase(unittest.TestCase):
         """ Test super class """
         self.assertTrue(issubclass(StrikeTextTagOptions, InlineWrappingTagOptions))
         self.assertEqual('<del>%s</del>', StrikeTextTagOptions().wrapping_format)
+        self.assertEqual('s', StrikeTextTagOptions().canonical_tag_name)
+        self.assertEqual(('strike', 'del'), StrikeTextTagOptions().alias_tag_names)
 
 
 class UnderlineTextTagTestCase(unittest.TestCase):
@@ -93,6 +99,8 @@ class UnderlineTextTagTestCase(unittest.TestCase):
         """ Test super class """
         self.assertTrue(issubclass(UnderlineTextTagOptions, InlineWrappingTagOptions))
         self.assertEqual('<ins>%s</ins>', UnderlineTextTagOptions().wrapping_format)
+        self.assertEqual('u', UnderlineTextTagOptions().canonical_tag_name)
+        self.assertEqual(('underline', 'ins'), UnderlineTextTagOptions().alias_tag_names)
 
 
 class SubscriptTextTagTestCase(unittest.TestCase):
@@ -107,6 +115,8 @@ class SubscriptTextTagTestCase(unittest.TestCase):
         """ Test super class """
         self.assertTrue(issubclass(SubscriptTextTagOptions, InlineWrappingTagOptions))
         self.assertEqual('<sub>%s</sub>', SubscriptTextTagOptions().wrapping_format)
+        self.assertEqual('sub', SubscriptTextTagOptions().canonical_tag_name)
+        self.assertEqual((), SubscriptTextTagOptions().alias_tag_names)
 
 
 class SupscriptTextTagTestCase(unittest.TestCase):
@@ -121,6 +131,8 @@ class SupscriptTextTagTestCase(unittest.TestCase):
         """ Test super class """
         self.assertTrue(issubclass(SupscriptTextTagOptions, InlineWrappingTagOptions))
         self.assertEqual('<sup>%s</sup>', SupscriptTextTagOptions().wrapping_format)
+        self.assertEqual('sup', SupscriptTextTagOptions().canonical_tag_name)
+        self.assertEqual((), SupscriptTextTagOptions().alias_tag_names)
 
 
 class PreTextTagTestCase(unittest.TestCase):
@@ -135,6 +147,8 @@ class PreTextTagTestCase(unittest.TestCase):
         """ Test super class """
         self.assertTrue(issubclass(PreTextTagOptions, InlineWrappingTagOptions))
         self.assertEqual('<pre>%s</pre>', PreTextTagOptions().wrapping_format)
+        self.assertEqual('pre', PreTextTagOptions().canonical_tag_name)
+        self.assertEqual((), PreTextTagOptions().alias_tag_names)
 
 
 class CiteTextTagTestCase(unittest.TestCase):
@@ -149,6 +163,8 @@ class CiteTextTagTestCase(unittest.TestCase):
         """ Test super class """
         self.assertTrue(issubclass(CiteTextTagOptions, InlineWrappingTagOptions))
         self.assertEqual('<cite>%s</cite>', CiteTextTagOptions().wrapping_format)
+        self.assertEqual('cite', CiteTextTagOptions().canonical_tag_name)
+        self.assertEqual((), CiteTextTagOptions().alias_tag_names)
 
 
 class InlineCodeTextTagTestCase(unittest.TestCase):
@@ -169,7 +185,10 @@ class InlineCodeTextTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertTrue(opts.inline)
         self.assertFalse(opts.close_inlines)
+        self.assertEqual('icode', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
+        self.assertEqual('<code>{content}</code>', opts.html_render_template)
 
     def test_render_html(self):
         """ Test the ``render_html`` method. """
@@ -279,7 +298,11 @@ class InlineSpoilerTextTagTestCase(unittest.TestCase):
     def test_subclassing(self):
         """ Test super class """
         self.assertTrue(issubclass(InlineSpoilerTextTagOptions, InlineWrappingTagOptions))
+        self.assertEqual('ispoiler', InlineSpoilerTextTagOptions().css_class_name)
+        self.assertEqual('<span class="{class_name}">%s</span>', InlineSpoilerTextTagOptions().html_render_template)
         self.assertEqual('<span class="ispoiler">%s</span>', InlineSpoilerTextTagOptions().wrapping_format)
+        self.assertEqual('ispoiler', InlineSpoilerTextTagOptions().canonical_tag_name)
+        self.assertEqual((), InlineSpoilerTextTagOptions().alias_tag_names)
 
     def test_subclassing_custom_css(self):
         """ Test super class """
@@ -302,6 +325,8 @@ class KeyboardTextTagTestCase(unittest.TestCase):
         """ Test super class """
         self.assertTrue(issubclass(KeyboardTextTagOptions, InlineWrappingTagOptions))
         self.assertEqual('<kbd>%s</kbd>', KeyboardTextTagOptions().wrapping_format)
+        self.assertEqual('kbd', KeyboardTextTagOptions().canonical_tag_name)
+        self.assertEqual(('keyboard', ), KeyboardTextTagOptions().alias_tag_names)
 
 
 class HighlightTextTagTestCase(unittest.TestCase):
@@ -320,6 +345,8 @@ class HighlightTextTagTestCase(unittest.TestCase):
         """ Test super class """
         self.assertTrue(issubclass(HighlightTextTagOptions, InlineWrappingTagOptions))
         self.assertEqual('<mark>%s</mark>', HighlightTextTagOptions().wrapping_format)
+        self.assertEqual('mark', HighlightTextTagOptions().canonical_tag_name)
+        self.assertEqual(('glow', 'highlight'), HighlightTextTagOptions().alias_tag_names)
 
 
 class SmallTextTagTestCase(unittest.TestCase):
@@ -334,3 +361,5 @@ class SmallTextTagTestCase(unittest.TestCase):
         """ Test super class """
         self.assertTrue(issubclass(SmallTextTagOptions, InlineWrappingTagOptions))
         self.assertEqual('<small>%s</small>', SmallTextTagOptions().wrapping_format)
+        self.assertEqual('small', SmallTextTagOptions().canonical_tag_name)
+        self.assertEqual((), SmallTextTagOptions().alias_tag_names)

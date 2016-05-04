@@ -14,6 +14,9 @@ class FootnoteDeclarationTagOptions(TagOptions):
     inline = True
     close_inlines = False
 
+    canonical_tag_name = 'footnote'
+    alias_tag_names = ('fn', )
+
     # Footnote ID attribute name
     footnote_id_attr_name = 'id'
 
@@ -28,6 +31,12 @@ class FootnoteDeclarationTagOptions(TagOptions):
 
     # Last footnote counter attribute name (for the root node)
     last_footnote_counter_attr_name = '_last_footnote_counter'
+
+    # HTML template for rendering
+    html_render_template = '<a id="{backward_id}" href="#{forward_id}"><sup>[{footnote_id}]</sup></a>'
+
+    # Text template for rendering
+    text_render_template = '[^{footnote_id}]'
 
     def get_footnote_id_from_counter(self, tree_node, root_tree_node):
         """
@@ -103,10 +112,10 @@ class FootnoteDeclarationTagOptions(TagOptions):
         footnote_id = self.get_footnote_id(tree_node, tree_node.root_tree_node)
 
         # Render the footnote
-        return '<a id="%s" href="#%s"><sup>[%s]</sup></a>' % (
-            self.get_footnote_backref_id(footnote_id),
-            self.get_footnote_ref_id(footnote_id),
-            footnote_id
+        return self.html_render_template.format(
+            backward_id=self.get_footnote_backref_id(footnote_id),
+            forward_id=self.get_footnote_ref_id(footnote_id),
+            footnote_id=footnote_id
         )
 
     def render_text(self, tree_node, inner_text, **kwargs):
@@ -122,7 +131,7 @@ class FootnoteDeclarationTagOptions(TagOptions):
         footnote_id = self.get_footnote_id(tree_node, tree_node.root_tree_node)
 
         # Render the footnote
-        return '[^%s]' % footnote_id
+        return self.text_render_template.format(footnote_id=footnote_id)
 
     def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
         """
@@ -147,8 +156,17 @@ class FootnoteReferenceTagOptions(TagOptions):
     inline = True
     close_inlines = False
 
+    canonical_tag_name = 'fnref'
+    alias_tag_names = ()
+
     # Footnote ID format for HTML rendering
     footnote_id_html_format = 'footnote-%s'
+
+    # HTML template for rendering
+    html_render_template = '<a href="#{forward_id}"><sup>[{footnote_id}]</sup></a>'
+
+    # Text template for rendering
+    text_render_template = '[^{footnote_id}]'
 
     def get_footnote_id(self, tree_node):
         """
@@ -177,8 +195,9 @@ class FootnoteReferenceTagOptions(TagOptions):
 
         # Get the footnote ID
         footnote_id = self.get_footnote_id(tree_node)
-        return '<a href="#%s"><sup>[%s]</sup></a>' % (
-            self.get_footnote_ref_id(footnote_id), footnote_id) if footnote_id else inner_html
+        return self.html_render_template.format(
+            forward_id=self.get_footnote_ref_id(footnote_id),
+            footnote_id=footnote_id) if footnote_id else inner_html
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
@@ -191,7 +210,7 @@ class FootnoteReferenceTagOptions(TagOptions):
 
         # Get the footnote ID
         footnote_id = self.get_footnote_id(tree_node)
-        return '[^%s]' % footnote_id if footnote_id else inner_text
+        return self.text_render_template.format(footnote_id=footnote_id) if footnote_id else inner_text
 
     def get_skcode_inner_content(self, tree_node, inner_skcode, **kwargs):
         """

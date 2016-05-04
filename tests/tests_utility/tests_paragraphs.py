@@ -17,6 +17,9 @@ from skcode.utility.paragraphs import (PARAGRAPH_NODE_NAME,
 class CustomBlockTagOptions(TagOptions):
     """ Custom subclass of ``TagOptions`` for tests. """
 
+    canonical_tag_name = 'test'
+    alias_tag_names = ()
+
 
 class CustomParagraphTagOptions(ParagraphTagOptions):
     """ Custom subclass of ``ParagraphTagOptions`` for tests. """

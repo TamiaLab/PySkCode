@@ -1,14 +1,20 @@
 """
-SkCode definition lists tag definitions code.
+SkCode definitions list tag definitions code.
 """
 
 from .base import TagOptions
 
 
 class DefinitionListTagOptions(TagOptions):
-    """ Definition list tag options container class. """
+    """ Definitions list tag options container class. """
 
     # FIXME Maybe post-process the tree to assert term/definition order
+
+    canonical_tag_name = 'dl'
+    alias_tag_names = ()
+
+    # HTML template for the rendering
+    render_html_template = '<dl>{inner_html}</dl>\n'
 
     def render_html(self, tree_node, inner_html, **kwargs):
         """
@@ -18,7 +24,7 @@ class DefinitionListTagOptions(TagOptions):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-        return '<dl>%s</dl>\n' % inner_html
+        return self.render_html_template.format(inner_html=inner_html)
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
@@ -32,7 +38,16 @@ class DefinitionListTagOptions(TagOptions):
 
 
 class DefinitionListTermTagOptions(TagOptions):
-    """ Definition list term tag options container class. """
+    """ Definitions list term tag options container class. """
+
+    canonical_tag_name = 'dt'
+    alias_tag_names = ()
+
+    # HTML template for the rendering
+    render_html_template = '<dt>{inner_html}</dt>\n'
+
+    # Text template for the rendering
+    render_text_template = '{inner_text} : '
 
     def render_html(self, tree_node, inner_html, **kwargs):
         """
@@ -42,7 +57,7 @@ class DefinitionListTermTagOptions(TagOptions):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-        return '<dt>%s</dt>\n' % inner_html
+        return self.render_html_template.format(inner_html=inner_html)
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
@@ -52,13 +67,19 @@ class DefinitionListTermTagOptions(TagOptions):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered text of this node.
         """
-        return '%s : ' % inner_text.strip()
+        return self.render_text_template.format(inner_text=inner_text.strip())
 
 
 class DefinitionListTermDefinitionTagOptions(TagOptions):
     """ Definition list term definition tag options container class. """
 
+    canonical_tag_name = 'dd'
+    alias_tag_names = ()
+
     make_paragraphs_here = True
+
+    # HTML template for the rendering
+    render_html_template = '<dd>{inner_html}</dd>\n'
 
     def render_html(self, tree_node, inner_html, **kwargs):
         """
@@ -68,7 +89,7 @@ class DefinitionListTermDefinitionTagOptions(TagOptions):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-        return '<dd>%s</dd>\n' % inner_html
+        return self.render_html_template.format(inner_html=inner_html)
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """

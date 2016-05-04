@@ -2,6 +2,9 @@
 SkCode links tag definitions code.
 """
 
+from html import escape as escape_html
+from html import unescape as unescape_html_entities
+
 from .base import TagOptions
 from ..tools import (sanitize_url,
                      slugify)
@@ -11,8 +14,20 @@ from ..utility.relative_urls import get_relative_url_base
 class UrlLinkTagOptions(TagOptions):
     """ URL link tag options container class. """
 
+    canonical_tag_name = 'url'
+    alias_tag_names = ('link', )
+
     inline = True
     close_inlines = False
+
+    # Special attribute name for the manual "nofollow" flag
+    nofollow_attr_name = 'nofollow'
+
+    # Title attribute name
+    title_attr_name = 'title'
+
+    # HTML template for rendering
+    html_render_template = '<a href="{src_link}"{extra_args}>{inner_html}</a>'
 
     def is_url_inside_tag_content(self, tree_node):
         """
@@ -21,6 +36,14 @@ class UrlLinkTagOptions(TagOptions):
         :return ``True`` if the target URL is in the tag content, not in attributes.
         """
         return tree_node.name not in tree_node.attrs
+
+    def get_nofollow_flag(self, tree_node):
+        """
+        Return ``True`` if the "nofollow" flag is set.
+        :param tree_node: The current tree node instance.
+        :return ``True`` if the "nofollow" flag is set.
+        """
+        return self.nofollow_attr_name in tree_node.attrs
 
     def get_target_link(self, tree_node):
         """
@@ -37,27 +60,44 @@ class UrlLinkTagOptions(TagOptions):
                             convert_relative_to_absolute=bool(relative_url_base),
                             absolute_base_url=relative_url_base)
 
+    def get_title_link(self, tree_node):
+        """
+        Return the title of this link.
+        :param tree_node: The current tree node instance.
+        :return The title of this link, or an empty string.
+        """
+        link_title = tree_node.attrs.get(self.title_attr_name, '')
+        return unescape_html_entities(link_title)
+
     def render_html(self, tree_node, inner_html, force_rel_nofollow=True, **kwargs):
         """
         Callback function for rendering HTML.
         :param tree_node: The tree node to be rendered.
         :param inner_html: The inner HTML of this tree node.
-        :param force_rel_nofollow: If set to ``True``, all links in the rendered HTML will have the atribute
+        :param force_rel_nofollow: If set to ``True``, all links in the rendered HTML will have the attribute
         "rel=nofollow" to avoid search engines to scrawl them (default ``True``).
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
 
         # Handle force_rel_nofollow
-        extra_attrs = ' rel="nofollow"' if force_rel_nofollow else ''
+        extra_attrs = ' rel="nofollow"' if force_rel_nofollow or self.get_nofollow_flag(tree_node) else ''
+
+        # Add title if specified
+        link_title = self.get_title_link(tree_node)
+        if link_title:
+            extra_attrs += ' title="{}"'.format(escape_html(link_title))
 
         # Get the target URL
         target_url = self.get_target_link(tree_node)
 
         # Render the link
         if target_url:
-            return '<a href="%s"%s>%s</a>' % (target_url, extra_attrs,
-                                              target_url if self.is_url_inside_tag_content(tree_node) else inner_html)
+            if self.is_url_inside_tag_content(tree_node):
+                inner_html = target_url
+            return self.html_render_template.format(src_link=target_url,
+                                                    extra_args=extra_attrs,
+                                                    inner_html=inner_html)
         else:
             return inner_html
 
@@ -76,9 +116,9 @@ class UrlLinkTagOptions(TagOptions):
         # Render the link
         if target_url:
             if self.is_url_inside_tag_content(tree_node):
-                return '%s' % target_url
+                return target_url
             else:
-                return '%s (%s)' % (inner_text, target_url)
+                return '{} ({})'.format(inner_text, target_url)
         else:
             return inner_text
 
@@ -106,6 +146,12 @@ class EmailLinkTagOptions(TagOptions):
 
     inline = True
     close_inlines = False
+
+    canonical_tag_name = 'email'
+    alias_tag_names = ()
+
+    # HTML template for rendering
+    html_render_template = '<a href="mailto:{email_address}"{extra_args}>{inner_html}</a>'
 
     def is_email_inside_tag_content(self, tree_node):
         """
@@ -150,10 +196,11 @@ class EmailLinkTagOptions(TagOptions):
 
         # Render the email link
         if email_address:
-            return '<a href="mailto:%s"%s>%s</a>' % (
-                email_address, extra_html,
-                email_address if self.is_email_inside_tag_content(tree_node) else inner_html
-            )
+            if self.is_email_inside_tag_content(tree_node):
+                inner_html = email_address
+            return self.html_render_template.format(email_address=email_address,
+                                                    extra_args=extra_html,
+                                                    inner_html=inner_html)
         else:
             return inner_html
 
@@ -172,9 +219,9 @@ class EmailLinkTagOptions(TagOptions):
         # Render the email link
         if email_address:
             if self.is_email_inside_tag_content(tree_node):
-                return '<%s>' % email_address
+                return '<{}>'.format(email_address)
             else:
-                return '%s (<%s>)' % (inner_text, email_address)
+                return '{} (<{}>)'.format(inner_text, email_address)
         else:
             return inner_text
 
@@ -203,6 +250,12 @@ class AnchorTagOptions(TagOptions):
     inline = True
     close_inlines = False
 
+    canonical_tag_name = 'anchor'
+    alias_tag_names = ()
+
+    # HTML template for rendering
+    html_render_template = '<a id="{anchor_id}"></a>'
+
     def get_anchor_id(self, tree_node):
         """
         Get the ID of this anchor from the content of the node.
@@ -222,7 +275,7 @@ class AnchorTagOptions(TagOptions):
 
         # Get the anchor ID
         anchor_id = self.get_anchor_id(tree_node)
-        return '<a id="%s"></a>' % anchor_id if anchor_id else inner_html
+        return self.html_render_template.format(anchor_id=anchor_id) if anchor_id else inner_html
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
@@ -235,7 +288,7 @@ class AnchorTagOptions(TagOptions):
 
         # Get the anchor ID
         anchor_id = self.get_anchor_id(tree_node)
-        return '[#%s]' % anchor_id if anchor_id else inner_text
+        return '[#{}]'.format(anchor_id) if anchor_id else inner_text
 
     def get_skcode_inner_content(self, tree_node, inner_skcode, **kwargs):
         """
@@ -254,8 +307,14 @@ class GoToAnchorTagOptions(TagOptions):
     inline = True
     close_inlines = False
 
+    canonical_tag_name = 'goto'
+    alias_tag_names = ()
+
     # Anchor ID attribute name
     anchor_id_attr_name = 'id'
+
+    # HTML template for rendering
+    html_render_template = '<a href="#{anchor_id}">{inner_html}</a>'
 
     def get_anchor_id(self, tree_node):
         """
@@ -282,7 +341,8 @@ class GoToAnchorTagOptions(TagOptions):
 
         # Get the anchor ID
         anchor_id = self.get_anchor_id(tree_node)
-        return '<a href="#%s">%s</a>' % (anchor_id, inner_html) if anchor_id else inner_html
+        return self.html_render_template.format(anchor_id=anchor_id,
+                                                inner_html=inner_html) if anchor_id else inner_html
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
@@ -295,7 +355,8 @@ class GoToAnchorTagOptions(TagOptions):
 
         # Get the anchor ID
         anchor_id = self.get_anchor_id(tree_node)
-        return '%s (#%s)' % (inner_text, anchor_id) if anchor_id else inner_text
+        return '{inner_text} (#{anchor_id})'.format(inner_text=inner_text,
+                                                    anchor_id=anchor_id) if anchor_id else inner_text
 
     def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
         """

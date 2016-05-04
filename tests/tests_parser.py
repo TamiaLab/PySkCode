@@ -23,7 +23,7 @@ class TagParserTestCase(unittest.TestCase):
         """ Test if the identifier charset is valid. """
         self.assertEqual(frozenset('abcdefghijklmnopqrstuvwxyz'
                                    'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-                                   '0123456789_'), IDENTIFIER_CHARSET)
+                                   '0123456789_*'), IDENTIFIER_CHARSET)
 
     def test_skip_nb_char_then_whitespaces_asserts(self):
         """

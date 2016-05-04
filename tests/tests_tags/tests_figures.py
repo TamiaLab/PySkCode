@@ -1,5 +1,5 @@
 """
-SkCode figures tag test code.
+SkCode figures tag definitions test code.
 """
 
 import unittest
@@ -13,7 +13,7 @@ from skcode.tags import (RootTagOptions,
                          DEFAULT_RECOGNIZED_TAGS)
 
 
-class FigureCaptionTagTestCase(unittest.TestCase):
+class FigureCaptionTagOptionsTestCase(unittest.TestCase):
     """ Tests suite for the figure caption lists tag module. """
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
@@ -31,8 +31,11 @@ class FigureCaptionTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertFalse(opts.inline)
         self.assertTrue(opts.close_inlines)
+        self.assertEqual('figcaption', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
         self.assertEqual('caption', opts.caption_css_class_name)
+        self.assertEqual('<figcaption class="{class_name}">{inner_html}</figcaption>\n', opts.render_html_template)
 
     def test_html_rendering(self):
         """ Test HTML rendering. """
@@ -62,7 +65,7 @@ class FigureCaptionTagTestCase(unittest.TestCase):
         self.assertEqual(expected_output, rendered_output)
 
 
-class FigureDeclarationTagTestCase(unittest.TestCase):
+class FigureDeclarationTagOptionsTestCase(unittest.TestCase):
     """ Tests suite for the figure lists tag module. """
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
@@ -80,6 +83,8 @@ class FigureDeclarationTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertFalse(opts.inline)
         self.assertTrue(opts.close_inlines)
+        self.assertEqual('figure', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertTrue(opts.make_paragraphs_here)
         self.assertEqual('id', opts.figure_id_attr_name)
         self.assertEqual(FigureCaptionTagOptions, opts.figure_caption_class)
@@ -152,7 +157,7 @@ class FigureDeclarationTagTestCase(unittest.TestCase):
         root_tree_node = RootTreeNode(RootTagOptions())
         tree_node = root_tree_node.new_child('figure', opts)
         rendered_output = opts.render_html(tree_node, 'test')
-        expected_output = '<figure class="thumbnail">test</figure>\n'
+        expected_output = '<figure class="thumbnail" id="">test</figure>\n'
         self.assertEqual(expected_output, rendered_output)
 
     def test_html_rendering_with_id(self):
@@ -170,7 +175,7 @@ class FigureDeclarationTagTestCase(unittest.TestCase):
         root_tree_node = RootTreeNode(RootTagOptions())
         tree_node = root_tree_node.new_child('figure', opts)
         rendered_output = opts.render_html(tree_node, 'test')
-        expected_output = '<figure class="custom_css">test</figure>\n'
+        expected_output = '<figure class="custom_css" id="">test</figure>\n'
         self.assertEqual(expected_output, rendered_output)
 
     def test_text_rendering(self):

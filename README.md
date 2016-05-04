@@ -3,12 +3,12 @@
 
 ### Overview
 
-This project is a BBCode to HTML/text rendering engine.
+This project is a BBCode to HTML / text rendering engine.
 
 The code included in this project converts [BBCode](http://en.wikipedia.org/wiki/BBCode) into HTML ready for display, or plain text ready for mailing.
 
 The code is split into three parts:
-- the lexer/tokenizer/parser engine,
+- the lexer / tokenizer / parser engine,
 - the post-parsing related code (aka utilities), 
 - the rendering engine.
 
@@ -16,11 +16,7 @@ The code is designed to be modular and easy to extend to match any possible use-
 
 ### Installation
 
-Installation is easy as doing ``pip install``:
-
-```
-pip install git+https://github.com/TamiaLab/PySkCode.git
-```
+Installation is easy as doing ``pip install pygments git+https://github.com/TamiaLab/PySkCode.git``.
 
 Note: on systems like Debian, the ``pip`` command for Python 3.x may have been renamed ``pip3``.
 
@@ -44,39 +40,42 @@ print(render_to_html(document))
 
 ### Advantages Over [Postmarkup](https://code.google.com/p/postmarkup/) or [dcwatson/bbcode](https://github.com/dcwatson/bbcode)
 
-- Powerful tag lexer with escape sequences support in quoted attribute value, unquoted value and self closing tag support.
+- Powerful tag lexer with escape sequences support in quoted attribute value, unquoted value support and self closing tag support.
 - No regular expressions for low-level parsing, only pure (and readable) Python code.
 - Per tag options with at-instantiation modification possible, give you the power to choose how any tag should work, even internal one.
 - Class based tag implementation, a tag is nothing more than a class and a name. No callable and nested dict nightmare for tag options.
-- Nothing hard-coded, you can choose how any stage of the code should work.
+- Nothing hard-coded, you can choose how any stage of the code should work for your application.
 - Made to be extensible and clean, all parts of the code does not form an horrible monolithic spaghetti monster like other BBCode parser.
 - DOM-like parser, you can post-process the document tree and add your own sauce if necessary.
 - Useful toolkit of post-parsing utilities included, like auto-paragraph utility, summary extractor and more.
 - Sanitation of nested tag included out-the-box on per tag rules basis. **work in progress**
-- Smileys and cosmetics replacement.
+- Smileys and cosmetics replacement support, with some classic default rules per default.
 - User-proof settings by default. Import and play.
+- Can generate HTML, text (real text, not a html-striped version) or even cleaned BBCode
+- HTML work out-the-box with Bootstrap and Font-Awesome.
 
 ### Implemented BBCode tags and syntax
 
-The ``DEFAULT_RECOGNIZED_TAGS`` dictionary include the following definitions:
+The ``DEFAULT_RECOGNIZED_TAGS`` setting include the following tag definitions.
 
-N.B. Some tags included by default require CSS to work. If you're using Bootstrap for CSS you're already ready to go.
+N.B. Some tags included by default require CSS to work. 
+If you're using Bootstrap and Font-Awesome for your CSS, you're already ready to go.
 
-#### Acronym
+#### Acronyms / Abbreviations
 
-Tag name: ``acronym`` (alias: ``abbr``)
+Tag name: ``abbr`` (alias: ``acronym``)
 
 Supported attribute: ``title`` (alias: tag name)
 
-Syntax: ``Do this [acronym title="As Soon As Possible"]ASAP[/acronym].``
+Syntax: ``Do this [abbr title="As Soon As Possible"]ASAP[/abbr].``
 
-Shortcut syntax: ``Do this [acronym="As Soon As Possible"]ASAP[/acronym].``
+Shortcut syntax: ``Do this [abbr="As Soon As Possible"]ASAP[/abbr].``
 
 #### Alert box
  
-Tag name: ``alert`` (with multiple aliases, see below)
+Tag name: ``alert`` (alias: see below)
 
-Supported attributes: ``title`` (alias: tag name), ``type``
+Supported attributes: ``title`` (alias: tag name), ``type`` (see below)
 
 Syntax: ``[alert title="Shit happen" type="error"]We're doomed![/alert]``
 
@@ -91,17 +90,18 @@ Supported types:
 - ``note``
 - ``question``
 
-Supported types can also be used as shortcut syntax.
+N.B. Supported types can also be used as aliases.
 
 Example: ``[error title="Shit happen"]We're doomed![/error]``
 
-Default HTML require the ``panel`` CSS module from bootstrap and some font awesome icon.
+Default HTML templates require the ``panel`` and ``media object`` CSS components from the bootstrap web framework 
+(version 3.x) and the latest version of the Font-Awesome web icons framework.
 
 #### Code block
 
-Tag name: ``code`` (with multiple aliases, see below)
+Tag name: ``code`` (alias: see below)
 
-Supported attributes: ``language`` (alias: tag name), ``hl_lines``, ``linenostart``, ``filename``, ``src``, ``id``
+Supported attributes: ``language`` (alias: tag name), ``hl_lines``, ``linenostart``, ``filename``, ``src``, ``id``.
 
 Syntax: ``[code language="python"]# Python code here[/code]``
 
@@ -109,7 +109,7 @@ Shortcut syntax: ``[code="python"]# Python code here[/code]``
 
 Attributes usage (all optional):
 - ``hl_lines``: Comma separated list of line numbers to be highlighted.
-- ``linenostart``: First line numer.
+- ``linenostart``: First line number.
 - ``filename``: Source file name.
 - ``src``: Source file link URL.
 - ``id``: enable HTML anchors on lines (format ``id-linenum`` and on the whole code block.
@@ -133,9 +133,14 @@ To add an horizontal scrollbar to all code blocks in HTML use :
 }
 ```
 
+Default HTML templates require the ``panel`` CSS components from the bootstrap web framework 
+(version 3.x) and the latest version of the Font-Awesome web icons framework.
+
+**The [Pygments](http://pygments.org/) library MUST be installed.**
+
 #### Definition list
 
-Tag name: ``dl`` (list), ``dt`` (term), ``dd`` (definition)
+Tags names: ``dl`` (list), ``dt`` (term), ``dd`` (definition)
 
 Supported attribute: none.
 
@@ -144,12 +149,15 @@ Syntax:
 [dl]
 [dt]Firefox[/dt]
 [dd]Powerful web browser.[/dd]
+
 [dt]Internet Explorer[/dt]
 [dd]Relic of the past.[/dd]
 [/dl]
 ```
 
-#### Electronic NOT notation
+N.B. A single term can have multiple definitions.
+
+#### Electronic NOT notation (line above text)
 
 Tag name: ``not``
 
@@ -159,7 +167,7 @@ Syntax: ``Pull the [not]RESET[/not] pin to low to reset.``
 
 #### Figure
 
-Tag name: ``figure`` (figure itself), ``figcaption`` (legend)
+Tag name: ``figure`` (figure), ``figcaption`` (legend)
 
 Supported attribute: ``id`` (alias: tag name) for ``figure``.
 
@@ -595,6 +603,35 @@ Syntax:
 
 Tag name can also be used to mark the task as "done" : ``[task="done"]Implement TODO list tag.[/task]``
 
+Example CSS for the TODO lists (require Font-Awesome):
+
+```
+.task_done {
+    text-decoration: line-through;
+    list-style-type: none;
+}
+
+.task_done p:before {
+    font-family: FontAwesome;
+    content:'\f046';
+    display: inline-block;
+    padding-right: 3px;
+    vertical-align: middle;
+}
+
+.task_pending {
+    list-style-type: none;
+}
+
+.task_pending p:before {
+    font-family: FontAwesome;
+    content:'\f096';
+    display: inline-block;
+    padding-right: 3px;
+    vertical-align: middle;
+}
+```
+
 #### Horizontal line
 
 Tag name: ``hr``
@@ -610,3 +647,44 @@ Tag name: ``br``
 Supported attribute: none.
 
 Syntax: ``First line.[br]Second line.``
+
+#### "Cut Here" marker
+
+Tag name: ``cuthere``
+
+Supported attribute: none.
+
+Generate a "Cut Here" marker as HTML comment for custom content preview processing.
+
+Syntax: 
+```
+First paragraph, before the marker.
+
+[cuthere]
+
+Second paragraph, after the marker .
+```
+
+#### Nota Bene
+
+Tag name: ``notabene`` (alias: ``nb``)
+
+Supported attribute: ``important`` (alias: tag value).
+
+Syntax: ``[notabene]Don't do this at home[/notabene]``
+
+Syntax: ``[notabene important]Don't do this at home[/notabene]``
+
+Syntax (using tag value): ``[notabene="important"]Don't do this at home[/notabene]``
+
+#### Post scriptum
+
+Tag name: ``postscriptum`` (alias: ``ps``)
+
+Supported attribute: ``important`` (alias: tag value).
+
+Syntax: ``[postscriptum]Don't do this at home[/postscriptum]``
+
+Syntax: ``[postscriptum important]Don't do this at home[/postscriptum]``
+
+Syntax (using tag value): ``[postscriptum="important"]Don't do this at home[/postscriptum]``

@@ -1,5 +1,5 @@
 """
-SkCode TO.DO lists tag test code.
+SkCode TODO list tag definitions code.
 """
 
 import unittest
@@ -11,8 +11,8 @@ from skcode.tags import (RootTagOptions,
                          DEFAULT_RECOGNIZED_TAGS)
 
 
-class TodoListsTagTestCase(unittest.TestCase):
-    """ Tests suite for the TO.DO lists tag module. """
+class TodoListTagOptionsTestCase(unittest.TestCase):
+    """ Tests suite for the TODO lists tag module. """
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
         """ Test the presence of the tag and aliases in the dictionary of default recognized tags. """
@@ -29,7 +29,11 @@ class TodoListsTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertFalse(opts.inline)
         self.assertTrue(opts.close_inlines)
+        self.assertEqual('todolist', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
+        self.assertEqual('<ul>{inner_html}</ul>\n', opts.html_render_template)
+        self.assertEqual('-- TODO LIST --\n{inner_text}\n', opts.text_render_template)
 
     def test_render_html(self):
         """ Test the ``render_html`` method. """
@@ -50,8 +54,8 @@ class TodoListsTagTestCase(unittest.TestCase):
         self.assertEqual(expected_result, output_result)
 
 
-class TodoListTasksTagTestCase(unittest.TestCase):
-    """ Tests suite for the TO.DO list tasks tag module. """
+class TodoTaskTagOptionsTestCase(unittest.TestCase):
+    """ Tests suite for the TODO list tasks tag module. """
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
         """ Test the presence of the tag and aliases in the dictionary of default recognized tags. """
@@ -68,11 +72,14 @@ class TodoListTasksTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertFalse(opts.inline)
         self.assertTrue(opts.close_inlines)
+        self.assertEqual('task', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertTrue(opts.make_paragraphs_here)
         self.assertEqual('done', opts.is_done_attr_name)
         self.assertEqual('done', opts.is_done_tagname_value)
         self.assertEqual('task_done', opts.task_done_html_class)
         self.assertEqual('task_pending', opts.task_pending_html_class)
+        self.assertEqual('<li class="{class_name}">{inner_html}</li>\n', opts.html_render_template)
 
     def test_get_is_done_task_flag_with_done_attribute_set(self):
         """ Test the ``get_is_done_task_flag`` method with the "done" attribute set. """

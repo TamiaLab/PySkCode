@@ -6,7 +6,6 @@ import unittest
 
 from skcode import parse_skcode
 from skcode.tags import (TagOptions,
-                         RootTagOptions,
                          TextTagOptions,
                          ErroneousTextTagOptions,
                          NewlineTagOptions)
@@ -21,14 +20,100 @@ class CustomErroneousTextTagOptions(ErroneousTextTagOptions):
     """ Custom subclass of ``ErroneousTextTagOptions`for tests. """
 
 
+class DummyTagOptions(TagOptions):
+    """ Dummy tag options for tests """
+
+    canonical_tag_name = 'test'
+    alias_tag_names = ('alias', )
+
+    def render_html(self, tree_node, inner_html, **kwargs):
+        return 'TEST'
+
+    def render_text(self, tree_node, inner_text, **kwargs):
+        return 'TEST'
+
+
 class ParserTestCase(unittest.TestCase):
     """
     Tests suite for the parser high-level API.
     """
 
+    def test_new_tags_declaration_style(self):
+        """ Test if the new tags declarations style (list based) works. """
+        known_tags = (
+            DummyTagOptions(),
+        )
+        document_tree = parse_skcode('[test][/test] [alias][/alias]', recognized_tags=known_tags)
+        self.assertTrue(isinstance(document_tree, RootTreeNode))
+        self.assertEqual(3, len(document_tree.children))
+        tree_node = document_tree.children[0]
+        self.assertEqual(document_tree, tree_node.root_tree_node)
+        self.assertEqual(document_tree, tree_node.parent)
+        self.assertEqual('test', tree_node.name)
+        self.assertEqual({}, tree_node.attrs)
+        self.assertEqual('', tree_node.content)
+        self.assertEqual(0, len(tree_node.children))
+        self.assertEqual('[test]', tree_node.source_open_tag)
+        self.assertEqual('[/test]', tree_node.source_close_tag)
+        tree_node = document_tree.children[1]
+        self.assertEqual(document_tree, tree_node.root_tree_node)
+        self.assertEqual(document_tree, tree_node.parent)
+        self.assertEqual('_text', tree_node.name)
+        self.assertEqual({}, tree_node.attrs)
+        self.assertEqual(' ', tree_node.content)
+        self.assertEqual(0, len(tree_node.children))
+        self.assertEqual('', tree_node.source_open_tag)
+        self.assertEqual('', tree_node.source_close_tag)
+        tree_node = document_tree.children[2]
+        self.assertEqual(document_tree, tree_node.root_tree_node)
+        self.assertEqual(document_tree, tree_node.parent)
+        self.assertEqual('alias', tree_node.name)
+        self.assertEqual({}, tree_node.attrs)
+        self.assertEqual('', tree_node.content)
+        self.assertEqual(0, len(tree_node.children))
+        self.assertEqual('[alias]', tree_node.source_open_tag)
+        self.assertEqual('[/alias]', tree_node.source_close_tag)
+
+    def test_old_tags_declaration_style(self):
+        """ Test if the new tags declarations style (dict based) works. """
+        known_tags = {
+            'test': DummyTagOptions(),
+            'alias': DummyTagOptions(),
+        }
+        document_tree = parse_skcode('[test][/test] [alias][/alias]', recognized_tags=known_tags)
+        self.assertTrue(isinstance(document_tree, RootTreeNode))
+        self.assertEqual(3, len(document_tree.children))
+        tree_node = document_tree.children[0]
+        self.assertEqual(document_tree, tree_node.root_tree_node)
+        self.assertEqual(document_tree, tree_node.parent)
+        self.assertEqual('test', tree_node.name)
+        self.assertEqual({}, tree_node.attrs)
+        self.assertEqual('', tree_node.content)
+        self.assertEqual(0, len(tree_node.children))
+        self.assertEqual('[test]', tree_node.source_open_tag)
+        self.assertEqual('[/test]', tree_node.source_close_tag)
+        tree_node = document_tree.children[1]
+        self.assertEqual(document_tree, tree_node.root_tree_node)
+        self.assertEqual(document_tree, tree_node.parent)
+        self.assertEqual('_text', tree_node.name)
+        self.assertEqual({}, tree_node.attrs)
+        self.assertEqual(' ', tree_node.content)
+        self.assertEqual(0, len(tree_node.children))
+        self.assertEqual('', tree_node.source_open_tag)
+        self.assertEqual('', tree_node.source_close_tag)
+        tree_node = document_tree.children[2]
+        self.assertEqual(document_tree, tree_node.root_tree_node)
+        self.assertEqual(document_tree, tree_node.parent)
+        self.assertEqual('alias', tree_node.name)
+        self.assertEqual({}, tree_node.attrs)
+        self.assertEqual('', tree_node.content)
+        self.assertEqual(0, len(tree_node.children))
+        self.assertEqual('[alias]', tree_node.source_open_tag)
+        self.assertEqual('[/alias]', tree_node.source_close_tag)
+
     def test_reject_private_tag_names(self):
         with self.assertRaises(ValueError) as e:
-            parse_skcode('', recognized_tags={'_test': TagOptions()})
+            parse_skcode('', recognized_tags={'_test': DummyTagOptions()})
         self.assertEqual('Tag names starting with an underscore are reserved for internal use only.', str(e.exception))
 
     def test_no_text(self):
@@ -42,7 +127,7 @@ class ParserTestCase(unittest.TestCase):
 
     def test_data_block(self):
         document_tree = parse_skcode('[test][i]Hello[test] world![/i][/test]',
-                                     recognized_tags={'test': TagOptions(parse_embedded=False)})
+                                     recognized_tags={'test': DummyTagOptions(parse_embedded=False)})
         self.assertTrue(isinstance(document_tree, RootTreeNode))
         self.assertEqual(1, len(document_tree.children))
         code_block = document_tree.children[0]
@@ -57,7 +142,7 @@ class ParserTestCase(unittest.TestCase):
 
     def test_data_block_swallow_newline(self):
         document_tree = parse_skcode('[test]\n\n[i]Hello[test] world![/i]\n[/test]',
-                                     recognized_tags={'test': TagOptions(parse_embedded=False,
+                                     recognized_tags={'test': DummyTagOptions(parse_embedded=False,
                                                                          swallow_trailing_newline=True)})
         self.assertTrue(isinstance(document_tree, RootTreeNode))
         self.assertEqual(1, len(document_tree.children))
@@ -159,7 +244,7 @@ class ParserTestCase(unittest.TestCase):
 
     def test_newline_swallow(self):
         document_tree = parse_skcode('[test]\nbar[/test]',
-                                     recognized_tags={'test': TagOptions(swallow_trailing_newline=True)})
+                                     recognized_tags={'test': DummyTagOptions(swallow_trailing_newline=True)})
         self.assertTrue(isinstance(document_tree, RootTreeNode))
         self.assertEqual(1, len(document_tree.children))
         child_node = document_tree.children[0]
@@ -169,7 +254,7 @@ class ParserTestCase(unittest.TestCase):
 
     def test_newline_close(self):
         document_tree = parse_skcode('[test][test]\nfoobar',
-                                     recognized_tags={'test': TagOptions(newline_closes=True)})
+                                     recognized_tags={'test': DummyTagOptions(newline_closes=True)})
         self.assertTrue(isinstance(document_tree, RootTreeNode))
         self.assertEqual(2, len(document_tree.children))
         child_node = document_tree.children[1]
@@ -184,7 +269,7 @@ class ParserTestCase(unittest.TestCase):
 
     def test_nesting_limit(self):
         document_tree = parse_skcode('[test][test][test][test]',
-                                     recognized_tags={'test': TagOptions()},
+                                     recognized_tags={'test': DummyTagOptions()},
                                      max_nesting_depth=5)
         self.assertTrue(isinstance(document_tree, RootTreeNode))
         self.assertEqual(1, len(document_tree.children))
@@ -202,7 +287,7 @@ class ParserTestCase(unittest.TestCase):
         self.assertEqual(0, len(child_node.children))
 
         document_tree = parse_skcode('[test][test][test][test]',
-                                     recognized_tags={'test': TagOptions()},
+                                     recognized_tags={'test': DummyTagOptions()},
                                      max_nesting_depth=4)
         self.assertTrue(isinstance(document_tree, RootTreeNode))
         self.assertEqual(1, len(document_tree.children))
@@ -220,7 +305,7 @@ class ParserTestCase(unittest.TestCase):
         self.assertEqual(0, len(child_node.children))
 
         document_tree = parse_skcode('[test][test][test][test]',
-                                     recognized_tags={'test': TagOptions()},
+                                     recognized_tags={'test': DummyTagOptions()},
                                      max_nesting_depth=3)
         self.assertTrue(isinstance(document_tree, RootTreeNode))
         self.assertEqual(1, len(document_tree.children))
@@ -238,14 +323,14 @@ class ParserTestCase(unittest.TestCase):
 
     def test_same_tag_close(self):
         document_tree = parse_skcode('[test][test][test]',
-                                     recognized_tags={'test': TagOptions(same_tag_closes=True)})
+                                     recognized_tags={'test': DummyTagOptions(same_tag_closes=True)})
         self.assertTrue(isinstance(document_tree, RootTreeNode))
         self.assertEqual(3, len(document_tree.children))
 
     def test_close_inline(self):
         document_tree = parse_skcode('[inline][inline][test]',
-                                     recognized_tags={'inline': TagOptions(inline=True, close_inlines=False),
-                                                      'test': TagOptions(inline=False, close_inlines=True)})
+                                     recognized_tags={'inline': DummyTagOptions(inline=True, close_inlines=False),
+                                                      'test': DummyTagOptions(inline=False, close_inlines=True)})
         self.assertTrue(isinstance(document_tree, RootTreeNode))
         self.assertEqual(2, len(document_tree.children))
         self.assertEqual('inline', document_tree.children[0].name)
@@ -253,40 +338,40 @@ class ParserTestCase(unittest.TestCase):
 
     def test_standalone_tag(self):
         document_tree = parse_skcode('[test][test][test]',
-                                     recognized_tags={'test': TagOptions(standalone=True)})
+                                     recognized_tags={'test': DummyTagOptions(standalone=True)})
         self.assertTrue(isinstance(document_tree, RootTreeNode))
         self.assertEqual(3, len(document_tree.children))
 
     def test_bad_closing(self):
-        document_tree = parse_skcode('[/test]', recognized_tags={'test': TagOptions()})
+        document_tree = parse_skcode('[/test]', recognized_tags={'test': DummyTagOptions()})
         self.assertTrue(isinstance(document_tree, RootTreeNode))
         self.assertEqual(1, len(document_tree.children))
         self.assertTrue(isinstance(document_tree.children[0].opts, ErroneousTextTagOptions))
 
     def test_bad_closing_2(self):
-        document_tree = parse_skcode('[inline][/test]', recognized_tags={'test': TagOptions(),
-                                                                         'inline': TagOptions()})
+        document_tree = parse_skcode('[inline][/test]', recognized_tags={'test': DummyTagOptions(),
+                                                                         'inline': DummyTagOptions()})
         self.assertTrue(isinstance(document_tree, RootTreeNode))
         self.assertEqual(1, len(document_tree.children))
         self.assertTrue(isinstance(document_tree.children[0].children[0].opts, ErroneousTextTagOptions))
 
     def test_self_closing_tag(self):
         document_tree = parse_skcode('[test/]',
-                                     recognized_tags={'test': TagOptions(standalone=True)})
+                                     recognized_tags={'test': DummyTagOptions(standalone=True)})
         self.assertTrue(isinstance(document_tree, RootTreeNode))
         self.assertEqual(1, len(document_tree.children))
         self.assertFalse(isinstance(document_tree.children[0].opts, ErroneousTextTagOptions))
 
     def test_self_closing_tag_2(self):
         document_tree = parse_skcode('[test/]',
-                                     recognized_tags={'test': TagOptions(standalone=False)})
+                                     recognized_tags={'test': DummyTagOptions(standalone=False)})
         self.assertTrue(isinstance(document_tree, RootTreeNode))
         self.assertEqual(1, len(document_tree.children))
         self.assertTrue(isinstance(document_tree.children[0].opts, ErroneousTextTagOptions))
 
     def test_texturize_unclosed(self):
         document_tree = parse_skcode('[test][test][test]',
-                                     recognized_tags={'test': TagOptions()},
+                                     recognized_tags={'test': DummyTagOptions()},
                                      texturize_unclosed_tags=True)
         self.assertTrue(isinstance(document_tree, RootTreeNode))
         self.assertEqual(3, len(document_tree.children))

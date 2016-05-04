@@ -15,6 +15,9 @@ class NoParseTagOptions(TagOptions):
     inline = True
     close_inlines = False
 
+    canonical_tag_name = 'noparse'
+    alias_tag_names = ('nobbc', )
+
     def render_html(self, tree_node, inner_html, **kwargs):
         """
         Callback function for rendering HTML.

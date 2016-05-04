@@ -14,6 +14,9 @@ PARAGRAPH_NODE_NAME = '_paragraph'
 class ParagraphTagOptions(TagOptions):
     """ Paragraph tag options container class. """
 
+    canonical_tag_name = PARAGRAPH_NODE_NAME
+    alias_tag_names = ()
+
     # HTML class for the paragraph
     html_text_class = 'text-justify'
 

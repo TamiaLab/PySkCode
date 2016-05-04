@@ -25,6 +25,8 @@ class RootTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertFalse(opts.inline)
         self.assertTrue(opts.close_inlines)
+        self.assertEqual('_root', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertTrue(opts.make_paragraphs_here)
 
     def test_render_html(self):
@@ -62,6 +64,8 @@ class TextTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertTrue(opts.inline)
         self.assertFalse(opts.close_inlines)
+        self.assertEqual('_text', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
 
     def test_render_html(self):
@@ -154,7 +158,10 @@ class ErroneousTextTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertTrue(opts.inline)
         self.assertFalse(opts.close_inlines)
+        self.assertEqual('_error', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
+        self.assertEqual('<span style="font-weight: bold; color: red;">{}</span>', opts.html_render_template)
 
     def test_render_html(self):
         """ Test the ``render_html`` method. """
@@ -202,6 +209,8 @@ class NewlineTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertTrue(opts.inline)
         self.assertFalse(opts.close_inlines)
+        self.assertEqual('_newline', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
 
     def test_render_html(self):
@@ -239,6 +248,8 @@ class HardNewlineTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertTrue(opts.inline)
         self.assertFalse(opts.close_inlines)
+        self.assertEqual('_newline', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
 
     def test_render_html(self):

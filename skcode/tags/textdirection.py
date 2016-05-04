@@ -16,6 +16,9 @@ class DirectionTextTagOptions(TagOptions):
     inline = True
     close_inlines = False
 
+    canonical_tag_name = 'bdo'
+    alias_tag_names = ()
+
     # Default text direction
     default_text_direction = TEXT_DIR_LEFT_TO_RIGHT
 
@@ -39,6 +42,9 @@ class DirectionTextTagOptions(TagOptions):
 
     # Text direction attribute name
     text_direction_attr_name = 'dir'
+
+    # HTML template for rendering
+    html_render_template = '<bdo dir="{text_direction}">{inner_html}</bdo>'
 
     def get_text_direction(self, tree_node):
         """
@@ -71,7 +77,8 @@ class DirectionTextTagOptions(TagOptions):
         :return The rendered HTML of this node.
         """
         text_direction = self.get_text_direction(tree_node)
-        return '<bdo dir="%s">%s</bdo>' % (self.bdo_html_attr_value_map[text_direction], inner_html)
+        return self.html_render_template.format(text_direction=self.bdo_html_attr_value_map[text_direction],
+                                                inner_html=inner_html)
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
@@ -106,13 +113,18 @@ class DirectionTextTagOptions(TagOptions):
 class FixedDirectionTextTagOptions(DirectionTextTagOptions):
     """ Fixed direction text tag options container class. """
 
-    def __init__(self, text_direction, **kwargs):
+    canonical_tag_name = None
+    alias_tag_names = ()
+
+    def __init__(self, text_direction, canonical_tag_name=None, **kwargs):
         """
         Fixed direction text modifier tag constructor.
         :param text_direction: Text direction to use.
+        :param canonical_tag_name: The canonical name of this tag, default to the text direction string.
         :param kwargs: Keyword arguments for super constructor.
         """
         assert text_direction, "The text direction is mandatory."
+        self.canonical_tag_name = canonical_tag_name or self.reverse_text_direction_map[text_direction]
         super(FixedDirectionTextTagOptions, self).__init__(**kwargs)
         self.text_direction = text_direction
 

@@ -8,6 +8,12 @@ from .base import TagOptions
 class TableTagOptions(TagOptions):
     """ Table tag options container class. """
 
+    canonical_tag_name = 'table'
+    alias_tag_names = ()
+
+    # HTML template for rendering
+    html_render_template = '<table class="{class_name}">{inner_html}</table>\n'
+
     # CSS class name for the table
     css_class_name = 'table table-condensed table-striped'
 
@@ -19,7 +25,7 @@ class TableTagOptions(TagOptions):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-        return '<table class="%s">%s</table>\n' % (self.css_class_name, inner_html)
+        return self.html_render_template.format(class_name=self.css_class_name, inner_html=inner_html)
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
@@ -36,6 +42,12 @@ class TableTagOptions(TagOptions):
 class TableRowTagOptions(TagOptions):
     """ Table row tag options container class. """
 
+    canonical_tag_name = 'tr'
+    alias_tag_names = ()
+
+    # HTML template for rendering
+    html_render_template = '<tr>{inner_html}</tr>\n'
+
     def render_html(self, tree_node, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
@@ -44,7 +56,7 @@ class TableRowTagOptions(TagOptions):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-        return '<tr>%s</tr>\n' % inner_html
+        return self.html_render_template.format(inner_html=inner_html)
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
@@ -61,7 +73,13 @@ class TableRowTagOptions(TagOptions):
 class TableCellTagOptions(TagOptions):
     """ Table tag options container class. """
 
+    canonical_tag_name = 'td'
+    alias_tag_names = ()
+
     make_paragraphs_here = True
+
+    # HTML template for rendering
+    html_render_template = '<td{extra_args}>{inner_html}</td>\n'
 
     # Column span attribute name
     colspan_attr_name = 'colspan'
@@ -139,7 +157,7 @@ class TableCellTagOptions(TagOptions):
         :return The rendered HTML of this node.
         """
         extra_attrs = self.get_html_extra_attrs(tree_node)
-        return '<td%s>%s</td>\n' % (extra_attrs, inner_html)
+        return self.html_render_template.format(extra_args=extra_attrs, inner_html=inner_html)
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
@@ -173,24 +191,8 @@ class TableCellTagOptions(TagOptions):
 class TableHeaderCellTagOptions(TableCellTagOptions):
     """ Table tag options container class. """
 
-    def render_html(self, tree_node, inner_html, **kwargs):
-        """
-        Callback function for rendering HTML.
-        :param tree_node: The tree node to be rendered.
-        :param inner_html: The inner HTML of this tree node.
-        :param kwargs: Extra keyword arguments for rendering.
-        :return The rendered HTML of this node.
-        """
-        extra_attrs = self.get_html_extra_attrs(tree_node)
-        return '<th%s>%s</th>\n' % (extra_attrs, inner_html)
+    canonical_tag_name = 'th'
+    alias_tag_names = ()
 
-    def render_text(self, tree_node, inner_text, **kwargs):
-        """
-        Callback function for rendering text.
-        :param tree_node: The tree node to be rendered.
-        :param inner_text: The inner text of this tree node.
-        :param kwargs: Extra keyword arguments for rendering.
-        :return The rendered text of this node.
-        """
-        # TODO But how?
-        return inner_text
+    # HTML template for rendering
+    html_render_template = '<th{extra_args}>{inner_html}</th>\n'

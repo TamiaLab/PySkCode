@@ -124,6 +124,8 @@ class ListsTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertFalse(opts.inline)
         self.assertTrue(opts.close_inlines)
+        self.assertEqual('list', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
 
         self.assertEqual((
@@ -163,6 +165,11 @@ class ListsTagTestCase(unittest.TestCase):
             UPPER_ROMAN_LIST_TYPE: 'I',
             LOWER_ROMAN_LIST_TYPE: 'i',
         }, opts.alias_list_type_lut)
+
+        self.assertEqual('<ul>{inner_html}</ul>\n', opts.html_render_template_ul)
+        self.assertEqual('<ol type="{list_type}">{inner_html}</ol>\n', opts.html_render_template_ol)
+        self.assertEqual('<ol type="{list_type}" start="{list_start}">{inner_html}</ol>\n',
+                         opts.html_render_template_ol_start_number)
 
     def test_get_list_type_with_tagname_set(self):
         """ Test the ``get_list_type`` method with the tag name set. """
@@ -328,6 +335,20 @@ class UnorderedListsTagTestCase(unittest.TestCase):
         self.assertIn('ul', DEFAULT_RECOGNIZED_TAGS)
         self.assertIsInstance(DEFAULT_RECOGNIZED_TAGS['ul'], UnorderedListTagOptions)
 
+    def test_tag_constant_values(self):
+        """ Test tag constants. """
+        opts = UnorderedListTagOptions()
+        self.assertFalse(opts.newline_closes)
+        self.assertFalse(opts.same_tag_closes)
+        self.assertFalse(opts.standalone)
+        self.assertTrue(opts.parse_embedded)
+        self.assertFalse(opts.swallow_trailing_newline)
+        self.assertFalse(opts.inline)
+        self.assertTrue(opts.close_inlines)
+        self.assertEqual('ul', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
+        self.assertFalse(opts.make_paragraphs_here)
+
     def test_get_list_type(self):
         """ Test the ``get_list_type`` method. """
         opts = UnorderedListTagOptions()
@@ -361,6 +382,17 @@ class OrderedListsTagTestCase(unittest.TestCase):
     def test_tag_constant_values(self):
         """ Test tag constants. """
         opts = OrderedListTagOptions()
+        self.assertFalse(opts.newline_closes)
+        self.assertFalse(opts.same_tag_closes)
+        self.assertFalse(opts.standalone)
+        self.assertTrue(opts.parse_embedded)
+        self.assertFalse(opts.swallow_trailing_newline)
+        self.assertFalse(opts.inline)
+        self.assertTrue(opts.close_inlines)
+        self.assertEqual('ol', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
+        self.assertFalse(opts.make_paragraphs_here)
+
         self.assertEqual((
             NUMERIC_LIST_TYPE,
             UPPERCASE_LIST_TYPE,
@@ -383,15 +415,18 @@ class ListElementTagTestCase(unittest.TestCase):
         """ Test tag constants. """
         opts = ListElementTagOptions()
         self.assertFalse(opts.newline_closes)
-        self.assertFalse(opts.same_tag_closes)
+        self.assertTrue(opts.same_tag_closes)
         self.assertFalse(opts.standalone)
         self.assertTrue(opts.parse_embedded)
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertFalse(opts.inline)
         self.assertTrue(opts.close_inlines)
+        self.assertEqual('li', opts.canonical_tag_name)
+        self.assertEqual(('*', ), opts.alias_tag_names)
         self.assertTrue(opts.make_paragraphs_here)
         self.assertEqual(UNORDERED_LIST_TYPE, opts.default_list_type)
         self.assertEqual(ListTagOptions, opts.base_list_class)
+        self.assertEqual('<li>{inner_html}</li>\n', opts.html_render_template)
 
     def test_get_parent_list_type_assertion(self):
         """ Test the ``get_parent_list_type```method assertions. """

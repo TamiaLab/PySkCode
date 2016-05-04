@@ -1,5 +1,5 @@
 """
-SkCode code blocks tag test code.
+SkCode code block tag definitions test code.
 """
 
 import unittest
@@ -13,7 +13,7 @@ from skcode.tags import (RootTagOptions,
 from skcode.utility.relative_urls import setup_relative_urls_conversion
 
 
-class CodeBlocksTagTestCase(unittest.TestCase):
+class CodeBlockTagOptionsTestCase(unittest.TestCase):
     """ Tests suite for the code blocks tag module. """
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
@@ -32,6 +32,8 @@ class CodeBlocksTagTestCase(unittest.TestCase):
         self.assertFalse(opts.inline)
         self.assertTrue(opts.close_inlines)
         self.assertFalse(opts.make_paragraphs_here)
+        self.assertEqual('code', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertEqual(4, opts.tab_size)
         self.assertEqual('default', opts.pygments_css_style_name)
         self.assertTrue(opts.display_line_numbers)
@@ -43,6 +45,22 @@ class CodeBlocksTagTestCase(unittest.TestCase):
         self.assertEqual('src', opts.source_link_attr_name)
         self.assertEqual('id', opts.figure_id_attr_name)
         self.assertEqual('codetable', opts.wrapping_div_class_name)
+
+        self.assertEqual("""<div class="{class_name}">
+    {source_code}
+</div>""", opts.wrapping_div_html_template)
+        self.assertEqual('Source : {}', opts.source_caption_html_template)
+        self.assertEqual('<a href="{src_link}"{extra_args} target="_blank">{caption} '
+                         '<i class="fa fa-link" aria-hidden="true"></i></a>', opts.source_link_html_template)
+        self.assertEqual("""<div class="panel panel-default" id="{figure_id}">
+    <div class="panel-body">
+        {source_code}
+    </div>
+    <div class="panel-footer">
+        {caption}
+    </div>
+</div>""", opts.code_html_template)
+        self.assertEqual('<a id="{figure_id}"></a>\n{source_code}', opts.code_only_html_template)
 
     def test_get_language_name_with_tagname_set(self):
         """ Test the ``get_language_name`` method with the tag name attribute set. """
@@ -266,10 +284,11 @@ class CodeBlocksTagTestCase(unittest.TestCase):
         tree_node = root_tree_node.new_child('code', opts,
                                              attrs={'code': 'python'}, content='# Hello World!')
         output_result = opts.render_html(tree_node, '')
-        expected_result = """<div class="codetable"><table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">1</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="color: #408080; font-style: italic"># Hello World!</span>
+        expected_result = """<div class="codetable">
+    <table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">1</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="color: #408080; font-style: italic"># Hello World!</span>
 </pre></div>
-</td></tr></table></div>
-"""
+</td></tr></table>
+</div>"""
         self.assertEqual(expected_result, output_result)
 
     def test_render_html_with_invalid_language(self):
@@ -279,10 +298,11 @@ class CodeBlocksTagTestCase(unittest.TestCase):
         tree_node = root_tree_node.new_child('code', opts,
                                              attrs={'code': 'somethingnotexisting'}, content='# Hello World!')
         output_result = opts.render_html(tree_node, '')
-        expected_result = """<div class="codetable"><table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">1</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"># Hello World!
+        expected_result = """<div class="codetable">
+    <table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">1</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"># Hello World!
 </pre></div>
-</td></tr></table></div>
-"""
+</td></tr></table>
+</div>"""
         self.assertEqual(expected_result, output_result)
 
     def test_render_html_with_default_language(self):
@@ -291,10 +311,11 @@ class CodeBlocksTagTestCase(unittest.TestCase):
         root_tree_node = RootTreeNode(RootTagOptions())
         tree_node = root_tree_node.new_child('code', opts, attrs={}, content='# Hello World!')
         output_result = opts.render_html(tree_node, '')
-        expected_result = """<div class="codetable"><table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">1</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"># Hello World!
+        expected_result = """<div class="codetable">
+    <table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">1</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"># Hello World!
 </pre></div>
-</td></tr></table></div>
-"""
+</td></tr></table>
+</div>"""
         self.assertEqual(expected_result, output_result)
 
     def test_render_html_with_hl_lines(self):
@@ -304,10 +325,11 @@ class CodeBlocksTagTestCase(unittest.TestCase):
         tree_node = root_tree_node.new_child('code', opts,
                                              attrs={'code': 'python', 'hl_lines': '1'}, content='# Hello World!')
         output_result = opts.render_html(tree_node, '')
-        expected_result = """<div class="codetable"><table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">1</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
+        expected_result = """<div class="codetable">
+    <table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">1</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
 </span></pre></div>
-</td></tr></table></div>
-"""
+</td></tr></table>
+</div>"""
         self.assertEqual(expected_result, output_result)
 
     def test_render_html_with_linenostart(self):
@@ -318,10 +340,11 @@ class CodeBlocksTagTestCase(unittest.TestCase):
                                              attrs={'code': 'python', 'hl_lines': '1', 'linenostart': '5'},
                                              content='# Hello World!')
         output_result = opts.render_html(tree_node, '')
-        expected_result = """<div class="codetable"><table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
+        expected_result = """<div class="codetable">
+    <table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
 </span></pre></div>
-</td></tr></table></div>
-"""
+</td></tr></table>
+</div>"""
         self.assertEqual(expected_result, output_result)
 
     def test_render_html_with_src_filename(self):
@@ -333,13 +356,18 @@ class CodeBlocksTagTestCase(unittest.TestCase):
                                                     'linenostart': '5', 'filename': 'test.py'},
                                              content='# Hello World!')
         output_result = opts.render_html(tree_node, '')
-        expected_result = """<figure>
-<div class="codetable"><table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
+        expected_result = """<div class="panel panel-default" id="">
+    <div class="panel-body">
+        <div class="codetable">
+    <table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
 </span></pre></div>
-</td></tr></table></div>
-<figcaption>Source : test.py</figcaption>
-</figure>
-"""
+</td></tr></table>
+</div>
+    </div>
+    <div class="panel-footer">
+        Source : test.py
+    </div>
+</div>"""
         self.assertEqual(expected_result, output_result)
 
     def test_render_html_with_src_filename_containing_html_entities(self):
@@ -351,13 +379,18 @@ class CodeBlocksTagTestCase(unittest.TestCase):
                                                     'linenostart': '5', 'filename': '<test>.py'},
                                              content='# Hello World!')
         output_result = opts.render_html(tree_node, '')
-        expected_result = """<figure>
-<div class="codetable"><table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
+        expected_result = """<div class="panel panel-default" id="">
+    <div class="panel-body">
+        <div class="codetable">
+    <table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
 </span></pre></div>
-</td></tr></table></div>
-<figcaption>Source : &lt;test&gt;.py</figcaption>
-</figure>
-"""
+</td></tr></table>
+</div>
+    </div>
+    <div class="panel-footer">
+        Source : &lt;test&gt;.py
+    </div>
+</div>"""
         self.assertEqual(expected_result, output_result)
 
     def test_render_html_with_src_link(self):
@@ -370,13 +403,18 @@ class CodeBlocksTagTestCase(unittest.TestCase):
                                                     'src': 'https://github.com/TamiaLab/PySkCode'},
                                              content='# Hello World!')
         output_result = opts.render_html(tree_node, '')
-        expected_result = """<figure>
-<div class="codetable"><table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
+        expected_result = """<div class="panel panel-default" id="">
+    <div class="panel-body">
+        <div class="codetable">
+    <table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
 </span></pre></div>
-</td></tr></table></div>
-<figcaption><a href="https://github.com/TamiaLab/PySkCode" rel="nofollow" target="_blank">Source : test.py <i class="fa fa-link"></i></a></figcaption>
-</figure>
-"""
+</td></tr></table>
+</div>
+    </div>
+    <div class="panel-footer">
+        <a href="https://github.com/TamiaLab/PySkCode" rel="nofollow" target="_blank">Source : test.py <i class="fa fa-link" aria-hidden="true"></i></a>
+    </div>
+</div>"""
         self.assertEqual(expected_result, output_result)
 
     def test_render_html_with_src_link_only(self):
@@ -389,13 +427,18 @@ class CodeBlocksTagTestCase(unittest.TestCase):
                                                     'src': 'https://github.com/TamiaLab/PySkCode'},
                                              content='# Hello World!')
         output_result = opts.render_html(tree_node, '')
-        expected_result = """<figure>
-<div class="codetable"><table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
+        expected_result = """<div class="panel panel-default" id="">
+    <div class="panel-body">
+        <div class="codetable">
+    <table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
 </span></pre></div>
-</td></tr></table></div>
-<figcaption><a href="https://github.com/TamiaLab/PySkCode" rel="nofollow" target="_blank">Source : https://github.com/TamiaLab/PySkCode <i class="fa fa-link"></i></a></figcaption>
-</figure>
-"""
+</td></tr></table>
+</div>
+    </div>
+    <div class="panel-footer">
+        <a href="https://github.com/TamiaLab/PySkCode" rel="nofollow" target="_blank">Source : https://github.com/TamiaLab/PySkCode <i class="fa fa-link" aria-hidden="true"></i></a>
+    </div>
+</div>"""
         self.assertEqual(expected_result, output_result)
 
     def test_render_html_with_src_link_without_force_nofollow(self):
@@ -408,13 +451,18 @@ class CodeBlocksTagTestCase(unittest.TestCase):
                                                     'src': 'https://github.com/TamiaLab/PySkCode'},
                                              content='# Hello World!')
         output_result = opts.render_html(tree_node, '', force_rel_nofollow=False)
-        expected_result = """<figure>
-<div class="codetable"><table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
+        expected_result = """<div class="panel panel-default" id="">
+    <div class="panel-body">
+        <div class="codetable">
+    <table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%">5</pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
 </span></pre></div>
-</td></tr></table></div>
-<figcaption><a href="https://github.com/TamiaLab/PySkCode" target="_blank">Source : test.py <i class="fa fa-link"></i></a></figcaption>
-</figure>
-"""
+</td></tr></table>
+</div>
+    </div>
+    <div class="panel-footer">
+        <a href="https://github.com/TamiaLab/PySkCode" target="_blank">Source : test.py <i class="fa fa-link" aria-hidden="true"></i></a>
+    </div>
+</div>"""
         self.assertEqual(expected_result, output_result)
 
     def test_render_html_with_figure_id(self):
@@ -428,13 +476,35 @@ class CodeBlocksTagTestCase(unittest.TestCase):
                                                     'id': 'helloworld'},
                                              content='# Hello World!')
         output_result = opts.render_html(tree_node, '')
-        expected_result = """<figure id="helloworld">
-<div class="codetable"><table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%"><a href="#helloworld-5">5</a></pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><a name="helloworld-5"></a><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
+        expected_result = """<div class="panel panel-default" id="helloworld">
+    <div class="panel-body">
+        <div class="codetable">
+    <table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%"><a href="#helloworld-5">5</a></pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><a name="helloworld-5"></a><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
 </span></pre></div>
-</td></tr></table></div>
-<figcaption><a href="https://github.com/TamiaLab/PySkCode" rel="nofollow" target="_blank">Source : test.py <i class="fa fa-link"></i></a></figcaption>
-</figure>
-"""
+</td></tr></table>
+</div>
+    </div>
+    <div class="panel-footer">
+        <a href="https://github.com/TamiaLab/PySkCode" rel="nofollow" target="_blank">Source : test.py <i class="fa fa-link" aria-hidden="true"></i></a>
+    </div>
+</div>"""
+        self.assertEqual(expected_result, output_result)
+
+    def test_render_html_with_only_figure_id(self):
+        """ Test the ``render_html`` method with 'src" set. """
+        opts = CodeBlockTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('code', opts,
+                                             attrs={'code': 'python', 'hl_lines': '1',
+                                                    'linenostart': '5',
+                                                    'id': 'helloworld'},
+                                             content='# Hello World!')
+        output_result = opts.render_html(tree_node, '')
+        expected_result = """<a id="helloworld"></a>\n<div class="codetable">
+    <table class="highlighttable"><tr><td><div class="linenodiv" style="background-color: #f0f0f0; padding-right: 10px"><pre style="line-height: 125%"><a href="#helloworld-5">5</a></pre></div></td><td class="code"><div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><a name="helloworld-5"></a><span style="background-color: #ffffcc"><span style="color: #408080; font-style: italic"># Hello World!</span>
+</span></pre></div>
+</td></tr></table>
+</div>"""
         self.assertEqual(expected_result, output_result)
 
     def test_render_text(self):
@@ -731,10 +801,6 @@ class FixedCodeBlocksTagTestCase(unittest.TestCase):
             FixedCodeBlockTagOptions(None)
         self.assertEqual('The language name is mandatory.', str(e.exception))
 
-    def test_subclassing(self):
-        """ Test super class """
-        self.assertTrue(issubclass(FixedCodeBlockTagOptions, CodeBlockTagOptions))
-
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
         """ Test the presence of the tag and aliases in the dictionary of default recognized tags. """
         self.assertIn('python', DEFAULT_RECOGNIZED_TAGS)
@@ -752,6 +818,20 @@ class FixedCodeBlocksTagTestCase(unittest.TestCase):
         self.assertIn('php', DEFAULT_RECOGNIZED_TAGS)
         self.assertIsInstance(DEFAULT_RECOGNIZED_TAGS['php'], FixedCodeBlockTagOptions)
         self.assertEqual('php', DEFAULT_RECOGNIZED_TAGS['php'].language_name)
+
+    def test_automatic_tag_name(self):
+        """ Test the constructor with no custom tag name set. """
+        opts = FixedCodeBlockTagOptions('customtype')
+        self.assertEqual('customtype', opts.language_name)
+        self.assertEqual('customtype', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
+
+    def test_custom_tag_name(self):
+        """ Test the constructor with a custom tag name set. """
+        opts = FixedCodeBlockTagOptions('customtype', canonical_tag_name='foobar')
+        self.assertEqual('customtype', opts.language_name)
+        self.assertEqual('foobar', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
 
     def test_get_language_name_method(self):
         """ Test if the ``get_language_name`` return the value set at constructor. """

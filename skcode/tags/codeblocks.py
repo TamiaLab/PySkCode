@@ -23,6 +23,9 @@ class CodeBlockTagOptions(TagOptions):
     parse_embedded = False
     swallow_trailing_newline = True
 
+    canonical_tag_name = 'code'
+    alias_tag_names = ()
+
     # Tabulation size in spaces
     tab_size = 4
 
@@ -55,6 +58,31 @@ class CodeBlockTagOptions(TagOptions):
 
     # CSS class of the wrapping div
     wrapping_div_class_name = 'codetable'
+
+    # HTML template of the wrapping div
+    wrapping_div_html_template = """<div class="{class_name}">
+    {source_code}
+</div>"""
+
+    # HTML template for the source caption text
+    source_caption_html_template = 'Source : {}'
+
+    # HTML template for the source link
+    source_link_html_template = '<a href="{src_link}"{extra_args} target="_blank">{caption} ' \
+                                '<i class="fa fa-link" aria-hidden="true"></i></a>'
+
+    # HTML template for the source code (with caption)
+    code_html_template = """<div class="panel panel-default" id="{figure_id}">
+    <div class="panel-body">
+        {source_code}
+    </div>
+    <div class="panel-footer">
+        {caption}
+    </div>
+</div>"""
+
+    # HTML template for the source code (without caption)
+    code_only_html_template = '<a id="{figure_id}"></a>\n{source_code}'
 
     def get_language_name(self, tree_node):
         """
@@ -171,7 +199,7 @@ class CodeBlockTagOptions(TagOptions):
         figure_id = self.get_figure_id(tree_node)
 
         # Handle line anchors
-        lineanchors = figure_id if figure_id else ''
+        lineanchors = figure_id
         anchorlinenos = bool(figure_id)
 
         # Render the source code
@@ -193,7 +221,8 @@ class CodeBlockTagOptions(TagOptions):
         source_code = highlight(tree_node.content, lexer, formatter)
 
         # Wrap table in div for horizontal scrolling
-        source_code = '<div class="%s">%s</div>\n' % (self.wrapping_div_class_name, source_code)
+        source_code = self.wrapping_div_html_template.format(class_name=self.wrapping_div_class_name,
+                                                             source_code=source_code)
 
         # Get extra filename and source link
         src_filename = self.get_filename(tree_node)
@@ -203,22 +232,25 @@ class CodeBlockTagOptions(TagOptions):
         if src_filename or src_link_url:
 
             # Source code with caption
-            caption = 'Source : %s' % (escape_html(src_filename) if src_filename else src_link_url)
+            caption = self.source_caption_html_template.format(escape_html(src_filename) if src_filename else src_link_url)
 
             # And source link
             if src_link_url:
                 extra_args = ' rel="nofollow"' if force_rel_nofollow else ''
-                caption = '<a href="%s"%s target="_blank">%s ' \
-                          '<i class="fa fa-link"></i></a>' % (src_link_url, extra_args, caption)
+                caption = self.source_link_html_template.format(src_link=src_link_url,
+                                                                extra_args=extra_args,
+                                                                caption=caption)
 
             # Return the final HTML
-            figure_extra = ' id="%s"' % figure_id if figure_id else ''
-            return "<figure%s>\n%s<figcaption>%s</figcaption>\n</figure>\n" % (figure_extra, source_code, caption)
+            return self.code_html_template.format(figure_id=figure_id, source_code=source_code, caption=caption)
+
+        elif figure_id:
+            # Source code only with anchor
+            return self.code_only_html_template.format(figure_id=figure_id, source_code=source_code)
 
         else:
             # Source code only
-            figure_extra = '<a id="%s"></a>\n' % figure_id if figure_id else ''
-            return '%s%s' % (figure_extra, source_code)
+            return source_code
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
@@ -301,13 +333,18 @@ class CodeBlockTagOptions(TagOptions):
 class FixedCodeBlockTagOptions(CodeBlockTagOptions):
     """ Fixed language code block tag options container class. """
 
-    def __init__(self, language_name, **kwargs):
+    canonical_tag_name = None
+    alias_tag_names = ()
+
+    def __init__(self, language_name, canonical_tag_name=None, **kwargs):
         """
         Fixed language code block tag constructor.
         :param language_name: The language name to use.
+        :param canonical_tag_name: The canonical name of this tag, default to the language name string.
         :param kwargs: Keyword arguments for super constructor.
         """
         assert language_name, "The language name is mandatory."
+        self.canonical_tag_name = canonical_tag_name or language_name
         super(FixedCodeBlockTagOptions, self).__init__(**kwargs)
         self.language_name = language_name
 

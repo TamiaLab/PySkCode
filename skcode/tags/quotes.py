@@ -16,6 +16,9 @@ from ..utility.relative_urls import get_relative_url_base
 class QuoteTagOptions(TagOptions):
     """ Quote tag options container class. """
 
+    canonical_tag_name = 'quote'
+    alias_tag_names = ('blockquote', )
+
     make_paragraphs_here = True
 
     # Author attribute name
@@ -27,11 +30,23 @@ class QuoteTagOptions(TagOptions):
     # Date attribute name
     date_attr_name = 'date'
 
-    # Translation of "write by"
-    write_by_word = 'par'
-
     # Date and time format for display
     datetime_format = '%d/%m/%Y %H:%M:%S'
+
+    # HTMl template for rendering
+    html_render_template_author_name = '<cite>{author_name}</cite>'
+
+    # HTMl template for rendering
+    html_render_template_author_link = '<a href="{src_link}"{extra_args}>{author_name}</a>'
+
+    # HTMl template for rendering
+    html_render_template_date = ' - <time datetime="{src_date_iso}">{src_date}</time>'
+
+    # HTMl template for rendering
+    html_render_template_footer = '\n<footer>{author_name}{src_date}</footer>'
+
+    # HTMl template for rendering
+    html_render_template = '<blockquote>{inner_html}{footer_html}</blockquote>\n'
 
     def get_quote_author_name(self, tree_node):
         """
@@ -96,28 +111,31 @@ class QuoteTagOptions(TagOptions):
         if author_name:
 
             # Craft author name citation
-            author_html = '<cite>%s</cite>' % escape_html(author_name)
+            author_html = self.html_render_template_author_name.format(author_name=escape_html(author_name))
 
             # Craft source link if any, and handle force_rel_nofollow
             src_link = self.get_quote_link(tree_node)
             if src_link:
                 extra_attrs = ' rel="nofollow"' if force_rel_nofollow else ''
-                author_html = '<a href="%s"%s>%s</a>' % (src_link, extra_attrs, author_html)
+                author_html = self.html_render_template_author_link.format(src_link=src_link,
+                                                                           extra_args=extra_attrs,
+                                                                           author_name=author_html)
 
             # Get and craft the source date
             src_date = self.get_quote_date(tree_node)
             if src_date is not None:
-                author_html = '%s - <time datetime="%s">%s</time>' % (author_html,
-                                                                      src_date.isoformat(),
-                                                                      src_date.strftime(self.datetime_format))
+                src_date_html = self.html_render_template_date.format(src_date_iso=src_date.isoformat(),
+                                                                      src_date=src_date.strftime(self.datetime_format))
+            else:
+                src_date_html = ''
 
             # Craft the final HTML
-            extra_html = '\n<small>%s %s</small>' % (self.write_by_word, author_html)
+            extra_html = self.html_render_template_footer.format(author_name=author_html, src_date=src_date_html)
         else:
             extra_html = ''
 
         # Render the quote
-        return '<blockquote>%s%s</blockquote>\n' % (inner_html, extra_html)
+        return self.html_render_template.format(inner_html=inner_html, footer_html=extra_html)
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
@@ -141,17 +159,17 @@ class QuoteTagOptions(TagOptions):
             # Add source link
             src_link = self.get_quote_link(tree_node)
             if src_link:
-                author_text = '%s (%s)' % (author_text, src_link)
+                author_text = '{} ({})'.format(author_text, src_link)
 
             # Add source date
             src_date = self.get_quote_date(tree_node)
             if src_date is not None:
-                author_text = '%s - %s' % (author_text,
-                                           src_date.strftime(self.datetime_format))
+                author_text = '{} - {}'.format(author_text,
+                                               src_date.strftime(self.datetime_format))
 
             # Append result
             lines.append('>')
-            lines.append('> -- %s %s' % (self.write_by_word, author_text))
+            lines.append('> -- ' + author_text)
 
         # Finish the job
         lines.append('')

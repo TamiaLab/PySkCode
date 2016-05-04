@@ -15,6 +15,9 @@ from skcode.render import (render_inner_html, render_to_html,
 class TestTagOptions(TagOptions):
     """ Test tag options class """
 
+    canonical_tag_name = 'test'
+    alias_tag_names = ()
+
     def __init__(self, identifier, **kwargs):
         super(TestTagOptions, self).__init__(**kwargs)
         assert identifier, "The node identifier string must be set for testing."

@@ -1,5 +1,5 @@
 """
-SkCode quotes tag test code.
+SkCode quote tag definitions test code.
 """
 
 import unittest
@@ -32,11 +32,12 @@ class QuotesTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertFalse(opts.inline)
         self.assertTrue(opts.close_inlines)
+        self.assertEqual('quote', opts.canonical_tag_name)
+        self.assertEqual(('blockquote', ), opts.alias_tag_names)
         self.assertTrue(opts.make_paragraphs_here)
         self.assertEqual(opts.author_attr_name, 'author')
         self.assertEqual(opts.link_attr_name, 'link')
         self.assertEqual(opts.date_attr_name, 'date')
-        self.assertEqual(opts.write_by_word, 'par')
         self.assertEqual(opts.datetime_format, '%d/%m/%Y %H:%M:%S')
 
     def test_get_quote_author_name_with_tagname_set(self):
@@ -162,7 +163,7 @@ class QuotesTagTestCase(unittest.TestCase):
         root_tree_node = RootTreeNode(RootTagOptions())
         tree_node = root_tree_node.new_child('quote', opts, attrs={'author': 'John Doe'})
         output_result = opts.render_html(tree_node, 'Hello World!')
-        expected_result = '<blockquote>Hello World!\n<small>par <cite>John Doe</cite></small></blockquote>\n'
+        expected_result = '<blockquote>Hello World!\n<footer><cite>John Doe</cite></footer></blockquote>\n'
         self.assertEqual(expected_result, output_result)
 
     def test_render_html_with_author_name_containing_html_entities(self):
@@ -171,7 +172,7 @@ class QuotesTagTestCase(unittest.TestCase):
         root_tree_node = RootTreeNode(RootTagOptions())
         tree_node = root_tree_node.new_child('quote', opts, attrs={'author': '<John Doe>'})
         output_result = opts.render_html(tree_node, 'Hello World!')
-        expected_result = '<blockquote>Hello World!\n<small>par <cite>&lt;John Doe&gt;</cite></small></blockquote>\n'
+        expected_result = '<blockquote>Hello World!\n<footer><cite>&lt;John Doe&gt;</cite></footer></blockquote>\n'
         self.assertEqual(expected_result, output_result)
 
     def test_render_html_with_src_link(self):
@@ -181,8 +182,8 @@ class QuotesTagTestCase(unittest.TestCase):
         tree_node = root_tree_node.new_child('quote', opts,
                                              attrs={'author': 'John Doe', 'link': 'http://example.com/'})
         output_result = opts.render_html(tree_node, 'Hello World!')
-        expected_result = '<blockquote>Hello World!\n<small>par <a href="http://example.com/" ' \
-                          'rel="nofollow"><cite>John Doe</cite></a></small></blockquote>\n'
+        expected_result = '<blockquote>Hello World!\n<footer><a href="http://example.com/" ' \
+                          'rel="nofollow"><cite>John Doe</cite></a></footer></blockquote>\n'
         self.assertEqual(expected_result, output_result)
 
     def test_render_html_with_src_link_nofollow_disabled(self):
@@ -192,8 +193,8 @@ class QuotesTagTestCase(unittest.TestCase):
         tree_node = root_tree_node.new_child('quote', opts,
                                              attrs={'author': 'John Doe', 'link': 'http://example.com/'})
         output_result = opts.render_html(tree_node, 'Hello World!', force_rel_nofollow=False)
-        expected_result = '<blockquote>Hello World!\n<small>par <a href="http://example.com/">' \
-                          '<cite>John Doe</cite></a></small></blockquote>\n'
+        expected_result = '<blockquote>Hello World!\n<footer><a href="http://example.com/">' \
+                          '<cite>John Doe</cite></a></footer></blockquote>\n'
         self.assertEqual(expected_result, output_result)
 
     def test_render_html_with_src_date(self):
@@ -204,9 +205,9 @@ class QuotesTagTestCase(unittest.TestCase):
                                              attrs={'author': 'John Doe', 'link': 'http://example.com/',
                                                     'date': '1356048000'})
         output_result = opts.render_html(tree_node, 'Hello World!')
-        expected_result = '<blockquote>Hello World!\n<small>par <a href="http://example.com/" ' \
+        expected_result = '<blockquote>Hello World!\n<footer><a href="http://example.com/" ' \
                           'rel="nofollow"><cite>John Doe</cite></a> - <time datetime="2012-12-21T00:00:00">' \
-                          '21/12/2012 00:00:00</time></small></blockquote>\n'
+                          '21/12/2012 00:00:00</time></footer></blockquote>\n'
         self.assertEqual(expected_result, output_result)
 
     def test_render_text(self):
@@ -224,7 +225,7 @@ class QuotesTagTestCase(unittest.TestCase):
         root_tree_node = RootTreeNode(RootTagOptions())
         tree_node = root_tree_node.new_child('quote', opts, attrs={'author': 'John Doe'})
         output_result = opts.render_text(tree_node, 'Hello World!')
-        expected_result = '> Hello World!\n>\n> -- par John Doe\n'
+        expected_result = '> Hello World!\n>\n> -- John Doe\n'
         self.assertEqual(expected_result, output_result)
 
     def test_render_text_with_src_link(self):
@@ -234,7 +235,7 @@ class QuotesTagTestCase(unittest.TestCase):
         tree_node = root_tree_node.new_child('quote', opts, attrs={'author': 'John Doe',
                                                          'link': 'http://example.com/'})
         output_result = opts.render_text(tree_node, 'Hello World!')
-        expected_result = '> Hello World!\n>\n> -- par John Doe (http://example.com/)\n'
+        expected_result = '> Hello World!\n>\n> -- John Doe (http://example.com/)\n'
         self.assertEqual(expected_result, output_result)
 
     def test_render_text_with_src_date(self):
@@ -245,7 +246,7 @@ class QuotesTagTestCase(unittest.TestCase):
                                                          'link': 'http://example.com/',
                                                          'date': '1356048000'})
         output_result = opts.render_text(tree_node, 'Hello World!')
-        expected_result = '> Hello World!\n>\n> -- par John Doe (http://example.com/) - 21/12/2012 00:00:00\n'
+        expected_result = '> Hello World!\n>\n> -- John Doe (http://example.com/) - 21/12/2012 00:00:00\n'
         self.assertEqual(expected_result, output_result)
 
     def test_get_skcode_attributes(self):

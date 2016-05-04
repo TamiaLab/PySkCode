@@ -1,5 +1,5 @@
 """
-SkCode spoiler tag test code.
+SkCode spoiler tag definitions test code.
 """
 
 import unittest
@@ -30,8 +30,11 @@ class SpoilerTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertFalse(opts.inline)
         self.assertTrue(opts.close_inlines)
+        self.assertEqual('spoiler', opts.canonical_tag_name)
+        self.assertEqual(('hide', ), opts.alias_tag_names)
         self.assertTrue(opts.make_paragraphs_here)
         self.assertEqual('spoiler', opts.css_class_name)
+        self.assertEqual('<div class="{class_name}">{inner_html}</div>\n', opts.html_render_template)
 
     def test_render_html(self):
         """ Test the ``render_html`` method. """

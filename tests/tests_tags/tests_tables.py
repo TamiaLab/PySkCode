@@ -1,5 +1,5 @@
 """
-SkCode definitions tag test code.
+SkCode tables tag definitions test code.
 """
 
 import unittest
@@ -31,8 +31,11 @@ class TablesTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertFalse(opts.inline)
         self.assertTrue(opts.close_inlines)
+        self.assertEqual('table', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
         self.assertEqual('table table-condensed table-striped', opts.css_class_name)
+        self.assertEqual('<table class="{class_name}">{inner_html}</table>\n', opts.html_render_template)
 
     def test_html_rendering(self):
         """ Test HTML rendering. """
@@ -80,7 +83,10 @@ class TableRowsTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertFalse(opts.inline)
         self.assertTrue(opts.close_inlines)
+        self.assertEqual('tr', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
+        self.assertEqual('<tr>{inner_html}</tr>\n', opts.html_render_template)
 
     def test_html_rendering(self):
         """ Test HTML rendering. """
@@ -119,9 +125,12 @@ class TableCellsTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertFalse(opts.inline)
         self.assertTrue(opts.close_inlines)
+        self.assertEqual('td', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertTrue(opts.make_paragraphs_here)
         self.assertEqual('colspan', opts.colspan_attr_name)
         self.assertEqual('rowspan', opts.rowspan_attr_name)
+        self.assertEqual('<td{extra_args}>{inner_html}</td>\n', opts.html_render_template)
 
     def test_get_cell_colspan(self):
         """ Test the ``get_cell_colspan`` with a valid value.  """
@@ -305,9 +314,12 @@ class TableHeaderCellsTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertFalse(opts.inline)
         self.assertTrue(opts.close_inlines)
+        self.assertEqual('th', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertTrue(opts.make_paragraphs_here)
         self.assertEqual('colspan', opts.colspan_attr_name)
         self.assertEqual('rowspan', opts.rowspan_attr_name)
+        self.assertEqual('<th{extra_args}>{inner_html}</th>\n', opts.html_render_template)
 
     def test_html_rendering(self):
         """ Test HTML rendering. """

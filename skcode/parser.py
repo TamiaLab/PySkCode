@@ -6,7 +6,7 @@ SkCode tag parsing code.
 WHITESPACE_CHARSET = frozenset(' \t\r\n')
 IDENTIFIER_CHARSET = frozenset('abcdefghijklmnopqrstuvwxyz'
                                'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-                               '0123456789_')
+                               '0123456789_*')
 
 
 def skip_nb_char_then_whitespaces(text, offset, nb_char_to_skip=0):

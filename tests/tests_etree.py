@@ -16,7 +16,9 @@ from skcode.tags import (TagOptions,
 
 class DummyTagOptions(TagOptions):
     """ Dummy tag options class for tests. """
-    pass
+
+    canonical_tag_name = 'test'
+    alias_tag_names = ()
 
 
 class ConstantsTestCase(unittest.TestCase):

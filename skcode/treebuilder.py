@@ -18,6 +18,23 @@ from .tokenizer import (tokenize_tag,
                         TOKEN_SELF_CLOSE_TAG)
 
 
+def build_recognized_tags_dict(tag_options_list):
+    recognized_tags_dict = {}
+
+    # For each tag declaration
+    for tag_options in tag_options_list:
+
+        # Register the canonical tag name
+        recognized_tags_dict[tag_options.canonical_tag_name] = tag_options
+
+        # Register all aliases
+        for alias_name in tag_options.alias_tag_names:
+            recognized_tags_dict[alias_name] = tag_options
+
+    # Return the dict
+    return recognized_tags_dict
+
+
 def parse_skcode(text,
                  recognized_tags=DEFAULT_RECOGNIZED_TAGS,
                  opening_tag_ch='[', closing_tag_ch=']',
@@ -71,6 +88,10 @@ def parse_skcode(text,
         "The ``erroneous_text_node_opts`` parameter must be an instance of a class, not the class type itself."
     assert type(newline_node_opts).__name__ != 'type', \
         "The ``newline_node_opts`` parameter must be an instance of a class, not the class type itself."
+
+    # New tags declaration style
+    if isinstance(recognized_tags, (list, tuple)):
+        recognized_tags = build_recognized_tags_dict(recognized_tags)
 
     # Avoid reserved tag names in the ``recognized_tags`` dictionary.
     for tag_name in recognized_tags.keys():

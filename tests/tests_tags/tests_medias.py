@@ -31,11 +31,14 @@ class ImagesTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertTrue(opts.inline)
         self.assertFalse(opts.close_inlines)
+        self.assertEqual('img', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
-        self.assertEqual(opts.alt_attr_name, 'alt')
-        self.assertEqual(opts.width_attr_name, 'width')
-        self.assertEqual(opts.height_attr_name, 'height')
-        self.assertEqual(opts.allowed_schemes, ('http', 'https'))
+        self.assertEqual('alt', opts.alt_attr_name)
+        self.assertEqual('width', opts.width_attr_name)
+        self.assertEqual('height', opts.height_attr_name)
+        self.assertEqual(('http', 'https'), opts.allowed_schemes)
+        self.assertEqual('<img src="{src_link}"{extra_args} />', opts.html_render_template)
 
     def test_get_image_src_link(self):
         """ Test the ``get_image_src_link`` method with a valid source link. """
@@ -328,6 +331,8 @@ class YoutubeVideosTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertFalse(opts.inline)
         self.assertTrue(opts.close_inlines)
+        self.assertEqual('youtube', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
         self.assertEqual(opts.default_iframe_width, 560)
         self.assertEqual(opts.default_iframe_height, 315)
@@ -336,11 +341,11 @@ class YoutubeVideosTagTestCase(unittest.TestCase):
         self.assertEqual(opts.video_id_in_path_domains, {'youtu.be'})
         self.assertEqual("""<div class="embed-container center-block">
         <div class="embed-video">
-            <iframe width="%(width)d" height="%(height)d" src="https://www.youtube.com/embed/%(video_id)s" frameborder="0" allowfullscreen="true"></iframe>
+            <iframe width="{width}" height="{height}" src="https://www.youtube.com/embed/{video_id}" frameborder="0" allowfullscreen="true"></iframe>
         </div>
     </div>
     """, opts.integration_html_template)
-        self.assertEqual('https://youtu.be/%s', opts.text_link_format)
+        self.assertEqual('https://youtu.be/{video_id}', opts.text_link_format)
 
     def test_get_youtube_video_id(self):
         """ Test the ``get_youtube_video_id`` method with a valid youtube link. """
@@ -484,11 +489,9 @@ class YoutubeVideosTagTestCase(unittest.TestCase):
         root_tree_node = RootTreeNode(RootTagOptions())
         tree_node = root_tree_node.new_child('youtube', opts, content='https://www.youtube.com/watch?v=dQw4w9WgXcQ')
         output_result = opts.render_html(tree_node, 'test')
-        expected_result = opts.integration_html_template % {
-            'width': opts.default_iframe_width,
-            'height': opts.default_iframe_height,
-            'video_id': 'dQw4w9WgXcQ'
-        }
+        expected_result = opts.integration_html_template.format(width=opts.default_iframe_width,
+                                                                height=opts.default_iframe_height,
+                                                                video_id='dQw4w9WgXcQ')
         self.assertEqual(expected_result, output_result)
 
     def test_render_html_without_video(self):

@@ -1,5 +1,5 @@
 """
-SkCode specials tag test code.
+SkCode special internal tag definitions test code.
 """
 
 import unittest
@@ -30,6 +30,8 @@ class NoParseTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertTrue(opts.inline)
         self.assertFalse(opts.close_inlines)
+        self.assertEqual('noparse', opts.canonical_tag_name)
+        self.assertEqual(('nobbc', ), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
 
     def test_html_rendering(self):

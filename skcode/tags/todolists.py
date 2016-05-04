@@ -6,7 +6,16 @@ from .base import TagOptions
 
 
 class TodoListTagOptions(TagOptions):
-    """ Todo list tag options container class. """
+    """ TODO list tag options container class. """
+
+    canonical_tag_name = 'todolist'
+    alias_tag_names = ()
+
+    # HTML template for rendering
+    html_render_template = '<ul>{inner_html}</ul>\n'
+
+    # Text template for rendering
+    text_render_template = '-- TODO LIST --\n{inner_text}\n'
 
     def render_html(self, tree_node, inner_html, **kwargs):
         """
@@ -16,7 +25,7 @@ class TodoListTagOptions(TagOptions):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-        return '<ul>%s</ul>\n' % inner_html
+        return self.html_render_template.format(inner_html=inner_html)
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
@@ -26,11 +35,14 @@ class TodoListTagOptions(TagOptions):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered text of this node.
         """
-        return '-- TODO LIST --\n%s\n' % inner_text
+        return self.text_render_template.format(inner_text=inner_text)
 
 
 class TodoTaskTagOptions(TagOptions):
-    """ Todo task tag options container class. """
+    """ TODO task tag options container class. """
+
+    canonical_tag_name = 'task'
+    alias_tag_names = ()
 
     make_paragraphs_here = True
     same_tag_closes = True
@@ -46,6 +58,9 @@ class TodoTaskTagOptions(TagOptions):
 
     # HTML class for "task pending"
     task_pending_html_class = 'task_pending'
+
+    # HTML template for rendering
+    html_render_template = '<li class="{class_name}">{inner_html}</li>\n'
 
     def get_is_done_task_flag(self, tree_node):
         """
@@ -69,7 +84,7 @@ class TodoTaskTagOptions(TagOptions):
         """
         task_is_done = self.get_is_done_task_flag(tree_node)
         html_class = self.task_done_html_class if task_is_done else self.task_pending_html_class
-        return '<li class="%s">%s</li>\n' % (html_class, inner_html)
+        return self.html_render_template.format(inner_html=inner_html, class_name=html_class)
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
@@ -85,7 +100,7 @@ class TodoTaskTagOptions(TagOptions):
         for line in inner_text.strip().splitlines():
             if is_first_line:
                 is_first_line = False
-                lines.append('[%s] %s' % ('x' if task_is_done else ' ', line))
+                lines.append('[{}] {}'.format('x' if task_is_done else ' ', line))
             else:
                 lines.append('    ' + line)
         lines.append('')
@@ -102,5 +117,5 @@ class TodoTaskTagOptions(TagOptions):
         """
         task_is_done = self.get_is_done_task_flag(tree_node)
         return {
-                   'done': None
+                   self.is_done_attr_name: None
                } if task_is_done else {}, None

@@ -10,8 +10,14 @@ from ..render import render_inner_text
 class FigureCaptionTagOptions(TagOptions):
     """ Figure caption tag options container class. """
 
+    canonical_tag_name = 'figcaption'
+    alias_tag_names = ()
+
     # Figure caption CSS class name
     caption_css_class_name = 'caption'
+
+    # HTML template for the rendering
+    render_html_template = '<figcaption class="{class_name}">{inner_html}</figcaption>\n'
 
     def render_html(self, tree_node, inner_html, **kwargs):
         """
@@ -21,7 +27,7 @@ class FigureCaptionTagOptions(TagOptions):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-        return '<figcaption class="%s">%s</figcaption>\n' % (self.caption_css_class_name, inner_html)
+        return self.render_html_template.format(class_name=self.caption_css_class_name, inner_html=inner_html)
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
@@ -41,6 +47,9 @@ class FigureDeclarationTagOptions(TagOptions):
 
     make_paragraphs_here = True
 
+    canonical_tag_name = 'figure'
+    alias_tag_names = ()
+
     # Figure ID attribute name
     figure_id_attr_name = 'id'
 
@@ -49,6 +58,9 @@ class FigureDeclarationTagOptions(TagOptions):
 
     # Figure CSS class name
     figure_css_class_name = 'thumbnail'
+
+    # HTML template for the rendering
+    render_html_template = '<figure class="{class_name}" id="{figure_id}">{inner_html}</figure>\n'
 
     def get_figure_id(self, tree_node):
         """
@@ -88,8 +100,8 @@ class FigureDeclarationTagOptions(TagOptions):
         figure_id = self.get_figure_id(tree_node)
 
         # Render the figure
-        figure_attr = ' id="%s"' % figure_id if figure_id else ''
-        return '<figure class="%s"%s>%s</figure>\n' % (self.figure_css_class_name, figure_attr, inner_html)
+        return self.render_html_template.format(class_name=self.figure_css_class_name,
+                                                figure_id=figure_id, inner_html=inner_html)
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """

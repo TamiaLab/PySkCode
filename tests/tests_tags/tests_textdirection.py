@@ -1,5 +1,5 @@
 """
-SkCode text direction tags test code.
+SkCode text direction tag definitions test code.
 """
 
 import unittest
@@ -36,22 +36,25 @@ class DirectionTextTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertTrue(opts.inline)
         self.assertFalse(opts.close_inlines)
+        self.assertEqual('bdo', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
 
         self.assertEqual(TEXT_DIR_LEFT_TO_RIGHT, opts.default_text_direction)
-        self.assertEqual(opts.text_direction_map, {
+        self.assertEqual({
             'ltr': TEXT_DIR_LEFT_TO_RIGHT,
             'rtl': TEXT_DIR_RIGHT_TO_LEFT,
-        })
-        self.assertEqual(opts.reverse_text_direction_map, {
+        }, opts.text_direction_map)
+        self.assertEqual({
             TEXT_DIR_LEFT_TO_RIGHT: 'ltr',
             TEXT_DIR_RIGHT_TO_LEFT: 'rtl',
-        })
-        self.assertEqual(opts.bdo_html_attr_value_map, {
+        }, opts.reverse_text_direction_map)
+        self.assertEqual({
             TEXT_DIR_LEFT_TO_RIGHT: 'ltr',
             TEXT_DIR_RIGHT_TO_LEFT: 'rtl',
-        })
+        }, opts.bdo_html_attr_value_map)
         self.assertEqual('dir', opts.text_direction_attr_name)
+        self.assertEqual('<bdo dir="{text_direction}">{inner_html}</bdo>', opts.html_render_template)
 
     def test_get_text_direction_with_tagname_set(self):
         """ Test the ``get_text_direction`` with the tag name attribute set. """
@@ -173,7 +176,7 @@ class FixedDirectionTextTagTestCase(unittest.TestCase):
         """ Test the ``get_text_direction``. """
         opts = FixedDirectionTextTagOptions(TEXT_DIR_RIGHT_TO_LEFT)
         root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('bdo', opts, attrs={'dir': 'test'})
+        tree_node = root_tree_node.new_child('rtl', opts, attrs={'dir': 'test'})
         text_direction = opts.get_text_direction(tree_node)
         self.assertEqual(TEXT_DIR_RIGHT_TO_LEFT, text_direction)
 
@@ -181,7 +184,21 @@ class FixedDirectionTextTagTestCase(unittest.TestCase):
         """ Test the ``get_skcode_attributes`` method. """
         opts = FixedDirectionTextTagOptions(TEXT_DIR_RIGHT_TO_LEFT)
         root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('bdo', opts, attrs={})
+        tree_node = root_tree_node.new_child('rtl', opts, attrs={})
         output_result = opts.get_skcode_attributes(tree_node, 'john doe')
         expected_result = ({}, None)
         self.assertEqual(expected_result, output_result)
+
+    def test_automatic_tag_name(self):
+        """ Test the constructor with no custom tag name set. """
+        opts = FixedDirectionTextTagOptions(TEXT_DIR_RIGHT_TO_LEFT)
+        self.assertEqual(TEXT_DIR_RIGHT_TO_LEFT, opts.text_direction)
+        self.assertEqual('rtl', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
+
+    def test_custom_tag_name(self):
+        """ Test the constructor with a custom tag name set. """
+        opts = FixedDirectionTextTagOptions(TEXT_DIR_RIGHT_TO_LEFT, canonical_tag_name='foobar')
+        self.assertEqual(TEXT_DIR_RIGHT_TO_LEFT, opts.text_direction)
+        self.assertEqual('foobar', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)

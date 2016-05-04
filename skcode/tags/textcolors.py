@@ -17,6 +17,9 @@ class ColorTextTagOptions(TagOptions):
     inline = True
     close_inlines = False
 
+    canonical_tag_name = 'color'
+    alias_tag_names = ()
+
     # Known plain-text color names (from CSS21).
     known_colors = (
         'aqua', 'black', 'blue',
@@ -27,11 +30,14 @@ class ColorTextTagOptions(TagOptions):
         'white', 'yellow'
     )
 
+    # HTML template for rendering
+    html_render_template = '<span style="color: {color_value}">{inner_html}</span>'
+
     def get_color_value(self, tree_node):
         """
         Return the color value.
         :param tree_node: The current tree node instance.
-        :return The color value as string, or None.
+        :return The color value as string, or an empty string.
         """
 
         # Get the color string
@@ -40,7 +46,7 @@ class ColorTextTagOptions(TagOptions):
             return ''
 
         # Accept RGB hex value or color name
-        if RGB_COLOR_RE.match(user_color_value) or user_color_value in self.known_colors:
+        if user_color_value in self.known_colors or RGB_COLOR_RE.match(user_color_value):
             return user_color_value
         else:
             return ''
@@ -62,7 +68,7 @@ class ColorTextTagOptions(TagOptions):
             return inner_html
 
         # Render the color
-        return '<span style="color: %s">%s</span>' % (color, inner_html)
+        return self.html_render_template.format(color_value=color, inner_html=inner_html)
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
@@ -93,13 +99,18 @@ class ColorTextTagOptions(TagOptions):
 class FixedColorTextTagOptions(ColorTextTagOptions):
     """ Fixed coloured tag options container class. """
 
-    def __init__(self, color_value, **kwargs):
+    canonical_tag_name = None
+    alias_tag_names = ()
+
+    def __init__(self, color_value, canonical_tag_name=None, **kwargs):
         """
         Fixed color text tag constructor.
         :param color_value: Text color to use.
+        :param canonical_tag_name: The canonical name of this tag, default to the color string.
         :param kwargs: Keyword arguments for super.
         """
         assert color_value, "The color value is mandatory."
+        self.canonical_tag_name = canonical_tag_name or color_value
         super(FixedColorTextTagOptions, self).__init__(**kwargs)
         self.color_value = color_value
 

@@ -1,5 +1,5 @@
 """
-SkCode base tag class definitions code.
+SkCode base tag definitions code.
 """
 
 from ..builder import build_tag_str
@@ -15,6 +15,8 @@ class TagOptions(object):
     This weird looking dynamic-typing pattern is used instead of a classic subclassing pattern to allow dynamic
     modifications of the node options. Only the option class define the behavior of the node.
     """
+
+    # ----- Node parsing options
 
     # Set to ``True`` if a newline should automatically close this tag.
     # When enabling this option, be sure to enable ``same_tag_closes`` to
@@ -44,7 +46,15 @@ class TagOptions(object):
     # Set to ``True`` if this tag should close any unclosed inline tag.
     close_inlines = True
 
-    # ----- Utility options
+    # ----- Node naming options
+
+    # Canonical tag name (string, mandatory)
+    canonical_tag_name = None
+
+    # Alias tag names (tuple of strings, can be empty)
+    alias_tag_names = ()
+
+    # ----- Utilities options
 
     # Set to ``True`` if any inline children nodes of this tag should be merged into paragraphs.
     make_paragraphs_here = False
@@ -56,6 +66,9 @@ class TagOptions(object):
         """
         for attr, value in kwargs.items():
             setattr(self, attr, value)
+
+        # Avoid node with no canonical name.
+        assert self.canonical_tag_name, "Canonical tag name is mandatory"
 
     def sanitize_node(self, tree_node, breadcrumb, erroneous_text_node_opts, drop_erroneous=False):
         """
@@ -100,7 +113,7 @@ class TagOptions(object):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-        raise NotImplementedError('render_html() need to be implemented in subclass.')
+        raise NotImplementedError('render_html() need to be implemented in subclass')
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
@@ -110,7 +123,7 @@ class TagOptions(object):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered text of this node.
         """
-        raise NotImplementedError('render_text() need to be implemented in subclass.')
+        raise NotImplementedError('render_text() need to be implemented in subclass')
 
     def render_skcode(self, tree_node, inner_skcode,
                       opening_tag_ch='[', closing_tag_ch=']',
@@ -146,9 +159,12 @@ class TagOptions(object):
         :param inner_skcode: The inner SkCode of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The tag name of this node for SkCode rendering.
-        Default implementation return the ``tree_node.name`` value.
+        Default implementation return the canonical name of the tag.
         """
-        return tree_node.name
+        if tree_node.name in self.alias_tag_names:
+            return self.canonical_tag_name
+        else:
+            return tree_node.name
 
     def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
         """

@@ -14,6 +14,9 @@ from html import unescape as unescape_html_entities
 class RootTagOptions(TagOptions):
     """ Root tag options container class. """
 
+    canonical_tag_name = '_root'
+    alias_tag_names = ()
+
     make_paragraphs_here = True
 
     def render_html(self, tree_node, inner_html, **kwargs):
@@ -52,6 +55,9 @@ class TextTagOptions(TagOptions):
 
     inline = True
     close_inlines = False
+
+    canonical_tag_name = '_text'
+    alias_tag_names = ()
 
     def render_html(self, tree_node, inner_html, **kwargs):
         """
@@ -117,6 +123,12 @@ class TextTagOptions(TagOptions):
 class ErroneousTextTagOptions(TextTagOptions):
     """ Erroneous text tag options container class. """
 
+    canonical_tag_name = '_error'
+    alias_tag_names = ()
+
+    # HTML template for rendering
+    html_render_template = '<span style="font-weight: bold; color: red;">{}</span>'
+
     def render_html(self, tree_node, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
@@ -126,7 +138,7 @@ class ErroneousTextTagOptions(TextTagOptions):
         :return The rendered HTML of this node.
         """
         content = super(ErroneousTextTagOptions, self).render_html(tree_node, inner_html, **kwargs)
-        return '<span style="font-weight: bold; color: red;">%s</span>' % content
+        return self.html_render_template.format(content)
 
     def do_custom_html_processing(self, root_tree_node, input_text):
         """
@@ -152,6 +164,9 @@ class NewlineTagOptions(TagOptions):
 
     inline = True
     close_inlines = False
+
+    canonical_tag_name = '_newline'
+    alias_tag_names = ()
 
     def render_html(self, tree_node, inner_html, **kwargs):
         """

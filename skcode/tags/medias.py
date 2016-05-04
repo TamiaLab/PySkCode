@@ -19,6 +19,9 @@ from ..utility.relative_urls import get_relative_url_base
 class ImageTagOptions(TagOptions):
     """ Image tag options container class. """
 
+    canonical_tag_name = 'img'
+    alias_tag_names = ()
+
     inline = True
     close_inlines = False
 
@@ -33,6 +36,9 @@ class ImageTagOptions(TagOptions):
 
     # Allowed schemes for URL
     allowed_schemes = ('http', 'https')
+
+    # HTML template for rendering
+    html_render_template = '<img src="{src_link}"{extra_args} />'
 
     def get_image_src_link(self, tree_node):
         """
@@ -93,20 +99,21 @@ class ImageTagOptions(TagOptions):
 
         # Get the alternative text
         alt_text = self.get_alt_text(tree_node)
-        extra_attrs = ' alt="%s"' % escape_html(alt_text) if alt_text else ''
+        extra_attrs = ' alt="{}"'.format(escape_html(alt_text)) if alt_text else ''
 
         # Get the image width
         img_width = self.get_img_width(tree_node)
         if img_width:
-            extra_attrs += ' width="%d"' % img_width
+            extra_attrs += ' width="{}"'.format(img_width)
 
         # Get the image height
         img_height = self.get_img_height(tree_node)
         if img_height:
-            extra_attrs += ' height="%d"' % img_height
+            extra_attrs += ' height="{}"'.format(img_height)
 
         # Render the image
-        return '<img src="%s"%s />' % (src_link, extra_attrs)
+        return self.html_render_template.format(src_link=src_link,
+                                                extra_args=extra_attrs)
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
@@ -126,7 +133,7 @@ class ImageTagOptions(TagOptions):
 
         # Get the alternative text
         alt_text = self.get_alt_text(tree_node)
-        return '%s (%s)' % (src_link, alt_text) if alt_text else src_link
+        return '{} ({})'.format(src_link, alt_text) if alt_text else src_link
 
     def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
         """
@@ -152,6 +159,9 @@ class ImageTagOptions(TagOptions):
 class YoutubeTagOptions(TagOptions):
     """ Youtube video integration tag options container class. """
 
+    canonical_tag_name = 'youtube'
+    alias_tag_names = ()
+
     # Default iframe width
     default_iframe_width = 560
 
@@ -176,13 +186,13 @@ class YoutubeTagOptions(TagOptions):
     # HTML template
     integration_html_template = """<div class="embed-container center-block">
         <div class="embed-video">
-            <iframe width="%(width)d" height="%(height)d" src="https://www.youtube.com/embed/%(video_id)s" frameborder="0" allowfullscreen="true"></iframe>
+            <iframe width="{width}" height="{height}" src="https://www.youtube.com/embed/{video_id}" frameborder="0" allowfullscreen="true"></iframe>
         </div>
     </div>
     """
 
     # Text link
-    text_link_format = 'https://youtu.be/%s'
+    text_link_format = 'https://youtu.be/{video_id}'
 
     def get_youtube_video_id(self, tree_node):
         """
@@ -250,11 +260,10 @@ class YoutubeTagOptions(TagOptions):
         video_id = self.get_youtube_video_id(tree_node)
 
         # Render the iframe
-        return self.integration_html_template % {
-            'width': self.default_iframe_width,
-            'height': self.default_iframe_height,
-            'video_id': quote_plus(video_id)
-        } if video_id else inner_html
+        return self.integration_html_template.format(
+            width=self.default_iframe_width,
+            height=self.default_iframe_height,
+            video_id=quote_plus(video_id)) if video_id else inner_html
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """
@@ -267,4 +276,4 @@ class YoutubeTagOptions(TagOptions):
 
         # Get the video ID
         video_id = self.get_youtube_video_id(tree_node)
-        return self.text_link_format % quote_plus(video_id) if video_id else inner_text
+        return self.text_link_format.format(video_id=quote_plus(video_id)) if video_id else inner_text

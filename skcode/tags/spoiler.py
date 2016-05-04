@@ -8,10 +8,16 @@ from .base import TagOptions
 class SpoilerTagOptions(TagOptions):
     """ Spoiler tag options container class. """
 
+    canonical_tag_name = 'spoiler'
+    alias_tag_names = ('hide', )
+
     make_paragraphs_here = True
 
     # CSS class name for the spoiler ``div`` element
     css_class_name = 'spoiler'
+
+    # HTML template for rendering
+    html_render_template = '<div class="{class_name}">{inner_html}</div>\n'
 
     def render_html(self, tree_node, inner_html, **kwargs):
         """
@@ -21,7 +27,7 @@ class SpoilerTagOptions(TagOptions):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-        return '<div class="%s">%s</div>\n' % (self.css_class_name, inner_html)
+        return self.html_render_template.format(class_name=self.css_class_name, inner_html=inner_html)
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """

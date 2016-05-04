@@ -8,13 +8,21 @@ from .base import TagOptions
 class TextAlignBaseTagOptions(TagOptions):
     """ Base class for all text alignment tag class. """
 
-    def __init__(self, text_alignment, **kwargs):
+    canonical_tag_name = None
+    alias_tag_names = ()
+
+    # HTML template for rendering
+    html_render_template = '<p class="text-{text_alignment}">{inner_html}</p>\n'
+
+    def __init__(self, text_alignment, canonical_tag_name=None, **kwargs):
         """
         Text alignment tag constructor.
         :param text_alignment: Text alignment as string, can be ``left``, ``right``, ``center`` or ``justify``.
+        :param canonical_tag_name: The canonical name of this tag, default to the text alignment type string.
         :param kwargs: Keywords arguments for super constructor.
         """
         assert text_alignment, "The text alignment is mandatory."
+        self.canonical_tag_name = canonical_tag_name or text_alignment
         super(TextAlignBaseTagOptions, self).__init__(**kwargs)
         self.text_alignment = text_alignment
 
@@ -26,7 +34,7 @@ class TextAlignBaseTagOptions(TagOptions):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-        return '<p class="text-%s">%s</p>\n' % (self.text_alignment, inner_html)
+        return self.html_render_template.format(text_alignment=self.text_alignment, inner_html=inner_html)
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """

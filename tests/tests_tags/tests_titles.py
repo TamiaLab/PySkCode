@@ -1,5 +1,5 @@
 """
-SkCode titles tag test code.
+SkCode title tag definitions test code.
 """
 
 import unittest
@@ -11,7 +11,7 @@ from skcode.tags import (RootTagOptions,
                          DEFAULT_RECOGNIZED_TAGS)
 
 
-class TitlesTagTestCase(unittest.TestCase):
+class TitleTagOptionsTestCase(unittest.TestCase):
     """ Tests suite for the titles tag module. """
 
     def test_assertions_constructor(self):
@@ -54,8 +54,14 @@ class TitlesTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertFalse(opts.inline)
         self.assertTrue(opts.close_inlines)
+        self.assertEqual('h1', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
-        self.assertEqual(opts.slug_id_attr_name, 'id')
+        self.assertEqual('id', opts.slug_id_attr_name)
+        self.assertEqual('<{title_tagname}><a id="{slug_id}">{inner_html}</a></{title_tagname}>\n', opts.html_render_template)
+        self.assertEqual('{title_level}[{slug_id}] {inner_text}\n', opts.text_render_template)
+        self.assertEqual('<{title_tagname}>{inner_html}</{title_tagname}>\n', opts.html_render_no_permalink_template)
+        self.assertEqual('{title_level} {inner_text}\n', opts.text_render_no_permalink_template)
 
     def test_constructor(self):
         """ Test if the constructor set the title level and HTML tag name correctly. """
@@ -63,6 +69,7 @@ class TitlesTagTestCase(unittest.TestCase):
             opts = TitleTagOptions(level)
             self.assertEqual(opts.title_level, level)
             self.assertEqual(opts.title_tagname, 'h%d' % level)
+            self.assertEqual('h%d' % level, opts.canonical_tag_name)
 
     def test_get_permalink_slug_with_tagname_set(self):
         """ Test the ``get_permalink_slug`` when the tag name attribute is set. """

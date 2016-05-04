@@ -11,13 +11,21 @@ class TextModifierBaseTagOptions(TagOptions):
     inline = True
     close_inlines = False
 
-    def __init__(self, text_modifier, **kwargs):
+    canonical_tag_name = None
+    alias_tag_names = ()
+
+    # HTML template for rendering
+    html_render_template = '<span class="text-{text_modifier}">{inner_html}</span>\n'
+
+    def __init__(self, text_modifier, canonical_tag_name=None, **kwargs):
         """
         Text modifier tag constructor.
         :param text_modifier: Text modifier to be use, can be ``lowercase``, ``uppercase`` or ``capitalize``.
+        :param canonical_tag_name: The canonical name of this tag, default to the text modifier type string.
         :param kwargs: Keyword arguments for super constructor.
         """
         assert text_modifier, "The text modifier is mandatory."
+        self.canonical_tag_name = canonical_tag_name or text_modifier
         super(TextModifierBaseTagOptions, self).__init__(**kwargs)
         self.text_modifier = text_modifier
 
@@ -29,7 +37,7 @@ class TextModifierBaseTagOptions(TagOptions):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-        return '<span class="text-%s">%s</span>\n' % (self.text_modifier, inner_html)
+        return self.html_render_template.format(text_modifier=self.text_modifier, inner_html=inner_html)
 
     def render_text(self, tree_node, inner_text, **kwargs):
         """

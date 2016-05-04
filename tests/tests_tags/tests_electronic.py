@@ -1,5 +1,5 @@
 """
-SkCode electronic tag test code.
+SkCode electronic special tag definitions code.
 """
 
 import unittest
@@ -10,7 +10,7 @@ from skcode.tags import (RootTagOptions,
                          DEFAULT_RECOGNIZED_TAGS)
 
 
-class NotNotationTagTestCase(unittest.TestCase):
+class NotNotationTagOptionsTestCase(unittest.TestCase):
     """ Tests suite for the NOT notation tag module. """
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
@@ -28,7 +28,11 @@ class NotNotationTagTestCase(unittest.TestCase):
         self.assertFalse(opts.swallow_trailing_newline)
         self.assertTrue(opts.inline)
         self.assertFalse(opts.close_inlines)
+        self.assertEqual('not', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
         self.assertFalse(opts.make_paragraphs_here)
+        self.assertEqual('<span style="text-decoration:overline; '
+                         'text-transform: uppercase;">{inner_html}</span>', opts.render_html_template)
 
     def test_html_rendering(self):
         """ Test HTML rendering. """
@@ -55,4 +59,31 @@ class NotNotationTagTestCase(unittest.TestCase):
         tree_node = root_tree_node.new_child('not', opts)
         rendered_output = opts.render_text(tree_node, 'reset')
         expected_output = '/RESET'
+        self.assertEqual(expected_output, rendered_output)
+
+    def test_text_rendering_no_text(self):
+        """ Test text rendering with no text. """
+        opts = NotNotationTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('not', opts)
+        rendered_output = opts.render_text(tree_node, '')
+        expected_output = ''
+        self.assertEqual(expected_output, rendered_output)
+
+    def test_text_rendering_only_whitespaces(self):
+        """ Test text rendering with no text. """
+        opts = NotNotationTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('not', opts)
+        rendered_output = opts.render_text(tree_node, '    ')
+        expected_output = ''
+        self.assertEqual(expected_output, rendered_output)
+
+    def test_text_rendering_trailing_whitespace(self):
+        """ Test text rendering with trailing whitespaces. """
+        opts = NotNotationTagOptions()
+        root_tree_node = RootTreeNode(RootTagOptions())
+        tree_node = root_tree_node.new_child('not', opts)
+        rendered_output = opts.render_text(tree_node, '   RESET ')
+        expected_output = ' /RESET '
         self.assertEqual(expected_output, rendered_output)
