@@ -32,6 +32,7 @@ class TagOptionsTestCase(unittest.TestCase):
         opts = TestTagOptions()
         self.assertFalse(opts.newline_closes)
         self.assertFalse(opts.same_tag_closes)
+        self.assertFalse(opts.weak_parent_close)
         self.assertFalse(opts.standalone)
         self.assertTrue(opts.parse_embedded)
         self.assertFalse(opts.swallow_trailing_newline)

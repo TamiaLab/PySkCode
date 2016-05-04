@@ -416,6 +416,7 @@ class ListElementTagTestCase(unittest.TestCase):
         opts = ListElementTagOptions()
         self.assertFalse(opts.newline_closes)
         self.assertTrue(opts.same_tag_closes)
+        self.assertTrue(opts.weak_parent_close)
         self.assertFalse(opts.standalone)
         self.assertTrue(opts.parse_embedded)
         self.assertFalse(opts.swallow_trailing_newline)
