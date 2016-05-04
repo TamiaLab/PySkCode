@@ -378,3 +378,29 @@ class ParserTestCase(unittest.TestCase):
         self.assertTrue(isinstance(document_tree.children[0].opts, ErroneousTextTagOptions))
         self.assertTrue(isinstance(document_tree.children[1].opts, ErroneousTextTagOptions))
         self.assertTrue(isinstance(document_tree.children[2].opts, ErroneousTextTagOptions))
+
+    def test_weak_parent_close(self):
+        document_tree = parse_skcode('[test][foobar][/test]',
+                                     recognized_tags={'test': DummyTagOptions(),
+                                                      'foobar': DummyTagOptions(weak_parent_close=True)})
+        self.assertTrue(isinstance(document_tree, RootTreeNode))
+        self.assertEqual(1, len(document_tree.children))
+        test_node = document_tree.children[0]
+        self.assertTrue(isinstance(test_node.opts, DummyTagOptions))
+        self.assertEqual('test', test_node.name)
+        self.assertEqual(1, len(test_node.children))
+        foobar_node = test_node.children[0]
+        self.assertTrue(isinstance(foobar_node.opts, DummyTagOptions))
+        self.assertEqual('foobar', foobar_node.name)
+        self.assertEqual(0, len(foobar_node.children))
+
+    def test_after_building_unclosed_weak_parent_close(self):
+        document_tree = parse_skcode('[test]',
+                                     recognized_tags={'test': DummyTagOptions(weak_parent_close=True)},
+                                     texturize_unclosed_tags=True)
+        self.assertTrue(isinstance(document_tree, RootTreeNode))
+        self.assertEqual(1, len(document_tree.children))
+        test_node = document_tree.children[0]
+        self.assertTrue(isinstance(test_node.opts, DummyTagOptions))
+        self.assertEqual('test', test_node.name)
+        self.assertEqual(0, len(test_node.children))

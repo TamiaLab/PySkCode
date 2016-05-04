@@ -25,7 +25,13 @@ class TagOptions(object):
 
     # Set to ``True`` if another opening tag of the same type should
     # automatically close this tag.
+    # When enabling this option, be sure to enable ``weak_parent_close`` to
+    # avoid problem with unclosed tag taking down the closnig tag of his parent.
     same_tag_closes = False
+
+    # Set to ``True`` if the parent closing tag should
+    # automatically close this tag (if not already closed).
+    weak_parent_close = False
 
     # Set to ``True`` if this tag does not have a closing tag.
     # When this option is enabled, the self closing tag format is

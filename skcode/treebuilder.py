@@ -224,9 +224,26 @@ def parse_skcode(text,
             # Check if current node can be closed
             if tree_node.parent is None or tree_node.name != tag_name:
 
-                # Tag cannot be closed, fallback as (erroneous) text
-                tree_node.new_child(TEXT_NODE_NAME, erroneous_text_node_opts,
-                                    content=token_source)
+                # Handle weak parent close option
+                if (tree_node.parent is None
+                        or tree_node.parent.name == tag_name) and tree_node.opts.weak_parent_close:
+
+                    # Close the current tree node
+                    tree_node = tree_node.parent
+
+                    # Also close the parent node
+                    tree_node.source_close_tag = token_source
+                    tree_node = tree_node.parent
+
+                    # Update nesting depth limit
+                    if cur_nesting_depth >= 2:
+                        cur_nesting_depth -= 2
+
+                else:
+
+                    # Tag cannot be closed, fallback as (erroneous) text
+                    tree_node.new_child(TEXT_NODE_NAME, erroneous_text_node_opts,
+                                        content=token_source)
 
             else:
 
@@ -261,6 +278,10 @@ def parse_skcode(text,
                 # Create a new child node
                 tree_node.new_child(tag_name, tag_opts, attrs=tag_attrs,
                                     source_open_tag=token_source)
+
+    # Close all remaining weak nodes
+    while tree_node != root_tree_node and tree_node.parent is not None and tree_node.opts.weak_parent_close:
+        tree_node = tree_node.parent
 
     # Unwrap unclosed tags and turn them into erroneous text node
     if texturize_unclosed_tags:

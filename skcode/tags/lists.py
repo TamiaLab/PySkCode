@@ -292,6 +292,7 @@ class ListElementTagOptions(TagOptions):
     """ List element tag options container class. """
 
     same_tag_closes = True
+    weak_parent_close = True
     make_paragraphs_here = True
 
     canonical_tag_name = 'li'
