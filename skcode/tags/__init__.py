@@ -88,168 +88,173 @@ from .postscriptum import PostScriptumTagOptions
 
 
 # Default list of recognized tags
-DEFAULT_RECOGNIZED_TAGS = {
+DEFAULT_RECOGNIZED_TAGS_LIST = (
     
     # --- Titles
-    'h1': TitleTagOptions(1),  # OK
-    'h2': TitleTagOptions(2),  # OK
-    'h3': TitleTagOptions(3),  # OK
-    'h4': TitleTagOptions(4),  # OK
-    'h5': TitleTagOptions(5),  # OK
-    'h6': TitleTagOptions(6),  # OK
+    TitleTagOptions(1),
+    TitleTagOptions(2),
+    TitleTagOptions(3),
+    TitleTagOptions(4),
+    TitleTagOptions(5),
+    TitleTagOptions(6),
 
     # --- Code blocks
-    'code': CodeBlockTagOptions(),  # OK
-    'python': FixedCodeBlockTagOptions('python'),  # OK
-    'cpp': FixedCodeBlockTagOptions('cpp'),  # OK
-    'java': FixedCodeBlockTagOptions('java'),  # OK
-    'html': FixedCodeBlockTagOptions('html'),  # OK
-    'php': FixedCodeBlockTagOptions('php'),  # OK
+    CodeBlockTagOptions(),  # OK
+    FixedCodeBlockTagOptions('python'),
+    FixedCodeBlockTagOptions('cpp'),
+    FixedCodeBlockTagOptions('java'),
+    FixedCodeBlockTagOptions('html'),
+    FixedCodeBlockTagOptions('php'),
 
     # --- Alerts box
-    'alert': AlertBoxTagOptions(), # OK
-    'error': FixedAlertBoxTagOptions(ALERT_TYPE_ERROR),  # OK
-    'danger': FixedAlertBoxTagOptions(ALERT_TYPE_DANGER),  # OK
-    'warning': FixedAlertBoxTagOptions(ALERT_TYPE_WARNING),  # OK
-    'info': FixedAlertBoxTagOptions(ALERT_TYPE_INFO),  # OK
-    'success': FixedAlertBoxTagOptions(ALERT_TYPE_SUCCESS),  # OK
-    'note': FixedAlertBoxTagOptions(ALERT_TYPE_NOTE),  # OK
-    'question': FixedAlertBoxTagOptions(ALERT_TYPE_QUESTION),  # OK
+    AlertBoxTagOptions(),
+    FixedAlertBoxTagOptions(ALERT_TYPE_ERROR),
+    FixedAlertBoxTagOptions(ALERT_TYPE_DANGER),
+    FixedAlertBoxTagOptions(ALERT_TYPE_WARNING),
+    FixedAlertBoxTagOptions(ALERT_TYPE_INFO),
+    FixedAlertBoxTagOptions(ALERT_TYPE_SUCCESS),
+    FixedAlertBoxTagOptions(ALERT_TYPE_NOTE),
+    FixedAlertBoxTagOptions(ALERT_TYPE_QUESTION),
 
     # --- Text formatting
-    'b': BoldTextTagOptions(),  # OK
-    'bold': BoldTextTagOptions(),  # OK
-    'strong': BoldTextTagOptions(),  # OK
-    
-    'i': ItalicTextTagOptions(),  # OK
-    'italic': ItalicTextTagOptions(),  # OK
-    'em': ItalicTextTagOptions(),  # OK
-    
-    's': StrikeTextTagOptions(),  # OK
-    'strike': StrikeTextTagOptions(),  # OK
-    'del': StrikeTextTagOptions(),  # OK
-    
-    'u': UnderlineTextTagOptions(),  # OK
-    'underline': UnderlineTextTagOptions(),  # OK
-    'ins': UnderlineTextTagOptions(),  # OK
-    
-    'sub': SubscriptTextTagOptions(),  # OK
-    'sup': SupscriptTextTagOptions(),  # OK
-    'pre': PreTextTagOptions(),  # OK
-    'icode': InlineCodeTextTagOptions(),  # OK
-    'ispoiler': InlineSpoilerTextTagOptions(),  # OK
-    
-    'kbd': KeyboardTextTagOptions(),  # OK
-    'keyboard': KeyboardTextTagOptions(),  # OK
-
-    'glow': HighlightTextTagOptions(),  # OK
-    'highlight': HighlightTextTagOptions(),  # OK
-    'mark': HighlightTextTagOptions(),  # OK
-    
-    'small': SmallTextTagOptions(),  # OK
-    
+    BoldTextTagOptions(),
+    ItalicTextTagOptions(),
+    StrikeTextTagOptions(),
+    UnderlineTextTagOptions(),
+    SubscriptTextTagOptions(),
+    SupscriptTextTagOptions(),
+    PreTextTagOptions(),
+    InlineCodeTextTagOptions(),
+    InlineSpoilerTextTagOptions(),
+    KeyboardTextTagOptions(),
+    HighlightTextTagOptions(),
+    SmallTextTagOptions(),
     # imath  # TODO
-    'cite': CiteTextTagOptions(),  # OK
+    CiteTextTagOptions(),
 
     # --- Text alignment
-    'center': CenterTextTagOptions(),  # OK
-    'left': LeftTextTagOptions(),  # OK
-    'right': RightTextTagOptions(),  # OK
-    'justify': JustifyTextTagOptions(),  # OK
+    CenterTextTagOptions(),
+    LeftTextTagOptions(),
+    RightTextTagOptions(),
+    JustifyTextTagOptions(),
 
     # --- Text direction
-    'bdo': DirectionTextTagOptions(),  # OK
-    'ltr': FixedDirectionTextTagOptions(TEXT_DIR_LEFT_TO_RIGHT),  # OK
-    'rtl': FixedDirectionTextTagOptions(TEXT_DIR_RIGHT_TO_LEFT),  # OK
+    DirectionTextTagOptions(),
+    FixedDirectionTextTagOptions(TEXT_DIR_LEFT_TO_RIGHT),
+    FixedDirectionTextTagOptions(TEXT_DIR_RIGHT_TO_LEFT),
 
     # --- Text modifiers
-    'lowercase': LowerCaseTextTagOptions(),  # OK
-    'uppercase': UpperCaseTextTagOptions(),  # OK
-    'capitalize': CapitalizeTextTagOptions(),  # OK
+    LowerCaseTextTagOptions(),
+    UpperCaseTextTagOptions(),
+    CapitalizeTextTagOptions(),
 
     # --- Text color
-    'color': ColorTextTagOptions(),  # OK
-    'black': FixedColorTextTagOptions('black'),  # OK
-    'blue': FixedColorTextTagOptions('blue'),  # OK
-    'gray': FixedColorTextTagOptions('gray'),  # OK
-    'green': FixedColorTextTagOptions('green'),  # OK
-    'orange': FixedColorTextTagOptions('orange'),  # OK
-    'purple': FixedColorTextTagOptions('purple'),  # OK
-    'red': FixedColorTextTagOptions('red'),  # OK
-    'white': FixedColorTextTagOptions('white'),  # OK
-    'yellow': FixedColorTextTagOptions('yellow'),  # OK
+    ColorTextTagOptions(),
+    FixedColorTextTagOptions('black'),
+    FixedColorTextTagOptions('blue'),
+    FixedColorTextTagOptions('gray'),
+    FixedColorTextTagOptions('green'),
+    FixedColorTextTagOptions('orange'),
+    FixedColorTextTagOptions('purple'),
+    FixedColorTextTagOptions('red'),
+    FixedColorTextTagOptions('white'),
+    FixedColorTextTagOptions('yellow'),
 
     # --- Spoiler box
-    'hide': SpoilerTagOptions(),  # OK
-    'spoiler': SpoilerTagOptions(),  # OK
+    SpoilerTagOptions(),
 
     # --- Figure and caption
-    'figure': FigureDeclarationTagOptions(),  # OK
-    'figcaption': FigureCaptionTagOptions(),  # OK
+    FigureDeclarationTagOptions(),
+    FigureCaptionTagOptions(),
 
     # --- Lists
-    'list': ListTagOptions(),  # OK
-    'ul': UnorderedListTagOptions(),  # OK
-    'ol': OrderedListTagOptions(),  # OK
-    'li': ListElementTagOptions(),  # OK
-    '*': ListElementTagOptions(),  # OK
+    ListTagOptions(),
+    UnorderedListTagOptions(),
+    OrderedListTagOptions(),
+    ListElementTagOptions(),
 
     # --- TO.DO list
-    'todolist': TodoListTagOptions(),  # OK
-    'task': TodoTaskTagOptions(),  # OK
+    TodoListTagOptions(),
+    TodoTaskTagOptions(),
 
     # --- Definitions lists
-    'dl': DefinitionListTagOptions(),  # OK
-    'dt': DefinitionListTermTagOptions(),  # OK
-    'dd': DefinitionListTermDefinitionTagOptions(),  # OK
+    DefinitionListTagOptions(),
+    DefinitionListTermTagOptions(),
+    DefinitionListTermDefinitionTagOptions(),
     
     # --- Tables
-    'table': TableTagOptions(),  # OK
-    'tr': TableRowTagOptions(),  # OK
-    'th': TableHeaderCellTagOptions(),  # OK
-    'td': TableCellTagOptions(),  # OK
+    TableTagOptions(),
+    TableRowTagOptions(),
+    TableHeaderCellTagOptions(),
+    TableCellTagOptions(),
 
     # --- Web special
-    'hr': HorizontalLineTagOptions(),  # OK
-    'br': LineBreakTagOptions(),  # OK
-    'cuthere': CutHereTagOptions(),  # OK
+    HorizontalLineTagOptions(),
+    LineBreakTagOptions(),
+    CutHereTagOptions(),
 
     # --- Quotes
-    'quote': QuoteTagOptions(),  # OK
-    'blockquote': QuoteTagOptions(),  # OK
+    QuoteTagOptions(),
 
     # --- Footnotes
-    'footnote': FootnoteDeclarationTagOptions(),  # OK
-    'fn': FootnoteDeclarationTagOptions(),  # OK
-    'fnref': FootnoteReferenceTagOptions(),  # OK
+    FootnoteDeclarationTagOptions(),
+    FootnoteReferenceTagOptions(),
 
     # --- Acronyms
-    'abbr': AcronymTagOptions(),  # OK
-    'acronym': AcronymTagOptions(),  # OK
+    AcronymTagOptions(),
 
     # --- Links
-    'anchor': AnchorTagOptions(),  # OK
-    'goto': GoToAnchorTagOptions(),  # OK
-    'url': UrlLinkTagOptions(),  # OK
-    'link': UrlLinkTagOptions(),  # OK
-    'email': EmailLinkTagOptions(),  # OK
+    AnchorTagOptions(),
+    GoToAnchorTagOptions(),
+    UrlLinkTagOptions(),
+    EmailLinkTagOptions(),
 
     # --- Medias
-    'img': ImageTagOptions(),  # OK
-    'youtube': YoutubeTagOptions(),  # OK
+    ImageTagOptions(),
+    YoutubeTagOptions(),
 
     # --- Special electronic
-    'not': NotNotationTagOptions(),  # OK
+    NotNotationTagOptions(),
 
     # --- Special internal
-    'nobbc': NoParseTagOptions(),  # OK
-    'noparse': NoParseTagOptions(),  # OK
+    NoParseTagOptions(),
 
     # --- Nota Bene
-    'notabene': NotaBeneTagOptions(),  # OK
-    'nb': NotaBeneTagOptions(),  # OK
+    NotaBeneTagOptions(),
 
     # --- Post scriptum
-    'postscriptum': PostScriptumTagOptions(),  # OK
-    'ps': PostScriptumTagOptions(),  # OK
-}
+    PostScriptumTagOptions(),
+)
+
+
+def build_recognized_tags_dict(tag_options_list):
+    """
+    Turn a list of tag options class instances into a dictionary of ``{tag_name: instance}``.
+
+    This function exits for compatibility reasons between the old dictionary-based declaration style
+    and the new list based declaration style.
+
+    The new declaration style use tag name and alias name declaration directly in the options class.
+    This allow simple filtering of allowed tags according to the user permission or settings.
+
+    :param tag_options_list: The list of tag options class instances of all known tags.
+    :return: A dictionary ``{tag_name: instance}`` with all tag name and alias registered as key.
+    """
+    recognized_tags_dict = {}
+
+    # For each tag declaration
+    for tag_options in tag_options_list:
+
+        # Register the canonical tag name
+        recognized_tags_dict[tag_options.canonical_tag_name] = tag_options
+
+        # Register all aliases
+        for alias_name in tag_options.alias_tag_names:
+            recognized_tags_dict[alias_name] = tag_options
+
+    # Return the dict
+    return recognized_tags_dict
+
+
+# Old dict declaration style for backward compatibility
+DEFAULT_RECOGNIZED_TAGS = build_recognized_tags_dict(DEFAULT_RECOGNIZED_TAGS_LIST)

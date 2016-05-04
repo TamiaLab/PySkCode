@@ -9,7 +9,8 @@ from .tags import (RootTagOptions,
                    TextTagOptions,
                    ErroneousTextTagOptions,
                    NewlineTagOptions,
-                   DEFAULT_RECOGNIZED_TAGS)
+                   DEFAULT_RECOGNIZED_TAGS_LIST,
+                   build_recognized_tags_dict)
 from .tokenizer import (tokenize_tag,
                         TOKEN_DATA,
                         TOKEN_NEWLINE,
@@ -18,25 +19,8 @@ from .tokenizer import (tokenize_tag,
                         TOKEN_SELF_CLOSE_TAG)
 
 
-def build_recognized_tags_dict(tag_options_list):
-    recognized_tags_dict = {}
-
-    # For each tag declaration
-    for tag_options in tag_options_list:
-
-        # Register the canonical tag name
-        recognized_tags_dict[tag_options.canonical_tag_name] = tag_options
-
-        # Register all aliases
-        for alias_name in tag_options.alias_tag_names:
-            recognized_tags_dict[alias_name] = tag_options
-
-    # Return the dict
-    return recognized_tags_dict
-
-
 def parse_skcode(text,
-                 recognized_tags=DEFAULT_RECOGNIZED_TAGS,
+                 recognized_tags=DEFAULT_RECOGNIZED_TAGS_LIST,
                  opening_tag_ch='[', closing_tag_ch=']',
                  allow_tagvalue_attr=True, allow_self_closing_tags=True,
                  root_node_opts=RootTagOptions(),
