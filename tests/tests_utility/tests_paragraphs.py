@@ -98,7 +98,6 @@ class ParagraphsUtilityTagTestCase(unittest.TestCase):
         d = root_tree_node.new_child('_newline', NewlineTagOptions())
         make_paragraphs(root_tree_node, paragraph_node_opts=CustomParagraphTagOptions())
         self.assertEqual(len(root_tree_node.children), 1)
-        print(repr(root_tree_node.children[0].opts))
         self.assertTrue(isinstance(root_tree_node.children[0].opts, CustomParagraphTagOptions))
         self.assertEqual([a, b, c, d], root_tree_node.children[0].children)
 
