@@ -4,6 +4,7 @@ SkCode tag parsing code.
 
 import string
 
+
 # Character charsets
 WHITESPACE_CHARSET = frozenset(string.whitespace)
 IDENTIFIER_CHARSET = frozenset(string.ascii_letters + string.digits + '_*')
