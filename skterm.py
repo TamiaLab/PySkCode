@@ -7,8 +7,7 @@ Test terminal for the SkCode project.
 
 from skcode.etree import debug_print_ast
 from skcode.render import (render_to_html,
-                           render_to_text,
-                           render_to_skcode)
+                           render_to_text)
 from skcode.treebuilder import parse_skcode
 
 
@@ -17,7 +16,7 @@ if __name__ == '__main__':
     print('-- SkCode testing terminal --')
 
     # Get user input
-    print('Use CTRL+C or type "EOF" on a single line to stop text input')
+    print('Use CTRL+C, CTRL+D or simply type "EOF" on a single line to stop text input')
     text = []
     try:
         while True:
@@ -41,8 +40,6 @@ if __name__ == '__main__':
     print(render_to_html(ast))
     print('----- TEXT output')
     print(render_to_text(ast))
-    print('----- SkCode output')
-    print(render_to_skcode(ast))
 
     # End of script
     input('Press enter to exit.')
