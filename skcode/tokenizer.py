@@ -22,15 +22,18 @@ def tokenize_newline(data):
     :param data: Input data string to be tokenize.
     """
     lines = data.split('\n')
-    last_line_num = len(lines) - 1
-    for num, line in enumerate(lines):
+    last_line = lines.pop()
+    for line in lines:
         if line:
             yield TOKEN_DATA, None, None, line
-        if num < last_line_num:
-            yield TOKEN_NEWLINE, None, None, '\n'
+        yield TOKEN_NEWLINE, None, None, '\n'
+
+    if last_line:
+        yield TOKEN_DATA, None, None, last_line
 
 
-def tokenize_tag(text, opening_tag_ch='[', closing_tag_ch=']',
+def tokenize_tag(text,
+                 opening_tag_ch='[', closing_tag_ch=']',
                  allow_tagvalue_attr=True, allow_self_closing_tags=True):
     """
     Split the given text into tokens (generator function).
@@ -45,7 +48,7 @@ def tokenize_tag(text, opening_tag_ch='[', closing_tag_ch=']',
     assert len(opening_tag_ch) == 1, "Opening tag character must be one char long exactly."
     assert len(closing_tag_ch) == 1, "Closing tag character must be one char long exactly."
 
-    # Normalize newlines
+    # Normalize newlines (fastest method)
     text = text.replace('\r\n', '\n').replace('\r', '\n')
 
     # Search an opening tag
