@@ -13,7 +13,7 @@ from urllib.parse import urlsplit, urlunsplit, urljoin
 URL_CHARSET_SUB = re.compile(r'[^a-zA-Z0-9-~+_.?#=!&;,/:%@$\|*\'()\[\]\x80-\xff]')
 
 
-def escape_attrvalue(value):
+def escape_attribute_value(value):
     """
     Escape the given value and return it escaped and wrapped in simple or double quotes.
     Try to avoid escape sequence as much as possible to make the value more user-friendly.
