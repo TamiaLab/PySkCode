@@ -125,7 +125,8 @@ def get_attribute_value(text, offset, ch, opening_tag_ch, closing_tag_ch):
     return attribute_value.strip(), offset, ch
 
 
-def parse_tag(text, start_offset=0, opening_tag_ch='[', closing_tag_ch=']',
+def parse_tag(text, start_offset,
+              opening_tag_ch='[', closing_tag_ch=']',
               allow_tagvalue_attr=True, allow_self_closing_tags=True):
     """
     Parse the text starting at ``start_offset`` to extract a valid tag, if any.
@@ -134,7 +135,7 @@ def parse_tag(text, start_offset=0, opening_tag_ch='[', closing_tag_ch=']',
     If something goes wrong (malformed tag, unexpected end-of-file, etc.) an exception
     of type``IndexError`` (unexpected end-of-file) or ``ValueError`` (malformed tag) is raised.
     :param text: The input text.
-    :param start_offset: The offset in the input text to start with (default 0).
+    :param start_offset: The offset in the input text to start with.
     :param opening_tag_ch: The opening tag char (must be one char long, default '[').
     :param closing_tag_ch: The closing tag char (must be one char long, default ']').
     :param allow_tagvalue_attr: Set to ``True`` to allow the BBcode ``tagname=tagvalue`` syntax shortcut
