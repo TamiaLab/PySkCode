@@ -1,5 +1,5 @@
 """
-SkCode tree node base elements.
+SkCode elements tree code.
 """
 
 from html import escape as escape_html

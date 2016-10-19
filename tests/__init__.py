@@ -1,3 +1,3 @@
 """
-Tests suite module for the SkCode project.
+Tests suites module for the SkCode project.
 """
