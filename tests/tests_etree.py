@@ -208,6 +208,15 @@ class TreeNodeTestCase(unittest.TestCase):
         self.assertEqual(expected_html, tree_node.render_error_html('inner HTML',
                                                                     '<error="{error_message}">{source}</error>'))
 
+    def test_default_render_error_html_implementation_xss(self):
+        """ Test the default ``render_error_html`` method implementation. """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('child', DummyTreeNode, error_message='msg',
+                                             source_open_tag='<test>', source_close_tag='</test>', content='')
+        expected_html = '<error="msg">&lt;test&gt;</error>\ninner HTML\n<error="msg">&lt;/test&gt;</error>'
+        self.assertEqual(expected_html, tree_node.render_error_html('inner HTML',
+                                                                    '<error="{error_message}">{source}</error>'))
+
     def test_default_render_error_html_implementation_open_tag(self):
         """ Test the default ``render_error_html`` method implementation. """
         root_tree_node = RootTreeNode()
