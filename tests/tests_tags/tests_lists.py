@@ -5,22 +5,25 @@ SkCode lists tag test code.
 import unittest
 
 from skcode.etree import RootTreeNode
-from skcode.tags import (RootTagOptions,
-                         ListTagOptions,
-                         ListElementTagOptions,
-                         OrderedListTagOptions,
-                         UnorderedListTagOptions,
-                         DEFAULT_RECOGNIZED_TAGS)
-from skcode.tags.lists import (UNORDERED_LIST_TYPE,
-                               NUMERIC_LIST_TYPE,
-                               UPPERCASE_LIST_TYPE,
-                               LOWERCASE_LIST_TYPE,
-                               UPPER_ROMAN_LIST_TYPE,
-                               LOWER_ROMAN_LIST_TYPE,
-                               ROMAN_NUMERALS,
-                               ALPHABET_NUMERALS,
-                               int_to_alphabet_numerals,
-                               int_to_roman_numerals)
+from skcode.tags import (
+    ListTreeNode,
+    ListElementTreeNode,
+    OrderedListTreeNode,
+    UnorderedListTreeNode,
+    DEFAULT_RECOGNIZED_TAGS_LIST
+)
+from skcode.tags.lists import (
+    UNORDERED_LIST_TYPE,
+    NUMERIC_LIST_TYPE,
+    UPPERCASE_LIST_TYPE,
+    LOWERCASE_LIST_TYPE,
+    UPPER_ROMAN_LIST_TYPE,
+    LOWER_ROMAN_LIST_TYPE,
+    ROMAN_NUMERALS,
+    ALPHABET_NUMERALS,
+    int_to_alphabet_numerals,
+    int_to_roman_numerals
+)
 
 
 class NumeralHelpersTestCase(unittest.TestCase):
@@ -111,22 +114,19 @@ class ListsTagTestCase(unittest.TestCase):
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
         """ Test the presence of the tag and aliases in the dictionary of default recognized tags. """
-        self.assertIn('list', DEFAULT_RECOGNIZED_TAGS)
-        self.assertIsInstance(DEFAULT_RECOGNIZED_TAGS['list'], ListTagOptions)
+        self.assertIn(ListTreeNode, DEFAULT_RECOGNIZED_TAGS_LIST)
 
     def test_tag_constant_values(self):
         """ Test tag constants. """
-        opts = ListTagOptions()
-        self.assertFalse(opts.newline_closes)
-        self.assertFalse(opts.same_tag_closes)
-        self.assertFalse(opts.standalone)
-        self.assertTrue(opts.parse_embedded)
-        self.assertFalse(opts.swallow_trailing_newline)
-        self.assertFalse(opts.inline)
-        self.assertTrue(opts.close_inlines)
-        self.assertEqual('list', opts.canonical_tag_name)
-        self.assertEqual((), opts.alias_tag_names)
-        self.assertFalse(opts.make_paragraphs_here)
+        self.assertFalse(ListTreeNode.newline_closes)
+        self.assertFalse(ListTreeNode.same_tag_closes)
+        self.assertFalse(ListTreeNode.standalone)
+        self.assertTrue(ListTreeNode.parse_embedded)
+        self.assertFalse(ListTreeNode.inline)
+        self.assertTrue(ListTreeNode.close_inlines)
+        self.assertEqual('list', ListTreeNode.canonical_tag_name)
+        self.assertEqual((), ListTreeNode.alias_tag_names)
+        self.assertFalse(ListTreeNode.make_paragraphs_here)
 
         self.assertEqual((
             UNORDERED_LIST_TYPE,
@@ -135,10 +135,10 @@ class ListsTagTestCase(unittest.TestCase):
             LOWERCASE_LIST_TYPE,
             UPPER_ROMAN_LIST_TYPE,
             LOWER_ROMAN_LIST_TYPE,
-        ), opts.allowed_list_types)
-        self.assertEqual(UNORDERED_LIST_TYPE, opts.default_list_type)
-        self.assertEqual('type', opts.list_type_attr_name)
-        self.assertEqual('start', opts.list_start_number_attr_name)
+        ), ListTreeNode.allowed_list_types)
+        self.assertEqual(UNORDERED_LIST_TYPE, ListTreeNode.default_list_type)
+        self.assertEqual('type', ListTreeNode.list_type_attr_name)
+        self.assertEqual('start', ListTreeNode.list_start_number_attr_name)
         self.assertEqual({
             '': UNORDERED_LIST_TYPE,
             '+': UNORDERED_LIST_TYPE,
@@ -149,14 +149,14 @@ class ListsTagTestCase(unittest.TestCase):
             'a': LOWERCASE_LIST_TYPE,
             'I': UPPER_ROMAN_LIST_TYPE,
             'i': LOWER_ROMAN_LIST_TYPE,
-        }, opts.list_type_alias)
+        }, ListTreeNode.list_type_alias)
         self.assertEqual({
             NUMERIC_LIST_TYPE: '1',
             UPPERCASE_LIST_TYPE: 'A',
             LOWERCASE_LIST_TYPE: 'a',
             UPPER_ROMAN_LIST_TYPE: 'I',
             LOWER_ROMAN_LIST_TYPE: 'i',
-        }, opts.html_list_type_lut)
+        }, ListTreeNode.html_list_type_lut)
         self.assertEqual({
             UNORDERED_LIST_TYPE: '',
             NUMERIC_LIST_TYPE: '1',
@@ -164,162 +164,128 @@ class ListsTagTestCase(unittest.TestCase):
             LOWERCASE_LIST_TYPE: 'a',
             UPPER_ROMAN_LIST_TYPE: 'I',
             LOWER_ROMAN_LIST_TYPE: 'i',
-        }, opts.alias_list_type_lut)
+        }, ListTreeNode.alias_list_type_lut)
 
-        self.assertEqual('<ul>{inner_html}</ul>\n', opts.html_render_template_ul)
-        self.assertEqual('<ol type="{list_type}">{inner_html}</ol>\n', opts.html_render_template_ol)
+        self.assertEqual('<ul>{inner_html}</ul>\n', ListTreeNode.html_render_template_ul)
+        self.assertEqual('<ol type="{list_type}">{inner_html}</ol>\n', ListTreeNode.html_render_template_ol)
         self.assertEqual('<ol type="{list_type}" start="{list_start}">{inner_html}</ol>\n',
-                         opts.html_render_template_ol_start_number)
+                         ListTreeNode.html_render_template_ol_start_number)
 
     def test_get_list_type_with_tagname_set(self):
         """ Test the ``get_list_type`` method with the tag name set. """
-        opts = ListTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('list', opts, attrs={'list': 'numeric'})
-        output_result = opts.get_list_type(tree_node)
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'list': 'numeric'})
+        output_result = tree_node.get_list_type()
         self.assertEqual(NUMERIC_LIST_TYPE, output_result)
 
     def test_get_list_type_with_type_attr_set(self):
         """ Test the ``get_list_type`` method with the type attribute set. """
-        opts = ListTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('list', opts, attrs={'type': 'numeric'})
-        output_result = opts.get_list_type(tree_node)
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'type': 'numeric'})
+        output_result = ListTreeNode.get_list_type(tree_node)
         self.assertEqual(NUMERIC_LIST_TYPE, output_result)
 
     def test_get_list_type_with_tagname_and_type_attr_set(self):
         """ Test the ``get_list_type`` method with the tag name and type attribute set. """
-        opts = ListTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('list', opts, attrs={'list': '1', 'type': 'A'})
-        output_result = opts.get_list_type(tree_node)
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'list': '1', 'type': 'A'})
+        output_result = tree_node.get_list_type()
         self.assertEqual(NUMERIC_LIST_TYPE, output_result)
 
     def test_get_list_type_with_no_type_set(self):
         """ Test the ``get_list_type`` method with no type set. """
-        opts = ListTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('list', opts, attrs={})
-        output_result = opts.get_list_type(tree_node)
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={})
+        output_result = tree_node.get_list_type()
         self.assertEqual(UNORDERED_LIST_TYPE, output_result)
 
     def test_get_list_type_alias_type(self):
         """ Test the ``get_list_type`` method with an type name alias set. """
-        opts = ListTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('list', opts, attrs={'type': '1'})
-        output_result = opts.get_list_type(tree_node)
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'type': '1'})
+        output_result = tree_node.get_list_type()
         self.assertEqual(NUMERIC_LIST_TYPE, output_result)
 
     def test_get_list_type_with_type_uppercase(self):
         """ Test the ``get_list_type`` method with an type name set. """
-        opts = ListTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('list', opts, attrs={'type': 'numeRIC'})
-        output_result = opts.get_list_type(tree_node)
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'type': 'numeRIC'})
+        output_result = tree_node.get_list_type()
         self.assertEqual(NUMERIC_LIST_TYPE, output_result)
 
     def test_get_list_type_invalid_type(self):
         """ Test the ``get_list_type`` method with an invalid type name set. """
-        opts = ListTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('list', opts, attrs={'type': 'test'})
-        output_result = opts.get_list_type(tree_node)
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'type': 'test'})
+        output_result = tree_node.get_list_type()
         self.assertEqual(UNORDERED_LIST_TYPE, output_result)
 
     def test_get_list_first_number_with_number(self):
         """ Test the ``get_list_first_number`` method with a positive number. """
-        opts = ListTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('list', opts, attrs={'start': '3'})
-        output_result = opts.get_list_first_number(tree_node)
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'start': '3'})
+        output_result = tree_node.get_list_first_number()
         self.assertEqual(3, output_result)
 
     def test_get_list_first_number_with_non_number(self):
         """ Test the ``get_list_first_number`` method with a non number value. """
-        opts = ListTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('list', opts, attrs={'start': 'abcd'})
-        output_result = opts.get_list_first_number(tree_node)
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'start': 'abcd'})
+        output_result = tree_node.get_list_first_number()
         self.assertEqual(1, output_result)
 
     def test_get_list_first_number_with_negative_number(self):
         """ Test the ``get_list_first_number`` method with a negative number. """
-        opts = ListTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('list', opts, attrs={'start': '-3'})
-        output_result = opts.get_list_first_number(tree_node)
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'start': '-3'})
+        output_result = tree_node.get_list_first_number()
         self.assertEqual(1, output_result)
 
     def test_get_list_first_number_with_zero(self):
         """ Test the ``get_list_first_number`` method with zero. """
-        opts = ListTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('list', opts, attrs={'start': '0'})
-        output_result = opts.get_list_first_number(tree_node)
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'start': '0'})
+        output_result = tree_node.get_list_first_number()
         self.assertEqual(1, output_result)
 
     def test_get_list_first_number_with_no_value(self):
         """ Test the ``get_list_first_number`` method with no value set. """
-        opts = ListTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('list', opts, attrs={'start': ''})
-        output_result = opts.get_list_first_number(tree_node)
+
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'start': ''})
+        output_result = tree_node.get_list_first_number()
         self.assertEqual(1, output_result)
 
     def test_render_html_unordered(self):
         """ Test the ``render_html`` method. """
-        opts = ListTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('list', opts)
-        output_result = opts.render_html(tree_node, 'test')
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('list', ListTreeNode)
+        output_result = tree_node.render_html('test')
         expected_result = '<ul>test</ul>\n'
         self.assertEqual(expected_result, output_result)
 
     def test_render_html_ordered(self):
         """ Test the ``render_html`` method. """
-        opts = ListTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('list', opts, attrs={'type': '1'})
-        output_result = opts.render_html(tree_node, 'test')
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'type': '1'})
+        output_result = tree_node.render_html('test')
         expected_result = '<ol type="1">test</ol>\n'
         self.assertEqual(expected_result, output_result)
 
     def test_render_html_ordered_with_start_number(self):
         """ Test the ``render_html`` method. """
-        opts = ListTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('list', opts, attrs={'type': '1', 'start': '3'})
-        output_result = opts.render_html(tree_node, 'test')
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'type': '1', 'start': '3'})
+        output_result = tree_node.render_html('test')
         expected_result = '<ol type="1" start="3">test</ol>\n'
         self.assertEqual(expected_result, output_result)
 
     def test_render_text(self):
         """ Test the ``render_text`` method. """
-        opts = ListTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('list', opts)
-        output_result = opts.render_text(tree_node, 'test')
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('list', ListTreeNode)
+        output_result = tree_node.render_text('test')
         expected_result = 'test'
-        self.assertEqual(expected_result, output_result)
-
-    def test_get_skcode_attributes(self):
-        """ Test the ``get_skcode_attributes`` method. """
-        opts = ListTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        for list_type in opts.allowed_list_types:
-            tree_node = root_tree_node.new_child('list', opts, attrs={'type': list_type})
-            output_result = opts.get_skcode_attributes(tree_node, 'test')
-            expected_result = ({'type': opts.alias_list_type_lut[list_type]}, 'type')
-            self.assertEqual(expected_result, output_result)
-
-    def test_get_skcode_non_ignored_empty_attributes(self):
-        """ Test the ``get_skcode_non_ignored_empty_attributes`` method. """
-        opts = ListTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('list', opts)
-        output_result = opts.get_skcode_non_ignored_empty_attributes(tree_node, 'test')
-        expected_result = ('type', )
         self.assertEqual(expected_result, output_result)
 
 
@@ -328,43 +294,30 @@ class UnorderedListsTagTestCase(unittest.TestCase):
 
     def test_subclassing(self):
         """ Test the modules constants """
-        self.assertTrue(issubclass(UnorderedListTagOptions, ListTagOptions))
+        self.assertTrue(issubclass(UnorderedListTreeNode, ListTreeNode))
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
         """ Test the presence of the tag and aliases in the dictionary of default recognized tags. """
-        self.assertIn('ul', DEFAULT_RECOGNIZED_TAGS)
-        self.assertIsInstance(DEFAULT_RECOGNIZED_TAGS['ul'], UnorderedListTagOptions)
+        self.assertIn(UnorderedListTreeNode, DEFAULT_RECOGNIZED_TAGS_LIST)
 
     def test_tag_constant_values(self):
         """ Test tag constants. """
-        opts = UnorderedListTagOptions()
-        self.assertFalse(opts.newline_closes)
-        self.assertFalse(opts.same_tag_closes)
-        self.assertFalse(opts.standalone)
-        self.assertTrue(opts.parse_embedded)
-        self.assertFalse(opts.swallow_trailing_newline)
-        self.assertFalse(opts.inline)
-        self.assertTrue(opts.close_inlines)
-        self.assertEqual('ul', opts.canonical_tag_name)
-        self.assertEqual((), opts.alias_tag_names)
-        self.assertFalse(opts.make_paragraphs_here)
+        self.assertFalse(UnorderedListTreeNode.newline_closes)
+        self.assertFalse(UnorderedListTreeNode.same_tag_closes)
+        self.assertFalse(UnorderedListTreeNode.standalone)
+        self.assertTrue(UnorderedListTreeNode.parse_embedded)
+        self.assertFalse(UnorderedListTreeNode.inline)
+        self.assertTrue(UnorderedListTreeNode.close_inlines)
+        self.assertEqual('ul', UnorderedListTreeNode.canonical_tag_name)
+        self.assertEqual((), UnorderedListTreeNode.alias_tag_names)
+        self.assertFalse(UnorderedListTreeNode.make_paragraphs_here)
 
     def test_get_list_type(self):
         """ Test the ``get_list_type`` method. """
-        opts = UnorderedListTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('list', opts, attrs={'list': 'numeric'})
-        output_result = opts.get_list_type(tree_node)
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('list', UnorderedListTreeNode, attrs={'list': 'numeric'})
+        output_result = tree_node.get_list_type()
         self.assertEqual(UNORDERED_LIST_TYPE, output_result)
-
-    def test_get_skcode_attributes(self):
-        """ Test the ``get_skcode_attributes`` method. """
-        opts = UnorderedListTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('list', opts, attrs={'type': 'numeric'})
-        output_result = opts.get_skcode_attributes(tree_node, 'test')
-        expected_result = ({}, None)
-        self.assertEqual(expected_result, output_result)
 
 
 class OrderedListsTagTestCase(unittest.TestCase):
@@ -372,26 +325,23 @@ class OrderedListsTagTestCase(unittest.TestCase):
 
     def test_subclassing(self):
         """ Test the modules constants """
-        self.assertTrue(issubclass(OrderedListTagOptions, ListTagOptions))
+        self.assertTrue(issubclass(OrderedListTreeNode, ListTreeNode))
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
         """ Test the presence of the tag and aliases in the dictionary of default recognized tags. """
-        self.assertIn('ol', DEFAULT_RECOGNIZED_TAGS)
-        self.assertIsInstance(DEFAULT_RECOGNIZED_TAGS['ol'], OrderedListTagOptions)
+        self.assertIn(OrderedListTreeNode, DEFAULT_RECOGNIZED_TAGS_LIST)
 
     def test_tag_constant_values(self):
         """ Test tag constants. """
-        opts = OrderedListTagOptions()
-        self.assertFalse(opts.newline_closes)
-        self.assertFalse(opts.same_tag_closes)
-        self.assertFalse(opts.standalone)
-        self.assertTrue(opts.parse_embedded)
-        self.assertFalse(opts.swallow_trailing_newline)
-        self.assertFalse(opts.inline)
-        self.assertTrue(opts.close_inlines)
-        self.assertEqual('ol', opts.canonical_tag_name)
-        self.assertEqual((), opts.alias_tag_names)
-        self.assertFalse(opts.make_paragraphs_here)
+        self.assertFalse(OrderedListTreeNode.newline_closes)
+        self.assertFalse(OrderedListTreeNode.same_tag_closes)
+        self.assertFalse(OrderedListTreeNode.standalone)
+        self.assertTrue(OrderedListTreeNode.parse_embedded)
+        self.assertFalse(OrderedListTreeNode.inline)
+        self.assertTrue(OrderedListTreeNode.close_inlines)
+        self.assertEqual('ol', OrderedListTreeNode.canonical_tag_name)
+        self.assertEqual((), OrderedListTreeNode.alias_tag_names)
+        self.assertFalse(OrderedListTreeNode.make_paragraphs_here)
 
         self.assertEqual((
             NUMERIC_LIST_TYPE,
@@ -399,8 +349,8 @@ class OrderedListsTagTestCase(unittest.TestCase):
             LOWERCASE_LIST_TYPE,
             UPPER_ROMAN_LIST_TYPE,
             LOWER_ROMAN_LIST_TYPE,
-        ), opts.allowed_list_types)
-        self.assertEqual(NUMERIC_LIST_TYPE, opts.default_list_type)
+        ), OrderedListTreeNode.allowed_list_types)
+        self.assertEqual(NUMERIC_LIST_TYPE, OrderedListTreeNode.default_list_type)
 
 
 class ListElementTagTestCase(unittest.TestCase):
@@ -408,173 +358,128 @@ class ListElementTagTestCase(unittest.TestCase):
 
     def test_tag_and_aliases_in_default_recognized_tags_dict(self):
         """ Test the presence of the tag and aliases in the dictionary of default recognized tags. """
-        self.assertIn('li', DEFAULT_RECOGNIZED_TAGS)
-        self.assertIsInstance(DEFAULT_RECOGNIZED_TAGS['li'], ListElementTagOptions)
+        self.assertIn(ListElementTreeNode, DEFAULT_RECOGNIZED_TAGS_LIST)
 
     def test_tag_constant_values(self):
         """ Test tag constants. """
-        opts = ListElementTagOptions()
-        self.assertFalse(opts.newline_closes)
-        self.assertTrue(opts.same_tag_closes)
-        self.assertTrue(opts.weak_parent_close)
-        self.assertFalse(opts.standalone)
-        self.assertTrue(opts.parse_embedded)
-        self.assertFalse(opts.swallow_trailing_newline)
-        self.assertFalse(opts.inline)
-        self.assertTrue(opts.close_inlines)
-        self.assertEqual('li', opts.canonical_tag_name)
-        self.assertEqual(('*', ), opts.alias_tag_names)
-        self.assertTrue(opts.make_paragraphs_here)
-        self.assertEqual(UNORDERED_LIST_TYPE, opts.default_list_type)
-        self.assertEqual(ListTagOptions, opts.base_list_class)
-        self.assertEqual('<li>{inner_html}</li>\n', opts.html_render_template)
-
-    def test_get_parent_list_type_assertion(self):
-        """ Test the ``get_parent_list_type```method assertions. """
-        opts = ListElementTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        with self.assertRaises(AssertionError) as e:
-            opts.get_parent_list_type(root_tree_node)
-        self.assertEqual('A list element cannot be a root tree node.', str(e.exception))
+        self.assertFalse(ListElementTreeNode.newline_closes)
+        self.assertTrue(ListElementTreeNode.same_tag_closes)
+        self.assertTrue(ListElementTreeNode.weak_parent_close)
+        self.assertFalse(ListElementTreeNode.standalone)
+        self.assertTrue(ListElementTreeNode.parse_embedded)
+        self.assertFalse(ListElementTreeNode.inline)
+        self.assertTrue(ListElementTreeNode.close_inlines)
+        self.assertEqual('li', ListElementTreeNode.canonical_tag_name)
+        self.assertEqual(('*', ), ListElementTreeNode.alias_tag_names)
+        self.assertTrue(ListElementTreeNode.make_paragraphs_here)
+        self.assertEqual(UNORDERED_LIST_TYPE, ListElementTreeNode.default_list_type)
+        self.assertEqual(ListTreeNode, ListElementTreeNode.base_list_class)
+        self.assertEqual('<li>{inner_html}</li>\n', ListElementTreeNode.html_render_template)
 
     def test_get_parent_list_type_with_list_as_parent(self):
         """ Test the ``get_parent_list_type```method with a list as parent node. """
-        opts = ListElementTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        parent_tree_node = root_tree_node.new_child('list', ListTagOptions(), attrs={'type': 'numeric'})
-        tree_node = parent_tree_node.new_child('li', opts)
-        self.assertEqual(NUMERIC_LIST_TYPE, opts.get_parent_list_type(tree_node))
+        root_tree_node = RootTreeNode()
+        parent_tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'type': 'numeric'})
+        tree_node = parent_tree_node.new_child('li', ListElementTreeNode)
+        self.assertEqual(NUMERIC_LIST_TYPE, tree_node.get_parent_list_type())
 
     def test_get_parent_list_type_with_non_list_as_parent(self):
         """ Test the ``get_parent_list_type```method without a list as parent node. """
-        opts = ListElementTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('li', opts)
-        self.assertEqual(UNORDERED_LIST_TYPE, opts.get_parent_list_type(tree_node))
-
-    def test_get_parent_list_first_number_assertion(self):
-        """ Test the ``get_parent_list_first_number```method assertions. """
-        opts = ListElementTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        with self.assertRaises(AssertionError) as e:
-            opts.get_parent_list_first_number(root_tree_node)
-        self.assertEqual('A list element cannot be a root tree node.', str(e.exception))
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('li', ListElementTreeNode)
+        self.assertEqual(UNORDERED_LIST_TYPE, tree_node.get_parent_list_type())
 
     def test_get_parent_list_first_number_with_list_as_parent(self):
         """ Test the ``get_parent_list_first_number```method with a list as parent node. """
-        opts = ListElementTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        parent_tree_node = root_tree_node.new_child('list', ListTagOptions(), attrs={'start': '5'})
-        tree_node = parent_tree_node.new_child('li', opts)
-        self.assertEqual(5, opts.get_parent_list_first_number(tree_node))
+        root_tree_node = RootTreeNode()
+        parent_tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'start': '5'})
+        tree_node = parent_tree_node.new_child('li', ListElementTreeNode)
+        self.assertEqual(5, tree_node.get_parent_list_first_number())
 
     def test_get_parent_list_first_number_with_non_list_as_parent(self):
         """ Test the ``get_parent_list_first_number```method without a list as parent node. """
-        opts = ListElementTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('li', opts)
-        self.assertEqual(1, opts.get_parent_list_first_number(tree_node))
-
-    def test_get_element_number_from_parent_assertion(self):
-        """ Test the ``get_element_number_from_parent```method assertions. """
-        opts = ListElementTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        with self.assertRaises(AssertionError) as e:
-            opts.get_element_number_from_parent(root_tree_node)
-        self.assertEqual('A list element cannot be a root tree node.', str(e.exception))
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('li', ListElementTreeNode)
+        self.assertEqual(1, tree_node.get_parent_list_first_number())
 
     def test_get_element_number_from_parent_with_list_as_parent(self):
         """ Test the ``get_element_number_from_parent```method with a list as parent node. """
-        opts = ListElementTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        parent_tree_node = root_tree_node.new_child('list', ListTagOptions())
-        tree_node = parent_tree_node.new_child('li', opts)
-        self.assertEqual(1, opts.get_element_number_from_parent(tree_node))
+        root_tree_node = RootTreeNode()
+        parent_tree_node = root_tree_node.new_child('list', ListTreeNode)
+        tree_node = parent_tree_node.new_child('li', ListElementTreeNode)
+        self.assertEqual(1, tree_node.get_element_number_from_parent())
 
     def test_get_element_number_from_parent_with_list_as_parent_and_multiple_elements(self):
         """ Test the ``get_element_number_from_parent```method with a list as parent node. """
-        opts = ListElementTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        parent_tree_node = root_tree_node.new_child('list', ListTagOptions())
-        parent_tree_node.new_child('li', opts)
-        tree_node = parent_tree_node.new_child('li', opts)
-        self.assertEqual(2, opts.get_element_number_from_parent(tree_node))
-        tree_node = parent_tree_node.new_child('li', opts)
-        parent_tree_node.new_child('li', opts)
-        self.assertEqual(3, opts.get_element_number_from_parent(tree_node))
+        root_tree_node = RootTreeNode()
+        parent_tree_node = root_tree_node.new_child('list', ListTreeNode)
+        parent_tree_node.new_child('li', ListElementTreeNode)
+        tree_node = parent_tree_node.new_child('li', ListElementTreeNode)
+        self.assertEqual(2, tree_node.get_element_number_from_parent())
+        tree_node = parent_tree_node.new_child('li', ListElementTreeNode)
+        parent_tree_node.new_child('li', ListElementTreeNode)
+        self.assertEqual(3, tree_node.get_element_number_from_parent())
 
     def test_get_element_number_from_parent_with_non_list_as_parent(self):
         """ Test the ``get_parent_list_first_number```method without a list as parent node. """
-        opts = ListElementTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        tree_node = root_tree_node.new_child('li', opts)
-        self.assertEqual(1, opts.get_element_number_from_parent(tree_node))
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('li', ListElementTreeNode)
+        self.assertEqual(1, tree_node.get_element_number_from_parent())
 
     def test_get_list_bullet(self):
         """ Test the ``get_list_bullet`` method. """
-        opts = ListElementTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-
-        parent_tree_node = root_tree_node.new_child('list', ListTagOptions(), attrs={'type': UNORDERED_LIST_TYPE})
-        tree_node = parent_tree_node.new_child('li', opts)
-        self.assertEqual('-', opts.get_list_bullet(tree_node))
-
-        parent_tree_node = root_tree_node.new_child('list', ListTagOptions(), attrs={'type': NUMERIC_LIST_TYPE})
-        tree_node = parent_tree_node.new_child('li', opts)
-        self.assertEqual('1.', opts.get_list_bullet(tree_node))
-
-        parent_tree_node = root_tree_node.new_child('list', ListTagOptions(), attrs={'type': UPPERCASE_LIST_TYPE})
-        tree_node = parent_tree_node.new_child('li', opts)
-        self.assertEqual('A.', opts.get_list_bullet(tree_node))
-
-        parent_tree_node = root_tree_node.new_child('list', ListTagOptions(), attrs={'type': LOWERCASE_LIST_TYPE})
-        tree_node = parent_tree_node.new_child('li', opts)
-        self.assertEqual('a.', opts.get_list_bullet(tree_node))
-
-        parent_tree_node = root_tree_node.new_child('list', ListTagOptions(), attrs={'type': UPPER_ROMAN_LIST_TYPE})
-        tree_node = parent_tree_node.new_child('li', opts)
-        self.assertEqual('I.', opts.get_list_bullet(tree_node))
-
-        parent_tree_node = root_tree_node.new_child('list', ListTagOptions(), attrs={'type': LOWER_ROMAN_LIST_TYPE})
-        tree_node = parent_tree_node.new_child('li', opts)
-        self.assertEqual('i.', opts.get_list_bullet(tree_node))
+        root_tree_node = RootTreeNode()
+        parent_tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'type': UNORDERED_LIST_TYPE})
+        tree_node = parent_tree_node.new_child('li', ListElementTreeNode)
+        self.assertEqual('-', tree_node.get_list_bullet())
+        parent_tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'type': NUMERIC_LIST_TYPE})
+        tree_node = parent_tree_node.new_child('li', ListElementTreeNode)
+        self.assertEqual('1.', tree_node.get_list_bullet())
+        parent_tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'type': UPPERCASE_LIST_TYPE})
+        tree_node = parent_tree_node.new_child('li', ListElementTreeNode)
+        self.assertEqual('A.', tree_node.get_list_bullet())
+        parent_tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'type': LOWERCASE_LIST_TYPE})
+        tree_node = parent_tree_node.new_child('li', ListElementTreeNode)
+        self.assertEqual('a.', tree_node.get_list_bullet())
+        parent_tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'type': UPPER_ROMAN_LIST_TYPE})
+        tree_node = parent_tree_node.new_child('li', ListElementTreeNode)
+        self.assertEqual('I.', tree_node.get_list_bullet())
+        parent_tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'type': LOWER_ROMAN_LIST_TYPE})
+        tree_node = parent_tree_node.new_child('li', ListElementTreeNode)
+        self.assertEqual('i.', tree_node.get_list_bullet())
 
     def test_render_html(self):
         """ Test the ``render_html`` method. """
-        opts = ListElementTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        parent_tree_node = root_tree_node.new_child('list', ListTagOptions())
-        tree_node = parent_tree_node.new_child('li', opts)
-        output_result = opts.render_html(tree_node, 'test')
+        root_tree_node = RootTreeNode()
+        parent_tree_node = root_tree_node.new_child('list', ListTreeNode)
+        tree_node = parent_tree_node.new_child('li', ListElementTreeNode)
+        output_result = tree_node.render_html('test')
         expected_result = '<li>test</li>\n'
         self.assertEqual(expected_result, output_result)
 
     def test_render_text(self):
         """ Test the ``render_text`` method. """
-        opts = ListElementTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        parent_tree_node = root_tree_node.new_child('list', ListTagOptions(), attrs={'type': NUMERIC_LIST_TYPE})
-        tree_node = parent_tree_node.new_child('li', opts)
-        output_result = opts.render_text(tree_node, 'Foo\nBar')
+        root_tree_node = RootTreeNode()
+        parent_tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'type': NUMERIC_LIST_TYPE})
+        tree_node = parent_tree_node.new_child('li', ListElementTreeNode)
+        output_result = tree_node.render_text('Foo\nBar')
         expected_result = '1. Foo\n   Bar\n'
         self.assertEqual(expected_result, output_result)
 
     def test_render_text_no_content(self):
         """ Test the ``render_text`` method. """
-        opts = ListElementTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        parent_tree_node = root_tree_node.new_child('list', ListTagOptions(), attrs={'type': NUMERIC_LIST_TYPE})
-        tree_node = parent_tree_node.new_child('li', opts)
-        output_result = opts.render_text(tree_node, '')
+        root_tree_node = RootTreeNode()
+        parent_tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'type': NUMERIC_LIST_TYPE})
+        tree_node = parent_tree_node.new_child('li', ListElementTreeNode)
+        output_result = tree_node.render_text('')
         expected_result = '1.\n'
         self.assertEqual(expected_result, output_result)
 
     def test_render_text_trailing_whitespaces(self):
         """ Test the ``render_text`` method. """
-        opts = ListElementTagOptions()
-        root_tree_node = RootTreeNode(RootTagOptions())
-        parent_tree_node = root_tree_node.new_child('list', ListTagOptions(), attrs={'type': NUMERIC_LIST_TYPE})
-        tree_node = parent_tree_node.new_child('li', opts)
-        output_result = opts.render_text(tree_node, '  Foo\nBar  ')
+        root_tree_node = RootTreeNode()
+        parent_tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'type': NUMERIC_LIST_TYPE})
+        tree_node = parent_tree_node.new_child('li', ListElementTreeNode)
+        output_result = tree_node.render_text('  Foo\nBar  ')
         expected_result = '1. Foo\n   Bar\n'
         self.assertEqual(expected_result, output_result)
