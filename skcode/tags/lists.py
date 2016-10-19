@@ -271,7 +271,6 @@ class ListElementTreeNode(TreeNode):
         Get the parent list type.
         :return The parent list type, or the default one.
         """
-        assert self.parent, "A list element cannot be a root tree node."
         if isinstance(self.parent, self.base_list_class):
             return self.parent.get_list_type()
         else:
@@ -282,7 +281,6 @@ class ListElementTreeNode(TreeNode):
         Get the parent list first number.
         :return The parent list first number, or 1.
         """
-        assert self.parent, "A list element cannot be a root tree node."
         if isinstance(self.parent, self.base_list_class):
             return self.parent.get_list_first_number()
         else:
@@ -291,12 +289,10 @@ class ListElementTreeNode(TreeNode):
     def get_element_number_from_parent(self):
         """
         Get the current element number from the parent node.
-
         :return The current element number of this list item.
         """
-        assert self.parent, "A list element cannot be a root tree node."
         parent_node_children = self.parent.children
-        cur_index = parent_node_children.index()
+        cur_index = parent_node_children.index(self)
         children_before_cur = parent_node_children[:cur_index]
         count = sum([1 if isinstance(child, ListElementTreeNode) else 0 for child in children_before_cur])
         return count + self.get_parent_list_first_number()
