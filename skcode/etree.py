@@ -147,21 +147,6 @@ class TreeNode(object):
                 content += child_node.get_raw_content()
         return content
 
-    def delete_from_parent(self):
-        """
-        Remove this node from his parent children list.
-        """
-        assert self.parent, "Cannot delete a node without parent."
-
-        # Commit suicide
-        self.parent.children.remove(self)
-
-    def unwrap_into_parent(self):
-        """
-        Unwrap the current node into the parent node children list.
-        """
-        # TODO implement unwrapping
-
     def search_in_tree(self, node_cls):
         """
         Walk down the tree and yield any node matching the given class.
@@ -265,20 +250,6 @@ class RootTreeNode(TreeNode):
         :param children: The root node children list (default to an empty list).
         """
         super(RootTreeNode, self).__init__(self, None, None, attrs=attrs, children=children)
-
-    def unwrap_into_parent(self):
-        """
-        This method is not implemented for the root tree node.
-        Calling this method will only raise an error for bad-code debugging purposes.
-        """
-        raise NotImplementedError('Root tree node cannot be unwrapped.')
-
-    def delete_from_parent(self):
-        """
-        This method is not implemented for the root tree node.
-        Calling this method will only raise an error for bad-code debugging purposes
-        """
-        raise NotImplementedError('Root tree node cannot be deleted.')
 
     def render_html(self, inner_html, **kwargs):
         """
