@@ -18,12 +18,6 @@ class DummyTreeNode(TreeNode):
 
     canonical_tag_name = 'test'
 
-    def render_html(self, inner_html, **kwargs):
-        return 'TEST'
-
-    def render_text(self, inner_text, **kwargs):
-        return 'TEST'
-
 
 def get_dummy_node(**kwargs):
     """
