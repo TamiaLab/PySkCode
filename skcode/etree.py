@@ -213,7 +213,9 @@ class TreeNode(object):
             output_html.append(html_error_template.format(error_message=self.error_message,
                                                           source=self.source_open_tag))
 
-        output_html.append(inner_html or escape_html(self.get_raw_content()))
+        inner_content = inner_html or escape_html(self.get_raw_content())
+        if inner_content:
+            output_html.append(inner_content)
 
         if self.source_close_tag:
             output_html.append(html_error_template.format(error_message=self.error_message,
