@@ -4,40 +4,40 @@ SkCode tools test code.
 
 import unittest
 
-from skcode.tools import (escape_attrvalue,
-                          sanitize_url,
-                          slugify)
+from skcode.tools import (
+    escape_attribute_value,
+    sanitize_url,
+    slugify
+)
 
 
 class ToolsTestCase(unittest.TestCase):
     """ Test suite for the tools module. """
 
     def test_escape_attr_value_with_single_quote(self):
-        """ Test the ``escape_attrvalue`` method with a string containing a single quote. """
-        output = escape_attrvalue("test'test")
+        """ Test the ``escape_attribute_value`` method with a string containing a single quote. """
+        output = escape_attribute_value("test'test")
         self.assertEqual('"test\'test"', output)
 
     def test_escape_attr_value_with_double_quote(self):
-        """ Test the ``escape_attrvalue`` method with a string containing a double quote. """
-        output = escape_attrvalue('test"test')
+        """ Test the ``escape_attribute_value`` method with a string containing a double quote. """
+        output = escape_attribute_value('test"test')
         self.assertEqual("'test\"test'", output)
 
     def test_escape_attr_value_with_single_and_double_quotes(self):
-        """ Test the ``escape_attrvalue`` method with a string containing a single and a double quote. """
-        output = escape_attrvalue("""test'test"test""")
+        """ Test the ``escape_attribute_value`` method with a string containing a single and a double quote. """
+        output = escape_attribute_value("""test'test"test""")
         self.assertEqual('"test\'test\\"test"', output)
 
     def test_escape_attr_value_with_single_and_double_quotes_and_backslash(self):
-        """ Test the ``escape_attrvalue`` method with a string containing a single and a double quote. """
-        output = escape_attrvalue("""test'test\\"test""")
+        """ Test the ``escape_attribute_value`` method with a string containing a single and a double quote. """
+        output = escape_attribute_value("""test'test\\"test""")
         self.assertEqual('"test\'test\\\\\\"test"', output)
 
     def test_escape_attr_value_with_no_quote(self):
-        """ Test the ``escape_attrvalue`` method with a string containing no quote. """
-        output = escape_attrvalue('test')
+        """ Test the ``escape_attribute_value`` method with a string containing no quote. """
+        output = escape_attribute_value('test')
         self.assertEqual('"test"', output)
-
-    # -----
 
     def test_sanitize_url_assertions(self):
         """ Test the assertions of the ``sanitize_url`` method. """
@@ -142,8 +142,6 @@ class ToolsTestCase(unittest.TestCase):
         output = sanitize_url('/TamiaLab/PySkCode',
                               absolute_base_url='https://github.com')
         self.assertEqual('https://github.com/TamiaLab/PySkCode', output)
-
-    # -----
 
     def test_slugify_no_value(self):
         """ Test the ``slugify`` method without value. """
