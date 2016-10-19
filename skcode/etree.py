@@ -211,7 +211,7 @@ class TreeNode(object):
         output_html = []
         if self.source_open_tag:
             output_html.append(html_error_template.format(error_message=self.error_message,
-                                                          source=self.source_open_tag))
+                                                          source=escape_html(self.source_open_tag)))
 
         inner_content = inner_html or escape_html(self.get_raw_content())
         if inner_content:
@@ -219,7 +219,7 @@ class TreeNode(object):
 
         if self.source_close_tag:
             output_html.append(html_error_template.format(error_message=self.error_message,
-                                                          source=self.source_close_tag))
+                                                          source=escape_html(self.source_close_tag)))
 
         return '\n'.join(output_html)
 
