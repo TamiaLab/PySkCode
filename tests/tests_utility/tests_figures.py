@@ -5,15 +5,16 @@ SkCode figures utility test code.
 import unittest
 
 from skcode.etree import RootTreeNode
-from skcode.tags import (RootTagOptions,
-                         FigureDeclarationTagOptions,
-                         TextTagOptions)
-from skcode.utility import extract_figures
+from skcode.tags import (
+    FigureDeclarationTreeNode,
+    TextTreeNode
+)
+from skcode.utility.figures import extract_figures
 
 
-class CustomFigureDeclarationTagOptions(FigureDeclarationTagOptions):
+class CustomFigureDeclarationTreeNode(FigureDeclarationTreeNode):
     """
-    Custom ``FigureDeclarationTagOptions`` subclass for tests.
+    Custom ``FigureDeclarationTreeNode`` subclass for tests.
     """
     pass
 
@@ -23,34 +24,34 @@ class FiguresUtilityTagTestCase(unittest.TestCase):
 
     def test_extract_figures(self):
         """ Test the ``extract_figures`` utility. """
-        document_tree = RootTreeNode(RootTagOptions())
-        document_tree.new_child('_text', TextTagOptions())
-        a1 = document_tree.new_child('figure', FigureDeclarationTagOptions())
-        document_tree.new_child('_text', TextTagOptions())
-        a2 = document_tree.new_child('figure', FigureDeclarationTagOptions())
-        document_tree.new_child('_text', TextTagOptions())
-        a3 = document_tree.new_child('figure', FigureDeclarationTagOptions())
-        document_tree.new_child('_text', TextTagOptions())
-        a4 = document_tree.new_child('figure', FigureDeclarationTagOptions())
+        document_tree = RootTreeNode()
+        document_tree.new_child(None, TextTreeNode)
+        a1 = document_tree.new_child('figure', FigureDeclarationTreeNode)
+        document_tree.new_child(None, TextTreeNode)
+        a2 = document_tree.new_child('figure', FigureDeclarationTreeNode)
+        document_tree.new_child(None, TextTreeNode)
+        a3 = document_tree.new_child('figure', FigureDeclarationTreeNode)
+        document_tree.new_child(None, TextTreeNode)
+        a4 = document_tree.new_child('figure', FigureDeclarationTreeNode)
         figures = extract_figures(document_tree)
         self.assertEqual([a1, a2, a3, a4], figures)
 
     def test_extract_figures_no_figures(self):
         """ Test the ``extract_figures`` utility with no figure. """
-        document_tree = RootTreeNode(RootTagOptions())
+        document_tree = RootTreeNode()
         figures = extract_figures(document_tree)
         self.assertEqual([], figures)
 
     def test_extract_figures_custom_class(self):
         """ Test the ``extract_figures`` utility with a custom figure options class. """
-        document_tree = RootTreeNode(RootTagOptions())
-        document_tree.new_child('_text', TextTagOptions())
-        a1 = document_tree.new_child('figure', CustomFigureDeclarationTagOptions())
-        document_tree.new_child('_text', TextTagOptions())
-        document_tree.new_child('figure', FigureDeclarationTagOptions())
-        document_tree.new_child('_text', TextTagOptions())
-        a3 = document_tree.new_child('figure', CustomFigureDeclarationTagOptions())
-        document_tree.new_child('_text', TextTagOptions())
-        document_tree.new_child('figure', FigureDeclarationTagOptions())
-        figures = extract_figures(document_tree, figure_ops_cls=CustomFigureDeclarationTagOptions)
+        document_tree = RootTreeNode()
+        document_tree.new_child(None, TextTreeNode)
+        a1 = document_tree.new_child('figure', CustomFigureDeclarationTreeNode)
+        document_tree.new_child(None, TextTreeNode)
+        document_tree.new_child('figure', FigureDeclarationTreeNode)
+        document_tree.new_child(None, TextTreeNode)
+        a3 = document_tree.new_child('figure', CustomFigureDeclarationTreeNode)
+        document_tree.new_child(None, TextTreeNode)
+        document_tree.new_child('figure', FigureDeclarationTreeNode)
+        figures = extract_figures(document_tree, figure_node_cls=CustomFigureDeclarationTreeNode)
         self.assertEqual([a1, a3], figures)

@@ -6,16 +6,16 @@ import unittest
 from html import escape as escape_html
 
 from skcode.etree import RootTreeNode
-from skcode.tags import (RootTagOptions,
-                         TextTagOptions,
-                         ErroneousTextTagOptions)
-from skcode.utility.smileys import (setup_smileys_replacement,
-                                    do_smileys_replacement,
-                                    DEFAULT_EMOTICONS_MAP,
-                                    EMOTICONS_MAP_ATTR_NAME,
-                                    EMOTICONS_REGEX_ATTR_NAME,
-                                    EMOTICONS_BASE_URL_ATTR_NAME,
-                                    EMOTICONS_HTML_CLASS_ATTR_NAME)
+from skcode.tags import TextTreeNode
+from skcode.utility.smileys import (
+    setup_smileys_replacement,
+    do_smileys_replacement,
+    DEFAULT_EMOTICONS_MAP,
+    EMOTICONS_MAP_ATTR_NAME,
+    EMOTICONS_REGEX_ATTR_NAME,
+    EMOTICONS_BASE_URL_ATTR_NAME,
+    EMOTICONS_HTML_CLASS_ATTR_NAME
+)
 
 
 class EmoticonsUtilityTagTestCase(unittest.TestCase):
@@ -23,7 +23,7 @@ class EmoticonsUtilityTagTestCase(unittest.TestCase):
 
     def test_setup_smileys_replacement(self):
         """ Test the ``setup_smileys_replacement`` helper. """
-        document_tree = RootTreeNode(RootTagOptions())
+        document_tree = RootTreeNode()
         self.assertNotIn(EMOTICONS_MAP_ATTR_NAME, document_tree.attrs)
         self.assertNotIn(EMOTICONS_REGEX_ATTR_NAME, document_tree.attrs)
         self.assertNotIn(EMOTICONS_BASE_URL_ATTR_NAME, document_tree.attrs)
@@ -47,32 +47,32 @@ class EmoticonsUtilityTagTestCase(unittest.TestCase):
 
     def test_setup_smileys_replacement_trailing_slash_base_url(self):
         """ Test the ``setup_smileys_replacement`` helper. """
-        document_tree = RootTreeNode(RootTagOptions())
+        document_tree = RootTreeNode()
         setup_smileys_replacement(document_tree, 'http://example.com')
         self.assertEqual('http://example.com/test.png', document_tree.attrs[EMOTICONS_BASE_URL_ATTR_NAME]('test.png'))
 
     def test_setup_smileys_replacement_callable_base_url(self):
         """ Test the ``setup_smileys_replacement`` helper. """
-        document_tree = RootTreeNode(RootTagOptions())
+        document_tree = RootTreeNode()
         setup_smileys_replacement(document_tree, lambda x: 'http://example.com/lambda/' + x)
         self.assertEqual('http://example.com/lambda/test.png',
                          document_tree.attrs[EMOTICONS_BASE_URL_ATTR_NAME]('test.png'))
 
     def test_do_smileys_replacement_no_input(self):
         """ Test the ``do_smileys_replacement`` function. """
-        root_tree_node = RootTreeNode(RootTagOptions())
+        root_tree_node = RootTreeNode()
         output = do_smileys_replacement(root_tree_node, '')
         self.assertEqual('', output)
 
     def test_do_smileys_replacement_no_setup(self):
         """ Test the ``do_smileys_replacement`` function. """
-        root_tree_node = RootTreeNode(RootTagOptions())
+        root_tree_node = RootTreeNode()
         output = do_smileys_replacement(root_tree_node, 'Test :)')
         self.assertEqual('Test :)', output)
 
     def test_do_smileys_replacement(self):
         """ Test the ``do_smileys_replacement`` function. """
-        root_tree_node = RootTreeNode(RootTagOptions())
+        root_tree_node = RootTreeNode()
         setup_smileys_replacement(root_tree_node, '/smiley/', html_class='custom_css')
         for smiley, filename in DEFAULT_EMOTICONS_MAP:
             smiley = escape_html(smiley)
@@ -81,7 +81,7 @@ class EmoticonsUtilityTagTestCase(unittest.TestCase):
 
     def test_do_smileys_replacement_no_css_class(self):
         """ Test the ``do_smileys_replacement`` function. """
-        root_tree_node = RootTreeNode(RootTagOptions())
+        root_tree_node = RootTreeNode()
         setup_smileys_replacement(root_tree_node, '/smiley/', html_class='')
         for smiley, filename in DEFAULT_EMOTICONS_MAP:
             smiley = escape_html(smiley)
@@ -90,29 +90,19 @@ class EmoticonsUtilityTagTestCase(unittest.TestCase):
 
     def test_do_smileys_replacement_text(self):
         """ Test the ``do_smileys_replacement`` function. """
-        root_tree_node = RootTreeNode(RootTagOptions())
+        root_tree_node = RootTreeNode()
         setup_smileys_replacement(root_tree_node, '/smiley/', html_class='')
-        tree_node = root_tree_node.new_child('_text', TextTagOptions(), content='Test :)')
-        output = tree_node.opts.render_html(tree_node, '')
+        tree_node = root_tree_node.new_child(None, TextTreeNode, content='Test :)')
+        output = tree_node.render_html('')
         self.assertEqual('Test <img src="/smiley/smile.png" alt=":)">', output)
-        output = tree_node.opts.render_text(tree_node, '')
-        self.assertEqual('Test :)', output)
-
-    def test_do_smileys_replacement_erroneous_text(self):
-        """ Test the ``do_smileys_replacement`` function. """
-        root_tree_node = RootTreeNode(RootTagOptions())
-        setup_smileys_replacement(root_tree_node, '/smiley/', html_class='')
-        tree_node = root_tree_node.new_child('_text', ErroneousTextTagOptions(), content='Test :)')
-        output = tree_node.opts.render_html(tree_node, '')
-        self.assertEqual('<span style="font-weight: bold; color: red;">Test :)</span>', output)
-        output = tree_node.opts.render_text(tree_node, '')
+        output = tree_node.render_text('')
         self.assertEqual('Test :)', output)
 
     def test_do_smileys_replacement_internal_error(self):
         """ Test the ``do_smileys_replacement`` function when the internal emoticons map is corrupted. """
-        root_tree_node = RootTreeNode(RootTagOptions())
+        root_tree_node = RootTreeNode()
         setup_smileys_replacement(root_tree_node, '/smiley/', html_class='')
         root_tree_node.attrs[EMOTICONS_MAP_ATTR_NAME].pop('&lt;3')
-        tree_node = root_tree_node.new_child('_text', TextTagOptions(), content='Test <3')
-        output = tree_node.opts.render_html(tree_node, '')
+        tree_node = root_tree_node.new_child(None, TextTreeNode, content='Test <3')
+        output = tree_node.render_html('')
         self.assertEqual('Test &lt;3', output)
