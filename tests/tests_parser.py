@@ -2,11 +2,13 @@
 SkCode tag parser test code.
 """
 
+import string
 import unittest
 
 from skcode.parser import (WHITESPACE_CHARSET,
                            IDENTIFIER_CHARSET,
-                           skip_nb_char_then_whitespaces,
+                           skip_whitespaces,
+                           skip_next_char_then_whitespaces,
                            get_identifier,
                            get_attribute_value,
                            parse_tag)
@@ -15,104 +17,69 @@ from skcode.parser import (WHITESPACE_CHARSET,
 class TagParserTestCase(unittest.TestCase):
     """ Tests suite for the tag parser module. """
 
-    def test_whitespace_charset_valid(self):
-        """ Test if the whitespace charset is valid. """
-        self.assertEqual(frozenset(' \t\r\n'), WHITESPACE_CHARSET)
+    def test_charsets_constants(self):
+        """ Test if the charset constants are valid. """
+        self.assertEqual(frozenset(string.whitespace), WHITESPACE_CHARSET)
+        self.assertEqual(frozenset(string.ascii_letters + string.digits + '_*'), IDENTIFIER_CHARSET)
 
-    def test_identifier_charset_valid(self):
-        """ Test if the identifier charset is valid. """
-        self.assertEqual(frozenset('abcdefghijklmnopqrstuvwxyz'
-                                   'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-                                   '0123456789_*'), IDENTIFIER_CHARSET)
-
-    def test_skip_nb_char_then_whitespaces_asserts(self):
-        """
-        Test if the ``skip_nb_char_then_whitespaces`` method correctly assert input arguments.
-        """
-        with self.assertRaises(AssertionError) as e:
-            skip_nb_char_then_whitespaces('', -1, 0)
-        self.assertEqual('Input text offset must be greater or equal to zero.', str(e.exception))
-
-        with self.assertRaises(AssertionError) as e:
-            skip_nb_char_then_whitespaces('', 0, -1)
-        self.assertEqual('The number of char to be skipped must be greater or equal to zero.', str(e.exception))
-
-    def test_skip_nb_char_then_whitespaces_with_whitespaces(self):
-        """
-        Test if the ``skip_nb_char_then_whitespaces`` method skip whitespaces at the beginning of the string.
-        """
-        offset, ch = skip_nb_char_then_whitespaces("     abcdef", 0, 0)
-        self.assertEqual(offset, 5)
+    def test_skip_whitespaces(self):
+        """ Test the ``skip_whitespaces`` method with some whitespaces """
+        offset, ch = skip_whitespaces('   abcd   ', 0, ' ')
+        self.assertEqual(offset, 3)
         self.assertEqual('a', ch)
 
-    def test_skip_nb_char_then_whitespaces_without_whitespaces(self):
-        """
-        Test if the ``skip_nb_char_then_whitespaces`` method work with a string starting without whitespaces.
-        """
-        offset, ch = skip_nb_char_then_whitespaces("abcdef", 0, 0)
+    def test_skip_whitespaces_without_spaces(self):
+        """ Test the ``skip_whitespaces`` method without any whitespaces """
+        offset, ch = skip_whitespaces('abcd   ', 0, 'a')
         self.assertEqual(offset, 0)
         self.assertEqual('a', ch)
 
-    def test_skip_nb_char_then_whitespaces_with_offset(self):
+    def test_skip_whitespaces_with_whitespaces_only(self):
         """
-        Test if the ``skip_nb_char_then_whitespaces`` method skip whitespaces at beginning of the string starting
+        Test if the ``skip_whitespaces`` method raise a ``IndexError`` if the string end with whitespaces.
+        """
+        with self.assertRaises(IndexError):
+            skip_whitespaces("  ", 0, ' ')
+
+    def test_skip_next_char_then_whitespaces_with_whitespaces(self):
+        """
+        Test if the ``skip_next_char_then_whitespaces`` method skip whitespaces at the beginning of the string.
+        """
+        offset, ch = skip_next_char_then_whitespaces("     abcdef", 0)
+        self.assertEqual(offset, 5)
+        self.assertEqual('a', ch)
+
+    def test_skip_next_char_then_whitespaces_without_whitespaces(self):
+        """
+        Test if the ``skip_next_char_then_whitespaces`` method work with a string starting without whitespaces.
+        """
+        offset, ch = skip_next_char_then_whitespaces("abcdef", 0)
+        self.assertEqual(offset, 1)
+        self.assertEqual('b', ch)
+
+    def test_skip_next_char_then_whitespaces_with_offset(self):
+        """
+        Test if the ``skip_next_char_then_whitespaces`` method skip whitespaces at beginning of the string starting
         at the given offset.
         """
-        offset, ch = skip_nb_char_then_whitespaces("xy   abcdef", 2, 0)
+        offset, ch = skip_next_char_then_whitespaces("xy   abcdef", 2)
         self.assertEqual(offset, 5)
         self.assertEqual('a', ch)
 
-    def test_skip_nb_char_then_whitespaces_with_too_big_offset(self):
+    def test_skip_next_char_then_whitespaces_with_default_nb_char_to_skip(self):
         """
-        Test if the ``skip_nb_char_then_whitespaces`` method raise an ``IndexError`` if the offset is greater than the
-        size of the input text.
+        Test if the ``skip_next_char_then_whitespaces`` method skip any char at beginning of the string if not specified.
         """
-        with self.assertRaises(IndexError):
-            skip_nb_char_then_whitespaces("0123456789", 10, 0)
-
-    def test_skip_nb_char_then_whitespaces_with_default_nb_char_to_skip(self):
-        """
-        Test if the ``skip_nb_char_then_whitespaces`` method skip any char at beginning of the string if not specified.
-        """
-        offset, ch = skip_nb_char_then_whitespaces("xy   abcdef", 0)
-        self.assertEqual(offset, 0)
-        self.assertEqual('x', ch)
-
-    def test_skip_nb_char_then_whitespaces_with_nb_char_to_skip(self):
-        """
-        Test if the ``skip_nb_char_then_whitespaces`` method skip the given count of char at beginning of the string.
-        """
-        offset, ch = skip_nb_char_then_whitespaces("xy   abcdef", 0, 2)
-        self.assertEqual(offset, 5)
-        self.assertEqual('a', ch)
-
-    def test_skip_nb_char_then_whitespaces_with_nb_char_to_skip_too_big(self):
-        """
-        Test if the ``skip_nb_char_then_whitespaces`` method raise an ``IndexError`` if the number of char to be skip
-        make the offset greater than the actual size of the input text.
-        """
-        with self.assertRaises(IndexError):
-            skip_nb_char_then_whitespaces("0123456789", 5, 5)
+        offset, ch = skip_next_char_then_whitespaces("xy   abcdef", 0)
+        self.assertEqual(offset, 1)
+        self.assertEqual('y', ch)
 
     def test_nb_char_to_skip_with_whitespaces_only(self):
         """
-        Test if the ``skip_nb_char_then_whitespaces`` method raise a ``IndexError`` if the string end with whitespaces.
+        Test if the ``skip_next_char_then_whitespaces`` method raise a ``IndexError`` if the string end with whitespaces.
         """
         with self.assertRaises(IndexError):
-            skip_nb_char_then_whitespaces("  ", 0, 0)
-
-    def test_get_identifier_asserts(self):
-        """
-        Test if the ``get_identifier`` method correctly assert input arguments.
-        """
-        with self.assertRaises(AssertionError) as e:
-            get_identifier('', -1, 'a')
-        self.assertEqual('Input text offset must be greater or equal to zero.', str(e.exception))
-
-        with self.assertRaises(AssertionError) as e:
-            get_identifier('', 0, ' ')
-        self.assertEqual('The current char should not be a whitespace, call this function after '
-                         'skipping any whitespaces.', str(e.exception))
+            skip_next_char_then_whitespaces("  ", 0)
 
     def test_get_identifier_with_valid_name(self):
         """
@@ -153,13 +120,6 @@ class TagParserTestCase(unittest.TestCase):
         """
         with self.assertRaises(IndexError):
             get_identifier('test', 0, 't')
-
-    def test_get_identifier_offset_too_big(self):
-        """
-        Test if the ``get_identifier`` method with an offset too big.
-        """
-        with self.assertRaises(IndexError):
-            get_identifier('test', 4, 't')
 
     # --- Functional tests
     PASS_TESTS = (
