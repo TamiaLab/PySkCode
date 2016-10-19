@@ -6,9 +6,11 @@ Test terminal for the SkCode project.
 """
 
 from skcode.etree import debug_print_ast
-from skcode.render import (render_to_html,
-                           render_to_text)
-from skcode.treebuilder import parse_skcode
+from skcode import (
+    parse_skcode,
+    render_to_html,
+    render_to_text
+)
 
 
 # Terminal code
@@ -32,13 +34,13 @@ if __name__ == '__main__':
     ast = parse_skcode(text)
 
     # Dump parsing info
-    print('----- Input text')
+    print('----- Input text -----')
     print(text)
-    print('----- Document tree')
+    print('----- Document tree -----')
     debug_print_ast(ast)
-    print('----- HTML output')
+    print('----- HTML output -----')
     print(render_to_html(ast))
-    print('----- TEXT output')
+    print('----- TEXT output -----')
     print(render_to_text(ast))
 
     # End of script
