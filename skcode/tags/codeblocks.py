@@ -20,7 +20,6 @@ class CodeBlockTreeNode(TreeNode):
     """ Code block tree node class. """
 
     parse_embedded = False
-    swallow_trailing_newline = True  # TODO Do lines strip at rendering
 
     canonical_tag_name = 'code'
     alias_tag_names = ()
@@ -176,6 +175,17 @@ class CodeBlockTreeNode(TreeNode):
         figure_id = self.attrs.get(self.figure_id_attr_name, '')
         return slugify(figure_id)
 
+    def get_cleaned_content(self, splitlines=False):
+        """
+        Return the content of this node with all trailing blank lines removed.
+        """
+        lines = self.content.splitlines()
+        while not lines[0].strip():
+            lines.pop(0)
+        while not lines[-1].strip():
+            lines.pop()
+        return lines if splitlines else '\n'.join(lines)
+
     def render_html(self, inner_html, force_rel_nofollow=True, **kwargs):
         """
         Callback function for rendering HTML.
@@ -209,7 +219,7 @@ class CodeBlockTreeNode(TreeNode):
                                   noclasses=True,
                                   lineanchors=lineanchors,
                                   anchorlinenos=anchorlinenos)
-        source_code = highlight(self.content, lexer, formatter)
+        source_code = highlight(self.get_cleaned_content(), lexer, formatter)
 
         # Wrap table in div for horizontal scrolling
         source_code = self.wrapping_div_html_template.format(class_name=self.wrapping_div_class_name,
@@ -260,7 +270,7 @@ class CodeBlockTreeNode(TreeNode):
 
         # Render the code block
         lines = []
-        for num, line in enumerate(self.content.strip('\r\n').splitlines(), start=get_start_line_number):
+        for num, line in enumerate(self.get_cleaned_content(splitlines=True), start=get_start_line_number):
             line = line.replace('\t', ' ' * self.tab_size)
             line_prefix = '%d>' % num if num in hl_lines else '%d.' % num
             lines.append('%s %s' % (line_prefix.ljust(4), line))
