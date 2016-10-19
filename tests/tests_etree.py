@@ -18,6 +18,13 @@ class DummyTreeNode(TreeNode):
     alias_tag_names = ()
 
 
+class OtherDummyTreeNode(TreeNode):
+    """ Dummy tag options class for tests. """
+
+    canonical_tag_name = 'test'
+    alias_tag_names = ()
+
+
 class TreeNodeTestCase(unittest.TestCase):
     """ Tests suite for the ``TreeNode`` class. """
 
@@ -159,7 +166,16 @@ class TreeNodeTestCase(unittest.TestCase):
         raw_content = l1_tree_node.get_raw_content(recursive=False)
         self.assertEqual('Level 1-1', raw_content)
 
-    #search_in_tree
+    def test_search_in_tree(self):
+        """ Test the ``search_in_tree`` helper. """
+        document_tree = RootTreeNode()
+        node1 = document_tree.new_child('node', DummyTreeNode)
+        l1_tree_node = document_tree.new_child('test_l1', OtherDummyTreeNode)
+        node2 = l1_tree_node.new_child('node', DummyTreeNode)
+        l2_tree_node = l1_tree_node.new_child('test_l2', OtherDummyTreeNode)
+        node3 = l2_tree_node.new_child('node', DummyTreeNode)
+        nodes = list(document_tree.search_in_tree(DummyTreeNode))
+        self.assertEqual([node1, node2, node3], nodes)
 
     def test_default_sanitize_node_policy(self):
         """ Test the default ``sanitize_node`` method policy. """
