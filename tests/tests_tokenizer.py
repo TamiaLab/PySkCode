@@ -4,12 +4,14 @@ SkCode tag parser test code.
 
 import unittest
 
-from skcode.tokenizer import (tokenize_tag,
-                              TOKEN_DATA,
-                              TOKEN_NEWLINE,
-                              TOKEN_OPEN_TAG,
-                              TOKEN_CLOSE_TAG,
-                              TOKEN_SELF_CLOSE_TAG)
+from skcode.tokenizer import (
+    tokenize_tag,
+    TOKEN_DATA,
+    TOKEN_NEWLINE,
+    TOKEN_OPEN_TAG,
+    TOKEN_CLOSE_TAG,
+    TOKEN_SELF_CLOSE_TAG
+)
 
 
 class TokenizerTestCase(unittest.TestCase):
