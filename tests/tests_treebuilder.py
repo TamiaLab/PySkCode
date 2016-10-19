@@ -305,3 +305,14 @@ class ParserTestCase(unittest.TestCase):
         self.assertIsInstance(test_node, DummyTreeNode)
         self.assertEqual('test', test_node.name)
         self.assertEqual(0, len(test_node.children))
+
+    def test_unclosed_tag(self):
+        document_tree = parse_skcode('[test]', recognized_tags=(DummyTreeNode, ),
+                                     mark_unclosed_tags_as_erroneous=True)
+        self.assertIsInstance(document_tree, RootTreeNode)
+        self.assertEqual(1, len(document_tree.children))
+        test_node = document_tree.children[0]
+        self.assertIsInstance(test_node, DummyTreeNode)
+        self.assertEqual('test', test_node.name)
+        self.assertEqual(0, len(test_node.children))
+        self.assertTrue(test_node.error_message)
