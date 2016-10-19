@@ -105,7 +105,6 @@ class RenderingTestCase(unittest.TestCase):
                           '<error=foo>[/level1-1]</error>' \
                           '[HTML+level1-2][/HTML]' \
                           '[HTML+level1-3][/HTML]'
-        print(output)
         self.assertEqual(expected_output, output)
 
     def test_render_inner_text(self):
