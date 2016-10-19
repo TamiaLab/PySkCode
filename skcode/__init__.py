@@ -7,7 +7,7 @@ __author__ = "Fabien Batteix (@skywodd)"
 __copyright__ = "Copyright 2016, TamiaLab"
 __credits__ = ["Fabien Batteix", "TamiaLab"]
 __license__ = "GPLv3"
-__version__ = "2.1.0"
+__version__ = "3.0.0"
 __maintainer__ = "Fabien Batteix"
 __email__ = "fabien.batteix@tamialab.fr"
 __status__ = "Production"
@@ -15,6 +15,4 @@ __status__ = "Production"
 
 # User friendly imports
 from .treebuilder import parse_skcode
-from .render import (render_to_html,
-                     render_to_skcode,
-                     render_to_text)
+from .render import render_to_html, render_to_text

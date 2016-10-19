@@ -2,259 +2,282 @@
 SkCode tag definitions code.
 """
 
-# Base classes
-from .base import (TagOptions,
-                   WrappingTagOptions,
-                   InlineWrappingTagOptions)
-
-
 # Import all tag definitions here
-from .internal import (RootTagOptions,
-                       TextTagOptions,
-                       ErroneousTextTagOptions,
-                       NewlineTagOptions,
-                       HardNewlineTagOptions)
-from .titles import TitleTagOptions
-from .codeblocks import (CodeBlockTagOptions,
-                         FixedCodeBlockTagOptions)
-from .alerts import (AlertBoxTagOptions,
-                     FixedAlertBoxTagOptions,
-                     ALERT_TYPE_ERROR,
-                     ALERT_TYPE_DANGER,
-                     ALERT_TYPE_WARNING,
-                     ALERT_TYPE_INFO,
-                     ALERT_TYPE_SUCCESS,
-                     ALERT_TYPE_NOTE,
-                     ALERT_TYPE_QUESTION)
-from .figures import (FigureDeclarationTagOptions,
-                      FigureCaptionTagOptions)
-from .footnotes import (FootnoteDeclarationTagOptions,
-                        FootnoteReferenceTagOptions)
-from .textformatting import (BoldTextTagOptions,
-                             ItalicTextTagOptions,
-                             StrikeTextTagOptions,
-                             UnderlineTextTagOptions,
-                             SubscriptTextTagOptions,
-                             SupscriptTextTagOptions,
-                             PreTextTagOptions,
-                             CiteTextTagOptions,
-                             InlineCodeTextTagOptions,
-                             InlineSpoilerTextTagOptions,
-                             KeyboardTextTagOptions,
-                             HighlightTextTagOptions,
-                             SmallTextTagOptions)
-from .textalign import (CenterTextTagOptions,
-                        LeftTextTagOptions,
-                        RightTextTagOptions,
-                        JustifyTextTagOptions)
-from .textdirection import (DirectionTextTagOptions,
-                            FixedDirectionTextTagOptions,
-                            TEXT_DIR_LEFT_TO_RIGHT,
-                            TEXT_DIR_RIGHT_TO_LEFT)
-from .textmodifiers import (LowerCaseTextTagOptions,
-                            UpperCaseTextTagOptions,
-                            CapitalizeTextTagOptions)
-from .textcolors import (ColorTextTagOptions,
-                         FixedColorTextTagOptions)
-from .spoiler import SpoilerTagOptions
-from .lists import (ListTagOptions,
-                    UnorderedListTagOptions,
-                    OrderedListTagOptions,
-                    ListElementTagOptions)
-from .todolists import (TodoListTagOptions,
-                        TodoTaskTagOptions)
-from .definitions import (DefinitionListTagOptions,
-                          DefinitionListTermTagOptions,
-                          DefinitionListTermDefinitionTagOptions)
-from .tables import (TableTagOptions,
-                     TableRowTagOptions,
-                     TableHeaderCellTagOptions,
-                     TableCellTagOptions)
-from .webspecials import (HorizontalLineTagOptions,
-                          LineBreakTagOptions,
-                          CutHereTagOptions)
-from .quotes import QuoteTagOptions
-from .acronyms import AcronymTagOptions
-from .links import (UrlLinkTagOptions,
-                    EmailLinkTagOptions,
-                    AnchorTagOptions,
-                    GoToAnchorTagOptions)
-from .medias import (ImageTagOptions,
-                     YoutubeTagOptions)
-from .electronic import NotNotationTagOptions
-from .internalspecials import NoParseTagOptions
-from .notabene import NotaBeneTagOptions
-from .postscriptum import PostScriptumTagOptions
+from .internal import (
+    TextTreeNode,
+    NewlineTreeNode,
+    HardNewlineTreeNode
+)
+from .titles import generate_title_cls
+from .codeblocks import (
+    CodeBlockTreeNode,
+    generate_fixed_code_block_type_cls
+)
+from .alerts import (
+    AlertBoxTreeNode,
+    generate_fixed_alert_type_cls,
+    ALERT_TYPE_ERROR,
+    ALERT_TYPE_DANGER,
+    ALERT_TYPE_WARNING,
+    ALERT_TYPE_INFO,
+    ALERT_TYPE_SUCCESS,
+    ALERT_TYPE_NOTE,
+    ALERT_TYPE_QUESTION
+)
+from .figures import (
+    FigureDeclarationTreeNode,
+    FigureCaptionTreeNode
+)
+from .footnotes import (
+    FootnoteDeclarationTreeNode,
+    FootnoteReferenceTreeNode
+)
+from .textformatting import (
+    BoldTextTreeNode,
+    ItalicTextTreeNode,
+    StrikeTextTreeNode,
+    UnderlineTextTreeNode,
+    SubscriptTextTreeNode,
+    SupscriptTextTreeNode,
+    PreTextTreeNode,
+    CiteTextTreeNode,
+    InlineCodeTextTreeNode,
+    InlineSpoilerTextTreeNode,
+    KeyboardTextTreeNode,
+    HighlightTextTreeNode,
+    SmallTextTreeNode
+)
+from .textalign import (
+    CenterTextTreeNode,
+    LeftTextTreeNode,
+    RightTextTreeNode,
+    JustifyTextTreeNode
+)
+from .textdirection import (
+    DirectionTextTreeNode,
+    LTRFixedDirectionTextTreeNode,
+    RTLFixedDirectionTextTreeNode
+)
+from .textmodifiers import (
+    LowerCaseTextTreeNode,
+    UpperCaseTextTreeNode,
+    CapitalizeTextTreeNode
+)
+from .textcolors import (
+    ColorTextTreeNode,
+    generate_fixed_color_text_cls
+)
+from .spoiler import SpoilerTreeNode
+from .lists import (
+    ListTreeNode,
+    UnorderedListTreeNode,
+    OrderedListTreeNode,
+    ListElementTreeNode
+)
+from .todolists import (
+    TodoListTreeNode,
+    TodoTaskTreeNode
+)
+from .definitions import (
+    DefinitionListTreeNode,
+    DefinitionListTermTreeNode,
+    DefinitionListTermDefinitionTreeNode
+)
+from .tables import (
+    TableTreeNode,
+    TableRowTreeNode,
+    TableHeaderCellTreeNode,
+    TableCellTreeNode
+)
+from .webspecials import (
+    HorizontalLineTreeNode,
+    LineBreakTreeNode,
+    CutHereTreeNode
+)
+from .quotes import QuoteTreeNode
+from .acronyms import AcronymTreeNode
+from .links import (
+    UrlLinkTreeNode,
+    EmailLinkTreeNode,
+    AnchorTreeNode,
+    GoToAnchorTreeNode
+)
+from .medias import (
+    ImageTreeNode,
+    YoutubeTreeNode
+)
+from .electronic import NotNotationTreeNode
+from .internalspecials import NoParseTreeNode
+from .notabene import NotaBeneTreeNode
+from .postscriptum import PostScriptumTreeNode
 
 
 # Default list of recognized tags
 DEFAULT_RECOGNIZED_TAGS_LIST = (
     
     # --- Titles
-    TitleTagOptions(1),
-    TitleTagOptions(2),
-    TitleTagOptions(3),
-    TitleTagOptions(4),
-    TitleTagOptions(5),
-    TitleTagOptions(6),
+    generate_title_cls(1),
+    generate_title_cls(2),
+    generate_title_cls(3),
+    generate_title_cls(4),
+    generate_title_cls(5),
+    generate_title_cls(6),
 
     # --- Code blocks
-    CodeBlockTagOptions(),  # OK
-    FixedCodeBlockTagOptions('python'),
-    FixedCodeBlockTagOptions('cpp'),
-    FixedCodeBlockTagOptions('java'),
-    FixedCodeBlockTagOptions('html'),
-    FixedCodeBlockTagOptions('php'),
+    CodeBlockTreeNode,
+    generate_fixed_code_block_type_cls('python'),
+    generate_fixed_code_block_type_cls('cpp'),
+    generate_fixed_code_block_type_cls('java'),
+    generate_fixed_code_block_type_cls('html'),
+    generate_fixed_code_block_type_cls('php'),
 
     # --- Alerts box
-    AlertBoxTagOptions(),
-    FixedAlertBoxTagOptions(ALERT_TYPE_ERROR),
-    FixedAlertBoxTagOptions(ALERT_TYPE_DANGER),
-    FixedAlertBoxTagOptions(ALERT_TYPE_WARNING),
-    FixedAlertBoxTagOptions(ALERT_TYPE_INFO),
-    FixedAlertBoxTagOptions(ALERT_TYPE_SUCCESS),
-    FixedAlertBoxTagOptions(ALERT_TYPE_NOTE),
-    FixedAlertBoxTagOptions(ALERT_TYPE_QUESTION),
+    AlertBoxTreeNode,
+    generate_fixed_alert_type_cls(ALERT_TYPE_ERROR),
+    generate_fixed_alert_type_cls(ALERT_TYPE_DANGER),
+    generate_fixed_alert_type_cls(ALERT_TYPE_WARNING),
+    generate_fixed_alert_type_cls(ALERT_TYPE_INFO),
+    generate_fixed_alert_type_cls(ALERT_TYPE_SUCCESS),
+    generate_fixed_alert_type_cls(ALERT_TYPE_NOTE),
+    generate_fixed_alert_type_cls(ALERT_TYPE_QUESTION),
 
     # --- Text formatting
-    BoldTextTagOptions(),
-    ItalicTextTagOptions(),
-    StrikeTextTagOptions(),
-    UnderlineTextTagOptions(),
-    SubscriptTextTagOptions(),
-    SupscriptTextTagOptions(),
-    PreTextTagOptions(),
-    InlineCodeTextTagOptions(),
-    InlineSpoilerTextTagOptions(),
-    KeyboardTextTagOptions(),
-    HighlightTextTagOptions(),
-    SmallTextTagOptions(),
-    # imath  # TODO
-    CiteTextTagOptions(),
+    BoldTextTreeNode,
+    ItalicTextTreeNode,
+    StrikeTextTreeNode,
+    UnderlineTextTreeNode,
+    SubscriptTextTreeNode,
+    SupscriptTextTreeNode,
+    PreTextTreeNode,
+    InlineCodeTextTreeNode,
+    InlineSpoilerTextTreeNode,
+    KeyboardTextTreeNode,
+    HighlightTextTreeNode,
+    SmallTextTreeNode,
+    CiteTextTreeNode,
 
     # --- Text alignment
-    CenterTextTagOptions(),
-    LeftTextTagOptions(),
-    RightTextTagOptions(),
-    JustifyTextTagOptions(),
+    CenterTextTreeNode,
+    LeftTextTreeNode,
+    RightTextTreeNode,
+    JustifyTextTreeNode,
 
     # --- Text direction
-    DirectionTextTagOptions(),
-    FixedDirectionTextTagOptions(TEXT_DIR_LEFT_TO_RIGHT),
-    FixedDirectionTextTagOptions(TEXT_DIR_RIGHT_TO_LEFT),
+    DirectionTextTreeNode,
+    LTRFixedDirectionTextTreeNode,
+    RTLFixedDirectionTextTreeNode,
 
     # --- Text modifiers
-    LowerCaseTextTagOptions(),
-    UpperCaseTextTagOptions(),
-    CapitalizeTextTagOptions(),
+    LowerCaseTextTreeNode,
+    UpperCaseTextTreeNode,
+    CapitalizeTextTreeNode,
 
     # --- Text color
-    ColorTextTagOptions(),
-    FixedColorTextTagOptions('black'),
-    FixedColorTextTagOptions('blue'),
-    FixedColorTextTagOptions('gray'),
-    FixedColorTextTagOptions('green'),
-    FixedColorTextTagOptions('orange'),
-    FixedColorTextTagOptions('purple'),
-    FixedColorTextTagOptions('red'),
-    FixedColorTextTagOptions('white'),
-    FixedColorTextTagOptions('yellow'),
+    ColorTextTreeNode,
+    generate_fixed_color_text_cls('black'),
+    generate_fixed_color_text_cls('blue'),
+    generate_fixed_color_text_cls('gray'),
+    generate_fixed_color_text_cls('green'),
+    generate_fixed_color_text_cls('orange'),
+    generate_fixed_color_text_cls('purple'),
+    generate_fixed_color_text_cls('red'),
+    generate_fixed_color_text_cls('white'),
+    generate_fixed_color_text_cls('yellow'),
 
     # --- Spoiler box
-    SpoilerTagOptions(),
+    SpoilerTreeNode,
 
     # --- Figure and caption
-    FigureDeclarationTagOptions(),
-    FigureCaptionTagOptions(),
+    FigureDeclarationTreeNode,
+    FigureCaptionTreeNode,
 
     # --- Lists
-    ListTagOptions(),
-    UnorderedListTagOptions(),
-    OrderedListTagOptions(),
-    ListElementTagOptions(),
+    ListTreeNode,
+    UnorderedListTreeNode,
+    OrderedListTreeNode,
+    ListElementTreeNode,
 
     # --- TO.DO list
-    TodoListTagOptions(),
-    TodoTaskTagOptions(),
+    TodoListTreeNode,
+    TodoTaskTreeNode,
 
     # --- Definitions lists
-    DefinitionListTagOptions(),
-    DefinitionListTermTagOptions(),
-    DefinitionListTermDefinitionTagOptions(),
+    DefinitionListTreeNode,
+    DefinitionListTermTreeNode,
+    DefinitionListTermDefinitionTreeNode,
     
     # --- Tables
-    TableTagOptions(),
-    TableRowTagOptions(),
-    TableHeaderCellTagOptions(),
-    TableCellTagOptions(),
+    TableTreeNode,
+    TableRowTreeNode,
+    TableHeaderCellTreeNode,
+    TableCellTreeNode,
 
     # --- Web special
-    HorizontalLineTagOptions(),
-    LineBreakTagOptions(),
-    CutHereTagOptions(),
+    HorizontalLineTreeNode,
+    LineBreakTreeNode,
+    CutHereTreeNode,
 
     # --- Quotes
-    QuoteTagOptions(),
+    QuoteTreeNode,
 
     # --- Footnotes
-    FootnoteDeclarationTagOptions(),
-    FootnoteReferenceTagOptions(),
+    FootnoteDeclarationTreeNode,
+    FootnoteReferenceTreeNode,
 
     # --- Acronyms
-    AcronymTagOptions(),
+    AcronymTreeNode,
 
     # --- Links
-    AnchorTagOptions(),
-    GoToAnchorTagOptions(),
-    UrlLinkTagOptions(),
-    EmailLinkTagOptions(),
+    AnchorTreeNode,
+    GoToAnchorTreeNode,
+    UrlLinkTreeNode,
+    EmailLinkTreeNode,
 
     # --- Medias
-    ImageTagOptions(),
-    YoutubeTagOptions(),
+    ImageTreeNode,
+    YoutubeTreeNode,
 
     # --- Special electronic
-    NotNotationTagOptions(),
+    NotNotationTreeNode,
 
     # --- Special internal
-    NoParseTagOptions(),
+    NoParseTreeNode,
 
     # --- Nota Bene
-    NotaBeneTagOptions(),
+    NotaBeneTreeNode,
 
     # --- Post scriptum
-    PostScriptumTagOptions(),
+    PostScriptumTreeNode,
 )
 
 
-def build_recognized_tags_dict(tag_options_list):
+def build_recognized_tags_dict(tag_class_list):
     """
-    Turn a list of tag options class instances into a dictionary of ``{tag_name: instance}``.
-
-    This function exits for compatibility reasons between the old dictionary-based declaration style
-    and the new list based declaration style.
-
-    The new declaration style use tag name and alias name declaration directly in the options class.
-    This allow simple filtering of allowed tags according to the user permission or settings.
-
-    :param tag_options_list: The list of tag options class instances of all known tags.
-    :return: A dictionary ``{tag_name: instance}`` with all tag name and alias registered as key.
+    Turn a list of tag node classes into a dictionary of tag names and corresponding node class.
+    :param tag_class_list: The list of tag node classes for all supported tags.
+    :return: A dictionary ``{tag_name: class}`` with all tag name and alias registered as key.
     """
     recognized_tags_dict = {}
 
     # For each tag declaration
-    for tag_options in tag_options_list:
+    for tag_class in tag_class_list:
+
+        # Sanity checks
+        if type(tag_class) is not type:
+            raise ValueError('{} is an instance, not a class type.'.format(tag_class.__class__.__name__))
+        if not tag_class.canonical_tag_name:
+            raise ValueError('{} does not have a canonical name'.format(tag_class.__name__))
 
         # Register the canonical tag name
-        recognized_tags_dict[tag_options.canonical_tag_name] = tag_options
+        if tag_class.canonical_tag_name in recognized_tags_dict:
+            raise KeyError('Tag name "{}" is already registered'.format(tag_class.canonical_tag_name))
+        recognized_tags_dict[tag_class.canonical_tag_name] = tag_class
 
         # Register all aliases
-        for alias_name in tag_options.alias_tag_names:
-            recognized_tags_dict[alias_name] = tag_options
+        for alias_name in tag_class.alias_tag_names:
+            if alias_name in recognized_tags_dict:
+                raise KeyError('Alias name "{}" is already registered'.format(alias_name))
+            recognized_tags_dict[alias_name] = tag_class
 
     # Return the dict
     return recognized_tags_dict
-
-
-# Old dict declaration style for backward compatibility
-DEFAULT_RECOGNIZED_TAGS = build_recognized_tags_dict(DEFAULT_RECOGNIZED_TAGS_LIST)

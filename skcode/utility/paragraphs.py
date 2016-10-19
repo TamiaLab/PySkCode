@@ -2,20 +2,12 @@
 SkCode auto paragraphs utility code.
 """
 
-from ..tags import TagOptions
-from ..treebuilder import (TEXT_NODE_NAME,
-                           NEWLINE_NODE_NAME)
+from ..etree import TreeNode
+from ..tags import TextTreeNode, NewlineTreeNode
 
 
-# Paragraph node type
-PARAGRAPH_NODE_NAME = '_paragraph'
-
-
-class ParagraphTagOptions(TagOptions):
-    """ Paragraph tag options container class. """
-
-    canonical_tag_name = PARAGRAPH_NODE_NAME
-    alias_tag_names = ()
+class ParagraphTreeNode(TreeNode):
+    """ Paragraph tree node class. """
 
     # HTML class for the paragraph
     html_text_class = 'text-justify'
@@ -23,55 +15,44 @@ class ParagraphTagOptions(TagOptions):
     # HTML template for the rendering
     html_render_template = '<p class="{class_name}">{inner_html}</p>\n'
 
-    def render_html(self, tree_node, inner_html, **kwargs):
+    def render_html(self, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param tree_node: The tree node to be rendered.
         :param inner_html: The inner HTML of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
         return self.html_render_template.format(class_name=self.html_text_class, inner_html=inner_html)
 
-    def render_text(self, tree_node, inner_text, **kwargs):
+    def render_text(self, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: The tree node to be rendered.
         :param inner_text: The inner text of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered text of this node.
         """
         return '%s\n\n' % inner_text.strip()
 
-    def render_skcode(self, tree_node, inner_skcode, **kwargs):
-        """
-        Callback function for rendering SkCode.
-        :param tree_node: The tree node to be rendered.
-        :param inner_skcode: The inner SkCode of this tree node.
-        :param kwargs: Extra keyword arguments for rendering.
-        :return The rendered SkCode of this node.
-        """
-        return '%s\n\n' % inner_skcode.strip()
-
 
 def make_paragraphs(tree_node,
-                    paragraph_node_opts=ParagraphTagOptions()):
+                    paragraph_node_cls=ParagraphTreeNode,
+                    text_node_cls=TextTreeNode,
+                    newline_node_cls=NewlineTreeNode,):
     """
     Group all inline nodes into paragraphs according to each node options.
     :param tree_node: Tree node to be processed.
-    :param paragraph_node_opts: Node options for all created paragraph nodes.
+    :param paragraph_node_cls: Node options for all created paragraph nodes.
+    :param text_node_cls: The tree node class for all normal text nodes.
+    :param newline_node_cls: The tree node class for all newlines.
     """
     assert tree_node, "The tree node instance is mandatory."
-    assert type(paragraph_node_opts).__name__ != 'type', \
-        "The ``paragraph_node_opts`` parameter must be an instance of a class, not the class type itself."
 
     # Process all children first
     for child_node in tree_node.children:
-        make_paragraphs(child_node, paragraph_node_opts)
+        make_paragraphs(child_node, paragraph_node_cls)
 
     # Process only block node with make_paragraphs_here option set
-    if tree_node.opts.inline \
-       or not tree_node.opts.make_paragraphs_here:
+    if tree_node.inline or not tree_node.make_paragraphs_here:
         return
 
     # Group all inline node into paragraphs
@@ -81,12 +62,11 @@ def make_paragraphs(tree_node,
     for child_node in tree_node.children:
 
         # Ignore blank lines
-        if child_node.name == TEXT_NODE_NAME \
-           and not child_node.content.strip():
+        if isinstance(child_node, text_node_cls) and not child_node.content.strip():
             continue
 
         # Handle newlines
-        if child_node.name == NEWLINE_NODE_NAME:
+        if isinstance(child_node, newline_node_cls):
 
             # If two consecutive newline are found
             if prev_was_newline:
@@ -113,14 +93,14 @@ def make_paragraphs(tree_node,
                     new_children.append(child_node)
 
         # Only group inline node
-        elif child_node.opts.inline:
+        elif child_node.inline:
 
             # This is not a newline
             prev_was_newline = False
 
             # Create a new paragraph if necessary
             if cur_paragraph is None:
-                cur_paragraph = tree_node.new_child(PARAGRAPH_NODE_NAME, paragraph_node_opts, append=False)
+                cur_paragraph = tree_node.new_child(None, paragraph_node_cls, append=False)
 
             # Move the node into the paragraph
             child_node.parent = cur_paragraph

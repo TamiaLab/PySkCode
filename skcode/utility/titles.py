@@ -4,33 +4,20 @@ SkCode titles utility code.
 
 from html import escape as escape_html
 
-from .walketree import walk_tree_for_cls
-from ..tags.titles import TitleTagOptions
+from ..tags.titles import TitleBaseTreeNode
 from ..tools import slugify
 
 
 def extract_titles(document_tree,
-                   title_ops_cls=TitleTagOptions):
+                   title_node_cls=TitleBaseTreeNode):
     """
     Extract all titles present in the given document tree.
     :param document_tree: The document tree to be analyzed.
-    :param title_ops_cls: The options class used for title declarations.
+    :param title_node_cls: The options class used for title declarations.
     :return: A list of all titles node instances in the document.
     """
     assert document_tree, "Document tree is mandatory."
-    # TODO Replace *_cls with the new categories based system
-
-    # List of titles found
-    titles = []
-
-    # For each title declaration
-    for tree_node in walk_tree_for_cls(document_tree, title_ops_cls):
-
-        # Store the title entry
-        titles.append(tree_node)
-
-    # Return the list
-    return titles
+    return list([tree_node for tree_node in document_tree.search_in_tree(title_node_cls)])
 
 
 def make_titles_hierarchy(titles, level=1):
@@ -101,7 +88,7 @@ def make_titles_hierarchy(titles, level=1):
     for title in titles:
 
         # Get the title level
-        title_level = title.opts.title_level
+        title_level = title.title_level
 
         # If level match current target level
         if title_level == level:
@@ -136,19 +123,19 @@ def make_titles_hierarchy(titles, level=1):
 
 
 def make_auto_title_ids(document_tree,
-                        title_ops_cls=TitleTagOptions):
+                        title_node_cls=TitleBaseTreeNode):
     """
     Assign an auto-generated ID to any titles without one.
     :param document_tree: The document tree to be analyzed.
-    :param title_ops_cls: The options class used for title declarations.
+    :param title_node_cls: The options class used for title declarations.
     """
     assert document_tree, "Document tree is mandatory."
 
     # For each title declaration
-    for tree_node in walk_tree_for_cls(document_tree, title_ops_cls):
+    for tree_node in document_tree.search_in_tree(title_node_cls):
 
         # Get the current title ID
-        title_id = tree_node.opts.get_permalink_slug(tree_node)
+        title_id = tree_node.get_permalink_slug()
 
         # Auto generate an ID if required
         if not title_id:
@@ -157,7 +144,7 @@ def make_auto_title_ids(document_tree,
             title_id = slugify(tree_node.get_raw_content())
 
             # Save the ID
-            tree_node.attrs[tree_node.opts.slug_id_attr_name] = title_id
+            tree_node.attrs[tree_node.slug_id_attr_name] = title_id
 
 
 def _recursive_render_titles_html(title_groups, output, li_class_name, a_class_name, ul_class_name):
@@ -177,7 +164,7 @@ def _recursive_render_titles_html(title_groups, output, li_class_name, a_class_n
     for title, subtitles in title_groups:
 
         # Get the title ID
-        title_id = title.opts.get_permalink_slug(title)
+        title_id = title.opts.get_permalink_slug()
 
         # Output the HTML list element for this title
         output.append('<li{}>'.format(li_class))

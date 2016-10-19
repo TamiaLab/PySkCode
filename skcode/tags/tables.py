@@ -2,11 +2,11 @@
 SkCode tables tag definitions code.
 """
 
-from .base import TagOptions
+from ..etree import TreeNode
 
 
-class TableTagOptions(TagOptions):
-    """ Table tag options container class. """
+class TableTreeNode(TreeNode):
+    """ Table tree node class. """
 
     canonical_tag_name = 'table'
     alias_tag_names = ()
@@ -17,20 +17,18 @@ class TableTagOptions(TagOptions):
     # CSS class name for the table
     css_class_name = 'table table-condensed table-striped'
 
-    def render_html(self, tree_node, inner_html, **kwargs):
+    def render_html(self, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param tree_node: The tree node to be rendered.
         :param inner_html: The inner HTML of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
         return self.html_render_template.format(class_name=self.css_class_name, inner_html=inner_html)
 
-    def render_text(self, tree_node, inner_text, **kwargs):
+    def render_text(self, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: The tree node to be rendered.
         :param inner_text: The inner text of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered text of this node.
@@ -39,8 +37,8 @@ class TableTagOptions(TagOptions):
         return inner_text
 
 
-class TableRowTagOptions(TagOptions):
-    """ Table row tag options container class. """
+class TableRowTreeNode(TreeNode):
+    """ Table row tree node class. """
 
     canonical_tag_name = 'tr'
     alias_tag_names = ()
@@ -48,20 +46,18 @@ class TableRowTagOptions(TagOptions):
     # HTML template for rendering
     html_render_template = '<tr>{inner_html}</tr>\n'
 
-    def render_html(self, tree_node, inner_html, **kwargs):
+    def render_html(self, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param tree_node: The tree node to be rendered.
         :param inner_html: The inner HTML of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
         return self.html_render_template.format(inner_html=inner_html)
 
-    def render_text(self, tree_node, inner_text, **kwargs):
+    def render_text(self, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: The tree node to be rendered.
         :param inner_text: The inner text of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered text of this node.
@@ -70,8 +66,8 @@ class TableRowTagOptions(TagOptions):
         return inner_text
 
 
-class TableCellTagOptions(TagOptions):
-    """ Table tag options container class. """
+class TableCellTreeNode(TreeNode):
+    """ Table tree node class. """
 
     canonical_tag_name = 'td'
     alias_tag_names = ()
@@ -87,15 +83,14 @@ class TableCellTagOptions(TagOptions):
     # Row span attribute name
     rowspan_attr_name = 'rowspan'
 
-    def get_cell_colspan(self, tree_node):
+    def get_cell_colspan(self):
         """
         Return the column span value of this cell.
-        :param tree_node: The current tree node instance.
         :return The column span value of this cell, or 1.
         """
 
         # Get the raw string value
-        user_colspan = tree_node.attrs.get(self.colspan_attr_name, '')
+        user_colspan = self.attrs.get(self.colspan_attr_name, '')
 
         # Shortcut if no value
         if not user_colspan:
@@ -108,15 +103,14 @@ class TableCellTagOptions(TagOptions):
         except ValueError:
             return 1
 
-    def get_cell_rowspan(self, tree_node):
+    def get_cell_rowspan(self):
         """
         Return the row span value of this cell.
-        :param tree_node: The current tree node instance.
         :return The row span value of this cell, or 1.
         """
 
         # Get the raw string value
-        user_rowspan = tree_node.attrs.get(self.rowspan_attr_name, '')
+        user_rowspan = self.attrs.get(self.rowspan_attr_name, '')
 
         # Shortcut if no value
         if not user_rowspan:
@@ -129,40 +123,37 @@ class TableCellTagOptions(TagOptions):
         except ValueError:
             return 1
 
-    def get_html_extra_attrs(self, tree_node):
+    def get_html_extra_attrs(self):
         """
         Return any extra attributes for the HTML rendering.
-        :param tree_node: The current tree node instance.
         :return Any extra attributes for the HTML rendering.
         """
 
         # Get the column span
-        colspan = self.get_cell_colspan(tree_node)
+        colspan = self.get_cell_colspan()
         extra_attrs = ' colspan="%d"' % colspan if colspan != 1 else ''
 
         # Get the row span
-        rowspan = self.get_cell_rowspan(tree_node)
+        rowspan = self.get_cell_rowspan()
         if rowspan != 1:
             extra_attrs += ' rowspan="%d"' % rowspan
 
         # Return the string
         return extra_attrs
 
-    def render_html(self, tree_node, inner_html, **kwargs):
+    def render_html(self, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param tree_node: The tree node to be rendered.
         :param inner_html: The inner HTML of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-        extra_attrs = self.get_html_extra_attrs(tree_node)
+        extra_attrs = self.get_html_extra_attrs()
         return self.html_render_template.format(extra_args=extra_attrs, inner_html=inner_html)
 
-    def render_text(self, tree_node, inner_text, **kwargs):
+    def render_text(self, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: The tree node to be rendered.
         :param inner_text: The inner text of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered text of this node.
@@ -170,26 +161,9 @@ class TableCellTagOptions(TagOptions):
         # TODO But how?
         return inner_text
 
-    def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
-        """
-        Getter function for retrieving all attributes of this node required for rendering SkCode.
-        :param tree_node: The tree node to be rendered.
-        :param inner_skcode: The inner SkCode of this tree node.
-        :param kwargs: Extra keyword arguments for rendering.
-        :return A dictionary of all attributes required for rendering SkCode and the tag value
-        attribute name for the shortcut syntax (if required).
-        """
-        # Get the column and row span
-        colspan = self.get_cell_colspan(tree_node)
-        rowspan = self.get_cell_rowspan(tree_node)
-        return {
-                   self.colspan_attr_name: str(colspan) if colspan != 1 else '',
-                   self.rowspan_attr_name: str(rowspan) if rowspan != 1 else ''
-               }, None
 
-
-class TableHeaderCellTagOptions(TableCellTagOptions):
-    """ Table tag options container class. """
+class TableHeaderCellTreeNode(TableCellTreeNode):
+    """ Table tree node class. """
 
     canonical_tag_name = 'th'
     alias_tag_names = ()

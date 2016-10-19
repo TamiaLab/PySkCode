@@ -3,10 +3,20 @@ SkCode rendering code.
 """
 
 
-def render_inner_html(tree_node, **kwargs):
+# Default HTML for error messages
+DEFAULT_ERROR_HTML_TEMPLATE = '<span style="font-weight: bold; color: red;" ' \
+                              'title="{error_message}">{source}</span>'
+
+
+def render_inner_html(tree_node,
+                      force_rel_nofollow=True,
+                      html_error_template=DEFAULT_ERROR_HTML_TEMPLATE, **kwargs):
     """
     Render all children of the given tree node as HTML.
     :param tree_node: The parent tree node with children to be rendered.
+    :param force_rel_nofollow: If set to ``True``, all links in the rendered HTML will have the attribute
+        "rel=nofollow" to avoid search engines to scrawl them (default ``True``).
+    :param html_error_template: HTML template for displaying error messages.
     :param kwargs: Extra keywords arguments for the ``render_html`` callback method.
     :return The rendered children tree as HTML.
     """
@@ -14,25 +24,41 @@ def render_inner_html(tree_node, **kwargs):
     # Get the inner HTML
     inner_html = []
     for child_node in tree_node.children:
-        inner_html.append(render_to_html(child_node, **kwargs))
+        inner_html.append(render_to_html(child_node,
+                                         force_rel_nofollow=force_rel_nofollow,
+                                         html_error_template=html_error_template, **kwargs))
 
     # Return the inner HTML as string
     return ''.join(inner_html)
 
 
-def render_to_html(tree_node, **kwargs):
+def render_to_html(tree_node,
+                   force_rel_nofollow=True,
+                   html_error_template=DEFAULT_ERROR_HTML_TEMPLATE, **kwargs):
     """
     Render the given tree node and children recursively as HTML.
     :param tree_node: The tree node to be rendered.
+    :param force_rel_nofollow: If set to ``True``, all links in the rendered HTML will have the attribute
+        "rel=nofollow" to avoid search engines to scrawl them (default ``True``).
+    :param html_error_template: HTML template for displaying error messages.
     :param kwargs: Extra keywords arguments for the ``render_html`` callback method.
     :return The rendered document tree as HTML.
     """
 
     # Get the inner HTML
-    inner_html = render_inner_html(tree_node, **kwargs)
+    inner_html = render_inner_html(tree_node,
+                                   force_rel_nofollow=force_rel_nofollow,
+                                   html_error_template=html_error_template, **kwargs)
 
     # Render the node
-    return tree_node.opts.render_html(tree_node, inner_html, **kwargs)
+    if tree_node.error_message:
+        return tree_node.render_error_html(inner_html,
+                                           force_rel_nofollow=force_rel_nofollow,
+                                           html_error_template=html_error_template, **kwargs)
+    else:
+        return tree_node.render_html(inner_html,
+                                     force_rel_nofollow=force_rel_nofollow,
+                                     html_error_template=html_error_template, **kwargs)
 
 
 def render_inner_text(tree_node, **kwargs):
@@ -64,36 +90,4 @@ def render_to_text(tree_node, **kwargs):
     inner_text = render_inner_text(tree_node, **kwargs)
 
     # Render the node
-    return tree_node.opts.render_text(tree_node, inner_text, **kwargs)
-
-
-def render_inner_skcode(tree_node, **kwargs):
-    """
-    Render all children the given tree node as SkCode.
-    :param tree_node: The parent tree node with children to be rendered.
-    :param kwargs: Extra keywords arguments for the ``render_skcode`` callback method.
-    :return The rendered children tree as SkCode.
-    """
-
-    # Get the inner SkCode
-    inner_skcode = []
-    for child_node in tree_node.children:
-        inner_skcode.append(render_to_skcode(child_node, **kwargs))
-
-    # Return the inner SkCode as string
-    return ''.join(inner_skcode)
-
-
-def render_to_skcode(tree_node, **kwargs):
-    """
-    Render the given tree node and children recursively as SkCode.
-    :param tree_node: The document tree node to be rendered.
-    :param kwargs: Extra keywords arguments for the ``render_skcode`` callback method.
-    :return The rendered document tree as SkCode.
-    """
-
-    # Get inner SkCode
-    inner_skcode = render_inner_skcode(tree_node, **kwargs)
-
-    # Render the node
-    return tree_node.opts.render_skcode(tree_node, inner_skcode, **kwargs)
+    return tree_node.render_text(inner_text, **kwargs)

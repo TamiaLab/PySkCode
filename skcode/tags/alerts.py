@@ -5,7 +5,7 @@ SkCode alert box tag definitions code.
 from html import escape as escape_html
 from html import unescape as unescape_html_entities
 
-from .base import TagOptions
+from ..etree import TreeNode
 
 
 # Alert types
@@ -18,8 +18,8 @@ ALERT_TYPE_NOTE = 'note'
 ALERT_TYPE_QUESTION = 'question'
 
 
-class AlertBoxTagOptions(TagOptions):
-    """ Alert box tag options container class. """
+class AlertBoxTreeNode(TreeNode):
+    """ Alert box tree node class. """
 
     make_paragraphs_here = True
 
@@ -231,29 +231,27 @@ class AlertBoxTagOptions(TagOptions):
     # Alert title attribute name
     alert_title_attr_name = 'title'
 
-    def get_alert_type(self, tree_node):
+    def get_alert_type(self):
         """
         Return the type of this alert.
         The type can be set by setting the ``alert_type_attr_name`` attribute of the tag.
-        :param tree_node: The current tree node instance.
         :return The alert type if set, or the default type.
         """
-        user_alert_type = tree_node.attrs.get(self.alert_type_attr_name, self.default_type)
+        user_alert_type = self.attrs.get(self.alert_type_attr_name, self.default_type)
         user_alert_type = user_alert_type.lower()
         return user_alert_type if user_alert_type in self.accepted_types else self.default_type
 
-    def get_alert_title(self, tree_node):
+    def get_alert_title(self):
         """
         Return the title of this alert.
         The title can be set by setting the ``alert_title_attr_name`` attribute of the tag or simply
         by setting the tag name attribute.
         The lookup order is: tag name (first), ``alert_title_attr_name``.
-        :param tree_node: The current tree node instance.
         :return The alert title if set or an empty string.
         """
-        alert_title = tree_node.attrs.get(tree_node.name, '')
+        alert_title = self.attrs.get(self.name, '')
         if not alert_title:
-            alert_title = tree_node.attrs.get(self.alert_title_attr_name, '')
+            alert_title = self.attrs.get(self.alert_title_attr_name, '')
         return unescape_html_entities(alert_title)
 
     def get_alert_html_template(self, alert_type, alert_title):
@@ -276,18 +274,17 @@ class AlertBoxTagOptions(TagOptions):
         """
         return self.text_title_line_template[alert_type]
 
-    def render_html(self, tree_node, inner_html, **kwargs):
+    def render_html(self, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param tree_node: The tree node to be rendered.
         :param inner_html: The inner HTML of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
 
         # Get the alert variables
-        alert_type = self.get_alert_type(tree_node)
-        alert_title = self.get_alert_title(tree_node)
+        alert_type = self.get_alert_type()
+        alert_title = self.get_alert_title()
         alert_html_template = self.get_alert_html_template(alert_type, alert_title)
 
         # Render the alert
@@ -295,18 +292,17 @@ class AlertBoxTagOptions(TagOptions):
                                           title=escape_html(alert_title),
                                           inner_html=inner_html.strip())
 
-    def render_text(self, tree_node, inner_text, **kwargs):
+    def render_text(self, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: The tree node to be rendered.
         :param inner_text: The inner text of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered text of this node.
         """
 
         # Get the alert variables
-        alert_type = self.get_alert_type(tree_node)
-        alert_title = self.get_alert_title(tree_node)
+        alert_type = self.get_alert_type()
+        alert_title = self.get_alert_title()
         alert_text_title_line_template = self.get_alert_text_title_line_template(alert_type)
 
         # Render the alert title line
@@ -319,63 +315,34 @@ class AlertBoxTagOptions(TagOptions):
         lines.append('')
         return '\n'.join(lines)
 
-    def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
-        """
-        Getter function for retrieving all attributes of this node required for rendering SkCode.
-        :param tree_node: The tree node to be rendered.
-        :param inner_skcode: The inner SkCode of this tree node.
-        :param kwargs: Extra keyword arguments for rendering.
-        :return A dictionary of all attributes required for rendering SkCode and the tag value
-        attribute name for the shortcut syntax (if required).
-        """
 
-        # Get the alert type and title
-        alert_type = self.get_alert_type(tree_node)
-        alert_title = self.get_alert_title(tree_node)
-        return {
-                   self.alert_type_attr_name: alert_type,
-                   self.alert_title_attr_name: alert_title
-               }, self.alert_title_attr_name
+def generate_fixed_alert_type_cls(alert_type,
+                                  canonical_tag_name=None,
+                                  alias_tag_names=None):
+    """
+    Generate a fixed alert type class at runtime.
+    :param alert_type: The desired fixed alert type.
+    :param canonical_tag_name: The canonical name of the tag.
+    :param alias_tag_names: The name alias of the tag
+    :return: The generated class type.
+    """
+    assert alert_type, "Alert type is mandatory."
+    _canonical_tag_name = canonical_tag_name or alert_type
+    _alias_tag_names = alias_tag_names or ()
+    _alert_type = alert_type
 
+    class FixedTypeAlertBoxTreeNode(AlertBoxTreeNode):
+        """ Fixed type alert box tree node class. """
 
-class FixedAlertBoxTagOptions(AlertBoxTagOptions):
-    """ Fixed type alert box tag options container class. """
+        canonical_tag_name = _canonical_tag_name
+        alias_tag_names = _alias_tag_names
+        alert_type = _alert_type
 
-    canonical_tag_name = None
-    alias_tag_names = ()
+        def get_alert_type(self):
+            """
+            Return the type of this alert.
+            :return The alert type, as set at ``self.alert_type``.
+            """
+            return self.alert_type
 
-    def __init__(self, alert_type, canonical_tag_name=None, **kwargs):
-        """
-        Alert box tag with fixed type.
-        :param alert_type: The fixed alert type.
-        :param canonical_tag_name: The canonical name of this tag, default to the alert type string.
-        :param kwargs: Keyword arguments for super constructor.
-        """
-        assert alert_type, "Alert type is mandatory."
-        self.canonical_tag_name = canonical_tag_name or alert_type
-        super(FixedAlertBoxTagOptions, self).__init__(**kwargs)
-        self.alert_type = alert_type
-
-    def get_alert_type(self, tree_node):
-        """
-        Return the type of this alert.
-        :param tree_node: The current tree node instance.
-        :return The alert type, as set at ``__init__``.
-        """
-        return self.alert_type
-
-    def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
-        """
-        Callback function for retrieving all attributes required for rendering SkCode.
-        :param tree_node: Current tree node to be rendered.
-        :param inner_skcode: Inner SkCode of this tree node.
-        :param kwargs: Extra keyword arguments for rendering.
-        :return A dictionary of all attributes required for rendering SkCode and the tag value
-        attribute name for the shortcut syntax (if required).
-        """
-
-        # Get the alert title
-        alert_title = self.get_alert_title(tree_node)
-        return {
-                   self.alert_title_attr_name: alert_title
-               }, self.alert_title_attr_name
+    return FixedTypeAlertBoxTreeNode

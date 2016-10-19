@@ -5,92 +5,114 @@ SkCode text formatting tag definitions code.
 from html import escape as escape_html
 from html import unescape as unescape_html_entities
 
-from .base import (InlineWrappingTagOptions,
-                   TagOptions)
+from ..etree import TreeNode
 
 
-class BoldTextTagOptions(InlineWrappingTagOptions):
-    """ Bold text tag options container class. """
+class InlineWrappingTreeNode(TreeNode):
+    """
+    Wrapping inline tree node class.
+    Subclass of ``TreeNode`` which wrap the HTML output of children nodes with a format string.
+    """
+
+    inline = True
+    close_inlines = False
+
+    # The wrapping format
+    wrapping_format = None
+
+    def render_html(self, inner_html, **kwargs):
+        """
+        Callback function for rendering HTML.
+        :param inner_html: The inner HTML of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
+        """
+        return self.wrapping_format.format(inner_html)
+
+    def render_text(self, inner_text, **kwargs):
+        """
+        Callback function for rendering text.
+        :param inner_text: The inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered text of this node.
+        """
+        return inner_text
+
+
+class BoldTextTreeNode(InlineWrappingTreeNode):
+    """ Bold text tree node class. """
 
     canonical_tag_name = 'b'
     alias_tag_names = ('bold', 'strong')
 
-    def __init__(self, **kwargs):
-        super(BoldTextTagOptions, self).__init__('<strong>%s</strong>', **kwargs)
+    wrapping_format = '<strong>{}</strong>'
 
 
-class ItalicTextTagOptions(InlineWrappingTagOptions):
-    """ Italic text tag options container class. """
+class ItalicTextTreeNode(InlineWrappingTreeNode):
+    """ Italic text tree node class. """
 
     canonical_tag_name = 'i'
     alias_tag_names = ('italic', 'em')
 
-    def __init__(self, **kwargs):
-        super(ItalicTextTagOptions, self).__init__('<em>%s</em>', **kwargs)
+    wrapping_format = '<em>{}</em>'
 
 
-class StrikeTextTagOptions(InlineWrappingTagOptions):
-    """ Strike text tag options container class. """
+class StrikeTextTreeNode(InlineWrappingTreeNode):
+    """ Strike text tree node class. """
 
     canonical_tag_name = 's'
     alias_tag_names = ('strike', 'del')
 
-    def __init__(self, **kwargs):
-        super(StrikeTextTagOptions, self).__init__('<del>%s</del>', **kwargs)
+    wrapping_format = '<del>{}</del>'
 
 
-class UnderlineTextTagOptions(InlineWrappingTagOptions):
-    """ Underline text tag options container class. """
+class UnderlineTextTreeNode(InlineWrappingTreeNode):
+    """ Underline text tree node class. """
 
     canonical_tag_name = 'u'
     alias_tag_names = ('underline', 'ins')
 
-    def __init__(self, **kwargs):
-        super(UnderlineTextTagOptions, self).__init__('<ins>%s</ins>', **kwargs)
+    wrapping_format = '<ins>{}</ins>'
 
 
-class SubscriptTextTagOptions(InlineWrappingTagOptions):
-    """ Subscript text tag options container class. """
+class SubscriptTextTreeNode(InlineWrappingTreeNode):
+    """ Subscript text tree node class. """
 
     canonical_tag_name = 'sub'
     alias_tag_names = ()
 
-    def __init__(self, **kwargs):
-        super(SubscriptTextTagOptions, self).__init__('<sub>%s</sub>', **kwargs)
+    wrapping_format = '<sub>{}</sub>'
 
 
-class SupscriptTextTagOptions(InlineWrappingTagOptions):
-    """ Supscript text tag options container class. """
+class SupscriptTextTreeNode(InlineWrappingTreeNode):
+    """ Supscript text tree node class. """
 
     canonical_tag_name = 'sup'
     alias_tag_names = ()
 
-    def __init__(self, **kwargs):
-        super(SupscriptTextTagOptions, self).__init__('<sup>%s</sup>', **kwargs)
+    wrapping_format = '<sup>{}</sup>'
 
 
-class PreTextTagOptions(InlineWrappingTagOptions):
-    """ Pre text tag options container class. """
+class PreTextTreeNode(InlineWrappingTreeNode):
+    """ Pre text tree node class. """
 
     canonical_tag_name = 'pre'
     alias_tag_names = ()
 
-    def __init__(self, **kwargs):
-        super(PreTextTagOptions, self).__init__('<pre>%s</pre>', **kwargs)
+    wrapping_format = '<pre>{}</pre>'
 
 
-class CiteTextTagOptions(InlineWrappingTagOptions):
-    """ Cite text tag options container class. """
+class CiteTextTreeNode(InlineWrappingTreeNode):
+    """ Cite text tree node class. """
 
     canonical_tag_name = 'cite'
     alias_tag_names = ()
 
-    def __init__(self, **kwargs):
-        super(CiteTextTagOptions, self).__init__('<cite>%s</cite>', **kwargs)
+    wrapping_format = '<cite>{}</cite>'
 
 
-class InlineCodeTextTagOptions(TagOptions):
-    """ Inline code text tag options container class. """
+class InlineCodeTextTreeNode(TreeNode):
+    """ Inline code text tree node class. """
 
     parse_embedded = False
     inline = True
@@ -102,87 +124,61 @@ class InlineCodeTextTagOptions(TagOptions):
     # HTML template for rendering
     html_render_template = '<code>{content}</code>'
 
-    def render_html(self, tree_node, inner_html, **kwargs):
+    def render_html(self, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param tree_node: The tree node to be rendered.
         :param inner_html: The inner HTML of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-        content = tree_node.content
+        content = self.content
         content = unescape_html_entities(content)
         content = escape_html(content)
         return self.html_render_template.format(content=content)
 
-    def render_text(self, tree_node, inner_text, **kwargs):
+    def render_text(self, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: The tree node to be rendered.
         :param inner_text: The inner text of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered text of this node.
         """
-        content = tree_node.content
-        content = unescape_html_entities(content)
-        return content
-
-    def get_skcode_inner_content(self, tree_node, inner_skcode, **kwargs):
-        """
-        Getter function for retrieving the inner content of this node for rendering SkCode.
-        :param tree_node: The tree node to be rendered.
-        :param inner_skcode: The inner SkCode of this tree node.
-        :param kwargs: Extra keyword arguments for rendering.
-        :return The inner content for SkCode rendering.
-        """
-        content = tree_node.content
+        content = self.content
         content = unescape_html_entities(content)
         return content
 
 
-class InlineSpoilerTextTagOptions(InlineWrappingTagOptions):
-    """ Inline spoiler text tag options container class. """
+class InlineSpoilerTextTreeNode(InlineWrappingTreeNode):
+    """ Inline spoiler text tree node class. """
 
     canonical_tag_name = 'ispoiler'
     alias_tag_names = ()
 
-    # CSS class name for the ``span`` element
-    css_class_name = 'ispoiler'
-
-    # HTML template for rendering
-    html_render_template = '<span class="{class_name}">%s</span>'
-
-    def __init__(self, **kwargs):
-        css_class_name = kwargs.get('css_class_name', self.css_class_name)
-        super(InlineSpoilerTextTagOptions, self).__init__(self.html_render_template.format(class_name=css_class_name),
-                                                          **kwargs)
+    wrapping_format = '<span class="ispoiler">{}</span>'
 
 
-class KeyboardTextTagOptions(InlineWrappingTagOptions):
-    """ Keyboard text tag options container class. """
+class KeyboardTextTreeNode(InlineWrappingTreeNode):
+    """ Keyboard text tree node class. """
 
     canonical_tag_name = 'kbd'
     alias_tag_names = ('keyboard', )
 
-    def __init__(self, **kwargs):
-        super(KeyboardTextTagOptions, self).__init__('<kbd>%s</kbd>', **kwargs)
+    wrapping_format = '<kbd>{}</kbd>'
 
 
-class HighlightTextTagOptions(InlineWrappingTagOptions):
-    """ Highlight text tag options container class. """
+class HighlightTextTreeNode(InlineWrappingTreeNode):
+    """ Highlight text tree node class. """
 
     canonical_tag_name = 'mark'
     alias_tag_names = ('glow', 'highlight')
 
-    def __init__(self, **kwargs):
-        super(HighlightTextTagOptions, self).__init__('<mark>%s</mark>', **kwargs)
+    wrapping_format = '<mark>{}</mark>'
 
 
-class SmallTextTagOptions(InlineWrappingTagOptions):
-    """ Small text tag options container class. """
+class SmallTextTreeNode(InlineWrappingTreeNode):
+    """ Small text tree node class. """
 
     canonical_tag_name = 'small'
     alias_tag_names = ()
 
-    def __init__(self, **kwargs):
-        super(SmallTextTagOptions, self).__init__('<small>%s</small>', **kwargs)
+    wrapping_format = '<small>{}</small>'

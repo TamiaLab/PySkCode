@@ -2,11 +2,11 @@
 SkCode spoiler tag definitions code.
 """
 
-from .base import TagOptions
+from ..etree import TreeNode
 
 
-class SpoilerTagOptions(TagOptions):
-    """ Spoiler tag options container class. """
+class SpoilerTreeNode(TreeNode):
+    """ Spoiler tree node class. """
 
     canonical_tag_name = 'spoiler'
     alias_tag_names = ('hide', )
@@ -19,20 +19,18 @@ class SpoilerTagOptions(TagOptions):
     # HTML template for rendering
     html_render_template = '<div class="{class_name}">{inner_html}</div>\n'
 
-    def render_html(self, tree_node, inner_html, **kwargs):
+    def render_html(self, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param tree_node: The tree node to be rendered.
         :param inner_html: The inner HTML of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
         return self.html_render_template.format(class_name=self.css_class_name, inner_html=inner_html)
 
-    def render_text(self, tree_node, inner_text, **kwargs):
+    def render_text(self, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: The tree node to be rendered.
         :param inner_text: The inner text of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered text of this node.

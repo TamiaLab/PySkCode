@@ -2,34 +2,20 @@
 SkCode footnotes utility code.
 """
 
-from .walketree import walk_tree_for_cls
-from ..tags.footnotes import FootnoteDeclarationTagOptions
-from ..render import (render_inner_html,
-                      render_inner_text)
+from ..tags.footnotes import FootnoteDeclarationTreeNode
+from ..render import render_inner_html, render_inner_text
 
 
 def extract_footnotes(document_tree,
-                      footnote_declaration_ops_cls=FootnoteDeclarationTagOptions):
+                      footnote_declaration_node_cls=FootnoteDeclarationTreeNode):
     """
     Extract all footnotes declaration present in the given document tree.
     :param document_tree: The document tree to be analyzed.
-    :param footnote_declaration_ops_cls: The options class used for footnote declarations.
+    :param footnote_declaration_node_cls: The options class used for footnote declarations.
     :return: A list of all footnote node instances in the document.
     """
     assert document_tree, "Document tree is mandatory."
-    # TODO Replace *_cls with the new categories based system
-
-    # List of footnotes found
-    footnotes = []
-
-    # For each footnote declaration
-    for tree_node in walk_tree_for_cls(document_tree, footnote_declaration_ops_cls):
-
-        # Store the footnote
-        footnotes.append(tree_node)
-
-    # Return the list
-    return footnotes
+    return list([tree_node for tree_node in document_tree.search_in_tree(footnote_declaration_node_cls)])
 
 
 def render_footnotes_html(footnotes,
@@ -56,12 +42,12 @@ def render_footnotes_html(footnotes,
     for footnote_node in footnotes:
 
         # Get the footnote ID
-        footnote_id = footnote_node.opts.get_footnote_id(footnote_node, footnote_node.root_tree_node)
+        footnote_id = footnote_node.get_footnote_id(footnote_node, footnote_node.root_tree_node)
 
         # Craft the footnote declaration HTML
         footnote_declaration_html = '<a id="{refid}" href="#{backrefid}"><sup>[{fnid}]</sup></a>'.format(
-            refid=footnote_node.opts.get_footnote_ref_id(footnote_id),
-            backrefid=footnote_node.opts.get_footnote_backref_id(footnote_id),
+            refid=footnote_node.get_footnote_ref_id(footnote_id),
+            backrefid=footnote_node.get_footnote_backref_id(footnote_id),
             fnid=footnote_id)
 
         # Render the footnote
@@ -98,7 +84,7 @@ def render_footnotes_text(footnotes):
     for footnote_node in footnotes:
 
         # Get the footnote ID
-        footnote_id = footnote_node.opts.get_footnote_id(footnote_node, footnote_node.root_tree_node)
+        footnote_id = footnote_node.get_footnote_id(footnote_node, footnote_node.root_tree_node)
 
         # Render the footnote
         footnote_text = render_inner_text(footnote_node)

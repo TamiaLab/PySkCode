@@ -2,7 +2,7 @@
 SkCode text direction tag definitions code.
 """
 
-from .base import TagOptions
+from ..etree import TreeNode
 
 
 # Text directions
@@ -10,8 +10,8 @@ TEXT_DIR_LEFT_TO_RIGHT = 1
 TEXT_DIR_RIGHT_TO_LEFT = 2
 
 
-class DirectionTextTagOptions(TagOptions):
-    """ Custom direction text tag options container class. """
+class DirectionTextTreeNode(TreeNode):
+    """ Custom direction text tree node class. """
 
     inline = True
     close_inlines = False
@@ -46,20 +46,20 @@ class DirectionTextTagOptions(TagOptions):
     # HTML template for rendering
     html_render_template = '<bdo dir="{text_direction}">{inner_html}</bdo>'
 
-    def get_text_direction(self, tree_node):
+    def get_text_direction(self):
         """
         Get the text direction.
         The text direction can be set by setting the ``text_direction_attr_name`` attribute of the tag or simply
         by setting the tag name attribute.
         The lookup order is: tag name (first), ``text_direction_attr_name``.
-        :param tree_node: The current tree node instance.
+
         :return The text direction of this block of text, or the default one.
         """
 
         # Get the user input
-        user_text_direction = tree_node.attrs.get(tree_node.name, '')
+        user_text_direction = self.attrs.get(self.name, '')
         if not user_text_direction:
-            user_text_direction = tree_node.attrs.get(self.text_direction_attr_name, '')
+            user_text_direction = self.attrs.get(self.text_direction_attr_name, '')
 
         # Remap the supplied value
         user_text_direction = user_text_direction.lower()
@@ -68,81 +68,52 @@ class DirectionTextTagOptions(TagOptions):
         else:
             return self.default_text_direction
 
-    def render_html(self, tree_node, inner_html, **kwargs):
+    def render_html(self, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param tree_node: The tree node to be rendered.
         :param inner_html: The inner HTML of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-        text_direction = self.get_text_direction(tree_node)
+        text_direction = self.get_text_direction()
         return self.html_render_template.format(text_direction=self.bdo_html_attr_value_map[text_direction],
                                                 inner_html=inner_html)
 
-    def render_text(self, tree_node, inner_text, **kwargs):
+    def render_text(self, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: The tree node to be rendered.
         :param inner_text: The inner text of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered text of this node.
         """
-        text_direction = self.get_text_direction(tree_node)
+        text_direction = self.get_text_direction()
         if text_direction == TEXT_DIR_RIGHT_TO_LEFT:
             return inner_text[::-1]
         else:
             return inner_text
 
-    def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
-        """
-        Getter function for retrieving all attributes of this node required for rendering SkCode.
-        :param tree_node: The tree node to be rendered.
-        :param inner_skcode: The inner SkCode of this tree node.
-        :param kwargs: Extra keyword arguments for rendering.
-        :return A dictionary of all attributes required for rendering SkCode and the tag value
-        attribute name for the shortcut syntax (if required).
-        """
-        text_direction = self.get_text_direction(tree_node)
-        text_direction = self.reverse_text_direction_map[text_direction]
-        return {
-                   self.text_direction_attr_name: text_direction
-               }, self.text_direction_attr_name
 
+class LTRFixedDirectionTextTreeNode(DirectionTextTreeNode):
+    """ Left-to-right fixed direction text tree node class. """
 
-class FixedDirectionTextTagOptions(DirectionTextTagOptions):
-    """ Fixed direction text tag options container class. """
-
-    canonical_tag_name = None
+    canonical_tag_name = 'ltr'
     alias_tag_names = ()
 
-    def __init__(self, text_direction, canonical_tag_name=None, **kwargs):
-        """
-        Fixed direction text modifier tag constructor.
-        :param text_direction: Text direction to use.
-        :param canonical_tag_name: The canonical name of this tag, default to the text direction string.
-        :param kwargs: Keyword arguments for super constructor.
-        """
-        assert text_direction, "The text direction is mandatory."
-        self.canonical_tag_name = canonical_tag_name or self.reverse_text_direction_map[text_direction]
-        super(FixedDirectionTextTagOptions, self).__init__(**kwargs)
-        self.text_direction = text_direction
+    # Text direction
+    text_direction= TEXT_DIR_LEFT_TO_RIGHT
 
-    def get_text_direction(self, tree_node):
+    def get_text_direction(self):
         """
         Get the text direction.
-        :param tree_node: The current tree node instance.
         :return The text direction as set in ``__init__``.
         """
         return self.text_direction
 
-    def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
-        """
-        Getter function for retrieving all attributes of this node required for rendering SkCode.
-        :param tree_node: The tree node to be rendered.
-        :param inner_skcode: The inner SkCode of this tree node.
-        :param kwargs: Extra keyword arguments for rendering.
-        :return A dictionary of all attributes required for rendering SkCode and the tag value
-        attribute name for the shortcut syntax (if required).
-        """
-        return {}, None
+
+class RTLFixedDirectionTextTreeNode(LTRFixedDirectionTextTreeNode):
+    """ Right-to-left fixed direction text tree node class. """
+
+    canonical_tag_name = 'rtl'
+    alias_tag_names = ()
+
+    text_direction = TEXT_DIR_RIGHT_TO_LEFT

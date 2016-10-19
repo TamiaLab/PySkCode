@@ -2,31 +2,29 @@
 SkCode web special tag definitions code.
 """
 
-from .base import TagOptions
+from ..etree import TreeNode
 
 
-class HorizontalLineTagOptions(TagOptions):
-    """ Horizontal line tag options container class. """
+class HorizontalLineTreeNode(TreeNode):
+    """ Horizontal line tree node class. """
 
     standalone = True
 
     canonical_tag_name = 'hr'
     alias_tag_names = ()
 
-    def render_html(self, tree_node, inner_html, **kwargs):
+    def render_html(self, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param tree_node: The tree node to be rendered.
         :param inner_html: The inner HTML of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
         return '<hr>\n'
 
-    def render_text(self, tree_node, inner_text, **kwargs):
+    def render_text(self, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: The tree node to be rendered.
         :param inner_text: The inner text of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered text of this node.
@@ -34,8 +32,8 @@ class HorizontalLineTagOptions(TagOptions):
         return '----------\n'
 
 
-class LineBreakTagOptions(TagOptions):
-    """ Line break tag options container class. """
+class LineBreakTreeNode(TreeNode):
+    """ Line break tree node class. """
 
     standalone = True
     inline = True
@@ -44,20 +42,18 @@ class LineBreakTagOptions(TagOptions):
     canonical_tag_name = 'br'
     alias_tag_names = ()
 
-    def render_html(self, tree_node, inner_html, **kwargs):
+    def render_html(self, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param tree_node: The tree node to be rendered.
         :param inner_html: The inner HTML of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
         return '<br>\n'
 
-    def render_text(self, tree_node, inner_text, **kwargs):
+    def render_text(self, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: The tree node to be rendered.
         :param inner_text: The inner text of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered text of this node.
@@ -65,32 +61,29 @@ class LineBreakTagOptions(TagOptions):
         return '\n'
 
 
-# The famous "cut here" string, for paid content preview
-CUT_HERE_STRING = '<!-- Cut Here -->'
-
-
-class CutHereTagOptions(TagOptions):
-    """ "Cut here" tag options container class. """
+class CutHereTreeNode(TreeNode):
+    """ "Cut here" tree node class. """
 
     standalone = True
 
     canonical_tag_name = 'cuthere'
     alias_tag_names = ()
 
-    def render_html(self, tree_node, inner_html, **kwargs):
+    # The delimiter string for latter HTML splitting
+    delimiter_string_html = '<!-- Cut Here -->'
+
+    def render_html(self, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param tree_node: The tree node to be rendered.
         :param inner_html: The inner HTML of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-        return CUT_HERE_STRING + '\n'
+        return '\n' + self.delimiter_string_html + '\n'
 
-    def render_text(self, tree_node, inner_text, **kwargs):
+    def render_text(self, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: The tree node to be rendered.
         :param inner_text: The inner text of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered text of this node.

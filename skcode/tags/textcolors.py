@@ -4,15 +4,15 @@ SkCode coloured text tag definitions code.
 
 import re
 
-from .base import TagOptions
+from ..etree import TreeNode
 
 
 # Valid HEX color according https://www.w3.org/TR/CSS21/syndata.html#value-def-color
 RGB_COLOR_RE = re.compile(r'^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$')
 
 
-class ColorTextTagOptions(TagOptions):
-    """ Coloured tag options container class. """
+class ColorTextTreeNode(TreeNode):
+    """ Coloured tree node class. """
 
     inline = True
     close_inlines = False
@@ -33,15 +33,14 @@ class ColorTextTagOptions(TagOptions):
     # HTML template for rendering
     html_render_template = '<span style="color: {color_value}">{inner_html}</span>'
 
-    def get_color_value(self, tree_node):
+    def get_color_value(self):
         """
         Return the color value.
-        :param tree_node: The current tree node instance.
         :return The color value as string, or an empty string.
         """
 
         # Get the color string
-        user_color_value = tree_node.attrs.get(tree_node.name, '').lower()
+        user_color_value = self.attrs.get(self.name, '').lower()
         if not user_color_value:
             return ''
 
@@ -51,17 +50,16 @@ class ColorTextTagOptions(TagOptions):
         else:
             return ''
 
-    def render_html(self, tree_node, inner_html, **kwargs):
+    def render_html(self, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
-        :param tree_node: The tree node to be rendered.
         :param inner_html: The inner HTML of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
 
         # Get color value
-        color = self.get_color_value(tree_node)
+        color = self.get_color_value()
 
         # If no color -> direct output
         if not color:
@@ -70,65 +68,43 @@ class ColorTextTagOptions(TagOptions):
         # Render the color
         return self.html_render_template.format(color_value=color, inner_html=inner_html)
 
-    def render_text(self, tree_node, inner_text, **kwargs):
+    def render_text(self, inner_text, **kwargs):
         """
         Callback function for rendering text.
-        :param tree_node: The tree node to be rendered.
         :param inner_text: The inner text of this tree node.
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered text of this node.
         """
         return inner_text
 
-    def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
-        """
-        Getter function for retrieving all attributes of this node required for rendering SkCode.
-        :param tree_node: The tree node to be rendered.
-        :param inner_skcode: The inner SkCode of this tree node.
-        :param kwargs: Extra keyword arguments for rendering.
-        :return A dictionary of all attributes required for rendering SkCode and the tag value
-        attribute name for the shortcut syntax (if required).
-        """
-        # Get color value
-        color = self.get_color_value(tree_node)
-        return {
-                   tree_node.name: color
-               }, tree_node.name
 
+def generate_fixed_color_text_cls(color_value,
+                                  canonical_tag_name=None,
+                                  alias_tag_names=None):
+    """
+    Generate a fixed color text class at runtime.
+    :param color_value: The desired fixed color value.
+    :param canonical_tag_name: The canonical name of the tag.
+    :param alias_tag_names: The name alias of the tag
+    :return: The generated class type.
+    """
+    assert color_value, "The color value is mandatory."
+    _canonical_tag_name = canonical_tag_name or color_value
+    _alias_tag_names = alias_tag_names or ()
+    _color_value = color_value
 
-class FixedColorTextTagOptions(ColorTextTagOptions):
-    """ Fixed coloured tag options container class. """
+    class FixedColorTextTreeNode(ColorTextTreeNode):
+        """ Fixed coloured tree node class. """
 
-    canonical_tag_name = None
-    alias_tag_names = ()
+        canonical_tag_name = _canonical_tag_name
+        alias_tag_names = _alias_tag_names
+        color_value = _color_value
 
-    def __init__(self, color_value, canonical_tag_name=None, **kwargs):
-        """
-        Fixed color text tag constructor.
-        :param color_value: Text color to use.
-        :param canonical_tag_name: The canonical name of this tag, default to the color string.
-        :param kwargs: Keyword arguments for super.
-        """
-        assert color_value, "The color value is mandatory."
-        self.canonical_tag_name = canonical_tag_name or color_value
-        super(FixedColorTextTagOptions, self).__init__(**kwargs)
-        self.color_value = color_value
+        def get_color_value(self):
+            """
+            Return the color value.
+            :return The color value as set set in ``self.color_value``.
+            """
+            return self.color_value
 
-    def get_color_value(self, tree_node):
-        """
-        Return the color value.
-        :param tree_node: The current tree node instance.
-        :return The color value as set set in ``__init__``.
-        """
-        return self.color_value
-
-    def get_skcode_attributes(self, tree_node, inner_skcode, **kwargs):
-        """
-        Getter function for retrieving all attributes of this node required for rendering SkCode.
-        :param tree_node: The tree node to be rendered.
-        :param inner_skcode: The inner SkCode of this tree node.
-        :param kwargs: Extra keyword arguments for rendering.
-        :return A dictionary of all attributes required for rendering SkCode and the tag value
-        attribute name for the shortcut syntax (if required).
-        """
-        return {}, None
+    return FixedColorTextTreeNode
