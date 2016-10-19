@@ -42,7 +42,7 @@ def render_footnotes_html(footnotes,
     for footnote_node in footnotes:
 
         # Get the footnote ID
-        footnote_id = footnote_node.get_footnote_id(footnote_node, footnote_node.root_tree_node)
+        footnote_id = footnote_node.get_footnote_id()
 
         # Craft the footnote declaration HTML
         footnote_declaration_html = '<a id="{refid}" href="#{backrefid}"><sup>[{fnid}]</sup></a>'.format(
@@ -84,7 +84,7 @@ def render_footnotes_text(footnotes):
     for footnote_node in footnotes:
 
         # Get the footnote ID
-        footnote_id = footnote_node.get_footnote_id(footnote_node, footnote_node.root_tree_node)
+        footnote_id = footnote_node.get_footnote_id()
 
         # Render the footnote
         footnote_text = render_inner_text(footnote_node)

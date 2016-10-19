@@ -164,7 +164,7 @@ def _recursive_render_titles_html(title_groups, output, li_class_name, a_class_n
     for title, subtitles in title_groups:
 
         # Get the title ID
-        title_id = title.opts.get_permalink_slug()
+        title_id = title.get_permalink_slug()
 
         # Output the HTML list element for this title
         output.append('<li{}>'.format(li_class))
