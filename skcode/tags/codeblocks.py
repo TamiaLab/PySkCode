@@ -180,9 +180,9 @@ class CodeBlockTreeNode(TreeNode):
         Return the content of this node with all trailing blank lines removed.
         """
         lines = self.content.splitlines()
-        while not lines[0].strip():
+        while lines and not lines[0].strip():
             lines.pop(0)
-        while not lines[-1].strip():
+        while lines and not lines[-1].strip():
             lines.pop()
         return lines if splitlines else '\n'.join(lines)
 

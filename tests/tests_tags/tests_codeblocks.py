@@ -569,6 +569,20 @@ class CodeBlockTreeNodeTestCase(unittest.TestCase):
         expected_result = '5.   # Hello World!\nSource : test.py (https://github.com/TamiaLab/PySkCode) [#helloworld]\n'
         self.assertEqual(expected_result, output_result)
 
+    def test_blank_lines(self):
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('code', CodeBlockTreeNode,
+                                             content='\n\n\n    \n\n# Hello \nWorld!\n\n\n    \n\n')
+        self.assertEqual('# Hello \nWorld!', tree_node.get_cleaned_content())
+        self.assertEqual(['# Hello ', 'World!'], tree_node.get_cleaned_content(splitlines=True))
+
+    def test_blank_lines_empty(self):
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('code', CodeBlockTreeNode,
+                                             content='')
+        self.assertEqual('', tree_node.get_cleaned_content())
+        self.assertEqual([], tree_node.get_cleaned_content(splitlines=True))
+
 
 class FixedCodeBlocksTagTestCase(unittest.TestCase):
     """ Tests suite for the fixed code blocks tag module. """
