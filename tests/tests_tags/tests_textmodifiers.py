@@ -5,7 +5,6 @@ SkCode text modifiers tag definitions test code.
 import unittest
 
 from skcode.etree import RootTreeNode
-from skcode.tags.textmodifiers import TextModifierBaseTreeNode
 from skcode.tags import (
     LowerCaseTextTreeNode,
     UpperCaseTextTreeNode,
