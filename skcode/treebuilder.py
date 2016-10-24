@@ -224,19 +224,20 @@ def parse_skcode(text,
             cur_tree_node = cur_tree_node.parent
 
     # Perform sanity check
-    sanitize_tree(root_tree_node, [])
+    sanitize_tree(root_tree_node)
     post_process_tree(root_tree_node)
 
     # Return the resulting AST
     return root_tree_node
 
 
-def sanitize_tree(tree_node, breadcrumb):
+def sanitize_tree(tree_node, breadcrumb=None):
     """
     Recursive method for sanitizing the given tree node and children recursively.
     :param tree_node: The tree node to be sanitized.
-    :param breadcrumb: The current breadcrumb of parent nodes.
+    :param breadcrumb: The current breadcrumb of parent nodes (default to an empty list).
     """
+    breadcrumb = breadcrumb or []
 
     # Down to top visit order (depth-first algorithm) with breadcrumb
     for child_node in tree_node.children:
