@@ -6,6 +6,7 @@ SkCode rendering code.
 # Default HTML for error messages
 DEFAULT_ERROR_HTML_TEMPLATE = '<span style="font-weight: bold; color: red;" ' \
                               'title="{error_message}">{source}</span>'
+SUPPRESS_ERROR_HTML_TEMPLATE = '<!-- {error_message} --> {source}'
 
 
 def render_inner_html(tree_node,
