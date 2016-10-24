@@ -13,11 +13,10 @@ IDENTIFIER_CHARSET = frozenset(string.ascii_letters + string.digits + '_*')
 def skip_whitespaces(text, offset, ch):
     """
     Skip any whitespaces.
-    Return the new offset and the new current char.
     :param text: The input text.
     :param offset: The current offset in the input text.
     :param ch: The current char.
-    :return The new offset and the current char.
+    :return The new offset and current char.
     """
     while ch in WHITESPACE_CHARSET:
         offset += 1
@@ -28,10 +27,9 @@ def skip_whitespaces(text, offset, ch):
 def skip_next_char_then_whitespaces(text, offset):
     """
     Skip the next char then any whitespaces.
-    Return the new offset and the new current char.
     :param text: The input text.
     :param offset: The current offset in the input text.
-    :return The new offset and the current char.
+    :return The new offset and current char.
     """
     offset += 1
     return skip_whitespaces(text, offset, text[offset])
@@ -39,12 +37,11 @@ def skip_next_char_then_whitespaces(text, offset):
 
 def get_identifier(text, offset, ch):
     """
-    Get the identifier starting in the text at the given offset.
-    Return the identifier (normalized as lower case), the new offset and the current char.
+    Get the identifier string starting in the text at the given offset.
     :param text: The input text.
     :param offset: The current offset in the input text.
     :param ch: The current char.
-    :return The identifier normalized as lowercase, the new offset and the current char.
+    :return The identifier normalized as lowercase, the new offset and current char.
     """
     identifier = ''
 
@@ -63,13 +60,12 @@ def get_identifier(text, offset, ch):
 def get_attribute_value(text, offset, ch, opening_tag_ch, closing_tag_ch):
     """
     Get the attribute value starting in the text at the given offset.
-    Return the attribute value (stripped), the new offset and the current char.
     :param text: The input text.
     :param offset: The current offset in the input text.
     :param ch: The current char.
     :param opening_tag_ch: The opening tag char.
     :param closing_tag_ch: The closing tag char.
-    :return The attribute's value with trailing whitespaces removed, the new offset and the current char.
+    :return The attribute value with trailing whitespaces removed, the new offset and current char.
     """
     attribute_value = ''
     
@@ -139,8 +135,8 @@ def parse_tag(text, start_offset,
     :param opening_tag_ch: The opening tag char (must be one char long, default '[').
     :param closing_tag_ch: The closing tag char (must be one char long, default ']').
     :param allow_tagvalue_attr: Set to ``True`` to allow the BBcode ``tagname=tagvalue`` syntax shortcut
-    (default ``True``).
-    :param allow_self_closing_tags: Set to ``True`` to allow the self closing tags syntax (default ``True``).
+    (default is ``True``).
+    :param allow_self_closing_tags: Set to ``True`` to allow the self closing tags syntax (default is ``True``).
     :return A tuple ``(tag_name, is_closing_tag, is_self_closing_tag, tag_attrs, offset + 1)`` on success, or an
     exception on error (see possible exception in the docstring above).
     """

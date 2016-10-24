@@ -43,15 +43,16 @@ def sanitize_url(url, default_scheme='http',
     :param default_scheme: The default scheme to use (default to ``http``).
     :param allowed_schemes: The list of allowed schemes (see defaults above).
     :param encode_html_entities: If set to ``True``, the output URL will be encoded to avoid raw HTML entities
-    (default ``True``).
-    :param force_default_scheme: Set to ``True`` to force the default scheme to be used in all case (default ``False``).
-    :param force_remove_scheme: Set to ``True`` to remove the scheme if set (default ``False``).
-    N.B. The ``force_default_scheme`` and ``force_remove_scheme`` are mutually exclusive.
-    :param fix_non_local_urls: Set to ``True`` to fix non local URL with netloc in path (default ``True``).
-    Example: ``google.com`` become ``http://google.com/``.
-    :param convert_relative_to_absolute: Set to ``True`` to convert relative URLs into absolute ones
-    (default ``False``). Example: ``/forum/`` become ``http://example.com/forum/``.
+    (default is ``True``).
+    :param force_default_scheme: Set to ``True`` to force the default scheme to be used in all case
+    (default is``False``).
+    :param force_remove_scheme: Set to ``True`` to remove the scheme if set (default is ``False``).
+    N.B. The ``force_default_scheme`` and ``force_remove_scheme`` are mutually exclusive for obvious reasons.
+    :param fix_non_local_urls: Set to ``True`` to fix non local URL with netloc in path (default is ``True``).
+    Example: with ``fix_non_local_urls`` set to ``True``, ``google.com`` will become ``http://google.com/``.
     :param absolute_base_url: The base URL for the relative-to-absolute conversion.
+    If set, relative URLs will be expanded as absolute URLs using the given base URL. Example: with
+    ``absolute_base_url`` set to ``http://example.com/``, ``/forum/`` will become ``http://example.com/forum/``.
     :return: The sanitized URL as string, or an empty string if erroneous.
     """
     assert default_scheme, "A default scheme is mandatory to avoid XSS."

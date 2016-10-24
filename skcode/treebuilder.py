@@ -38,13 +38,13 @@ def parse_skcode(text,
     :param opening_tag_ch: The opening tag char (must be one char long exactly, default '[').
     :param closing_tag_ch: The closing tag char (must be one char long exactly, default ']').
     :param allow_tagvalue_attr: Set to ``True`` to allow the BBCode ``tagname=tagvalue`` syntax shortcut
-    (default ``True``).
-    :param allow_self_closing_tags: Set to ``True`` to allow the self closing tags syntax (default ``True``).
+    (default is ``True``).
+    :param allow_self_closing_tags: Set to ``True`` to allow the self closing tags syntax (default is ``True``).
     :param root_node_cls: The tree node class for the root node.
     :param text_node_cls: The tree node class for all normal text nodes.
     :param newline_node_cls: The tree node class for all newlines.
     :param mark_unclosed_tags_as_erroneous: If set to ``True``, unclosed tags will be mark as erroneous
-    (default ``False``).
+    (default is ``False``).
     :param max_nesting_depth: The maximum nesting depth (default to 16). Set to zero to disable (not recommended
     because a Denial-Of-Service is possible if nesting depth is not limited).
     :return The resulting document tree at the end of the parsing stage.

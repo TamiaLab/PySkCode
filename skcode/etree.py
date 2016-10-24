@@ -16,7 +16,10 @@ class TreeNode(object):
     - an attributes dictionary,
     - a raw content string (for raw text nodes),
     - a list child nodes,
-    - the opening and closing tag source strings (for error displaying).
+    - the opening and closing tag source strings (for error displaying),
+    - an error message (in case of error).
+
+    The tree node class also contain all tag behavior options as static variables.
     """
 
     # ----- Node naming options
@@ -88,7 +91,7 @@ class TreeNode(object):
         N.B. Child nodes parent instance will be reset to this node instance.
         :param source_open_tag: The source text for the opening tag of this node (default to an empty string).
         :param source_close_tag: The source text for the closing tag of this node (default to an empty string).
-        :param error_message: The error message, if any error need to be reported. Default to an empty string.
+        :param error_message: The error message, if any error need to be reported (default to an empty string).
         """
         assert root_tree_node, "The root tree node instance is mandatory."
         if not self.is_root:

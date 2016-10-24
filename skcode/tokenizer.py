@@ -41,8 +41,8 @@ def tokenize_tag(text,
     :param opening_tag_ch: The opening tag char (must be one char long, default '[').
     :param closing_tag_ch: The closing tag char (must be one char long, default ']').
     :param allow_tagvalue_attr: Set to ``True`` to allow the BBcode ``tagname=tagvalue`` syntax shortcut
-    (default ``True``).
-    :param allow_self_closing_tags: Set to ``True`` to allow the self closing tags syntax (default ``True``).
+    (default is ``True``).
+    :param allow_self_closing_tags: Set to ``True`` to allow the self closing tags syntax (default is ``True``).
     """
     assert text, "No text input given (mandatory)."
     assert len(opening_tag_ch) == 1, "Opening tag character must be one char long exactly."
