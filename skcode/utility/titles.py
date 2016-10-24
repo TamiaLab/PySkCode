@@ -13,7 +13,7 @@ def extract_titles(document_tree,
     """
     Extract all titles present in the given document tree.
     :param document_tree: The document tree to be analyzed.
-    :param title_node_cls: The options class used for title declarations.
+    :param title_node_cls: The tree node class used for title declarations.
     :return: A list of all titles node instances in the document.
     """
     assert document_tree, "Document tree is mandatory."

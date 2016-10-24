@@ -11,7 +11,7 @@ def extract_footnotes(document_tree,
     """
     Extract all footnotes declaration present in the given document tree.
     :param document_tree: The document tree to be analyzed.
-    :param footnote_declaration_node_cls: The options class used for footnote declarations.
+    :param footnote_declaration_node_cls: The tree node class used for footnote declarations.
     :return: A list of all footnote node instances in the document.
     """
     assert document_tree, "Document tree is mandatory."

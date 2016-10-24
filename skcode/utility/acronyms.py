@@ -10,7 +10,7 @@ def extract_acronyms(document_tree,
     """
     Extract all acronyms present in the given document tree.
     :param document_tree: The document tree to be analyzed.
-    :param acronym_node_cls: The options class used for acronym declarations.
+    :param acronym_node_cls: The tree node class used for acronym declarations.
     :return: A list of all acronyms node instances in the document.
     """
     assert document_tree, "Document tree is mandatory."

@@ -41,8 +41,8 @@ def make_paragraphs(tree_node,
     """
     Group all inline nodes into paragraphs according to each node options.
     :param tree_node: Tree node to be processed.
-    :param paragraph_node_cls: Node options for all created paragraph nodes.
-    :param text_node_cls: The tree node class for all normal text nodes.
+    :param paragraph_node_cls: The tree node class for all newly created paragraph nodes.
+    :param text_node_cls: The tree node class for all text nodes.
     :param newline_node_cls: The tree node class for all newlines.
     """
     assert tree_node, "The tree node instance is mandatory."
