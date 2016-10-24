@@ -4,6 +4,7 @@ SkCode smileys replacement utility code.
 
 import re
 from html import escape as escape_html
+from urllib.parse import urljoin
 
 
 # Default emoticons map
@@ -269,15 +270,14 @@ def setup_smileys_replacement(document_tree, base_url, emoticons_map=DEFAULT_EMO
     # the emoticons are in plain text.
     emoticons_map = {escape_html(k): v for k, v in emoticons_map}
 
-    # Turn base_url into a callable
-    if isinstance(base_url, str):
-        base_path = base_url if base_url.endswith('/') else base_url + '/'
-        base_url = lambda x: base_path + x
+    # Helper method to turn ``base_url`` into a callable if necessary
+    def build_url(filename):
+        return urljoin(base_url, filename)
 
     # Store all emoticons related options
     document_tree.attrs[EMOTICONS_MAP_ATTR_NAME] = emoticons_map
     document_tree.attrs[EMOTICONS_REGEX_ATTR_NAME] = emoticons_regex
-    document_tree.attrs[EMOTICONS_BASE_URL_ATTR_NAME] = base_url
+    document_tree.attrs[EMOTICONS_BASE_URL_ATTR_NAME] = build_url if isinstance(base_url, str) else base_url
     document_tree.attrs[EMOTICONS_HTML_CLASS_ATTR_NAME] = html_class
 
 
