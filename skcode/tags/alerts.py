@@ -249,9 +249,7 @@ class AlertBoxTreeNode(TreeNode):
         The lookup order is: tag name (first), ``alert_title_attr_name``.
         :return The alert title if set or an empty string.
         """
-        alert_title = self.attrs.get(self.name, '')
-        if not alert_title:
-            alert_title = self.attrs.get(self.alert_title_attr_name, '')
+        alert_title = self.get_attribute_value('', self.alert_title_attr_name)
         return unescape_html_entities(alert_title)
 
     def get_alert_html_template(self, alert_type, alert_title):

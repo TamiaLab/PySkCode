@@ -166,6 +166,68 @@ class TreeNodeTestCase(unittest.TestCase):
         raw_content = l1_tree_node.get_raw_content(recursive=False)
         self.assertEqual('Level 1-1', raw_content)
 
+    def test_get_attribute_value(self):
+        """ Test the ``get_attribute_value`` helper method """
+        document_tree = RootTreeNode()
+        tree_node = document_tree.new_child('node', DummyTreeNode, attrs={'at1': 'foo'})
+        self.assertEqual('foo', tree_node.get_attribute_value('at1', 'at2', 'at3'))
+
+    def test_get_attribute_value_second_try(self):
+        """ Test the ``get_attribute_value`` helper method """
+        document_tree = RootTreeNode()
+        tree_node = document_tree.new_child('node', DummyTreeNode, attrs={'at1': '', 'at2': 'bar', 'at3': 'baz'})
+        self.assertEqual('bar', tree_node.get_attribute_value('at1', 'at2', 'at3'))
+        tree_node = document_tree.new_child('node', DummyTreeNode, attrs={'at3': 'baz'})
+        self.assertEqual('baz', tree_node.get_attribute_value('at1', 'at2', 'at3'))
+
+    def test_get_attribute_value_node_name(self):
+        """ Test the ``get_attribute_value`` helper method """
+        document_tree = RootTreeNode()
+        tree_node = document_tree.new_child('node', DummyTreeNode, attrs={'node': 'zog', 'at2': 'bar', 'at3': 'baz'})
+        self.assertEqual('zog', tree_node.get_attribute_value('', 'at1', 'at2', 'at3'))
+
+    def test_get_attribute_value_no_value(self):
+        """ Test the ``get_attribute_value`` helper method """
+        document_tree = RootTreeNode()
+        tree_node = document_tree.new_child('node', DummyTreeNode, attrs={})
+        self.assertEqual('', tree_node.get_attribute_value('at1', 'at2', 'at3'))
+
+    def test_get_attribute_value_default_value(self):
+        """ Test the ``get_attribute_value`` helper method """
+        document_tree = RootTreeNode()
+        tree_node = document_tree.new_child('node', DummyTreeNode, attrs={})
+        self.assertEqual('xyz', tree_node.get_attribute_value('at1', 'at2', 'at3', default='xyz'))
+
+    def test_has_attribute_switch_set_with_attr(self):
+        """ Test the ``has_attribute_switch_set`` method. """
+        document_tree = RootTreeNode()
+        tree_node = document_tree.new_child('node', DummyTreeNode, attrs={'foobar': True})
+        self.assertTrue(tree_node.has_attribute_switch_set('foobar'))
+
+    def test_has_attribute_switch_set_without_attr(self):
+        """ Test the ``has_attribute_switch_set`` method. """
+        document_tree = RootTreeNode()
+        tree_node = document_tree.new_child('node', DummyTreeNode, attrs={})
+        self.assertFalse(tree_node.has_attribute_switch_set('foobar'))
+
+    def test_has_attribute_switch_set_node_name(self):
+        """ Test the ``has_attribute_switch_set`` method. """
+        document_tree = RootTreeNode()
+        tree_node = document_tree.new_child('node', DummyTreeNode, attrs={'node': 'baz'})
+        self.assertTrue(tree_node.has_attribute_switch_set('foobar', 'baz'))
+
+    def test_has_attribute_switch_set_node_name_case(self):
+        """ Test the ``has_attribute_switch_set`` method. """
+        document_tree = RootTreeNode()
+        tree_node = document_tree.new_child('node', DummyTreeNode, attrs={'node': 'bAz'})
+        self.assertTrue(tree_node.has_attribute_switch_set('foobar', 'baz'))
+
+    def test_has_attribute_switch_set_node_name_no_match(self):
+        """ Test the ``has_attribute_switch_set`` method. """
+        document_tree = RootTreeNode()
+        tree_node = document_tree.new_child('node', DummyTreeNode, attrs={'node': 'bar'})
+        self.assertFalse(tree_node.has_attribute_switch_set('foobar', 'baz'))
+
     def test_search_in_tree(self):
         """ Test the ``search_in_tree`` helper. """
         document_tree = RootTreeNode()

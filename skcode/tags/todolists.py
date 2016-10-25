@@ -68,8 +68,7 @@ class TodoTaskTreeNode(TreeNode):
         The lookup order is: ``is_done_attr_name`` attribute (first), tag name value, ``False``.
         :return A boolean True if the task is done, False is the task is not.
         """
-        return self.is_done_attr_name in self.attrs \
-               or self.attrs.get(self.name, '').lower() == self.is_done_tagname_value
+        return self.has_attribute_switch_set(self.is_done_attr_name, self.is_done_tagname_value)
 
     def render_html(self, inner_html, **kwargs):
         """

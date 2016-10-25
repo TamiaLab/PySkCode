@@ -36,9 +36,7 @@ class AcronymTreeNode(TreeNode):
         The lookup order is: tag name (first), ``acronym_title_attr_name``.
         :return The acronym title if set, or an empty string.
         """
-        abbr_title = self.attrs.get(self.name, '')
-        if not abbr_title:
-            abbr_title = self.attrs.get(self.acronym_title_attr_name, '')
+        abbr_title = self.get_attribute_value('', self.acronym_title_attr_name)
         return unescape_html_entities(abbr_title)
 
     def render_html(self, inner_html, **kwargs):

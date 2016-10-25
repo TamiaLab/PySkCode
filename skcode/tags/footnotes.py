@@ -72,9 +72,7 @@ class FootnoteDeclarationTreeNode(TreeNode):
         (default ``True``).
         :return: The ID of this footnote.
         """
-        footnote_id = self.attrs.get(self.name, '')
-        if not footnote_id:
-            footnote_id = self.attrs.get(self.footnote_id_attr_name, '')
+        footnote_id = self.get_attribute_value('', self.footnote_id_attr_name)
         if not footnote_id and use_auto_generated_id:
             footnote_id = self.get_footnote_id_from_counter()
         return slugify(footnote_id)

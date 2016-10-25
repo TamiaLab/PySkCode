@@ -68,9 +68,7 @@ class FigureDeclarationTreeNode(TreeNode):
         The lookup order is: tag name (first), ``figure_id_attr_name``.
         :return: The ID of this figure, or an empty string.
         """
-        figure_id = self.attrs.get(self.name, '')
-        if not figure_id:
-            figure_id = self.attrs.get(self.figure_id_attr_name, '')
+        figure_id = self.get_attribute_value('', self.figure_id_attr_name)
         return slugify(figure_id)
 
     def get_figure_caption_node(self):

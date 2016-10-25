@@ -90,9 +90,7 @@ class CodeBlockTreeNode(TreeNode):
         The lookup order is: tag name (first), ``language_attr_name``.
         :return The language name of this code block, or the default one if not specified.
         """
-        language_name = self.attrs.get(self.name, '')
-        if not language_name:
-            language_name = self.attrs.get(self.language_attr_name, self.default_language_name)
+        language_name = self.get_attribute_value('', self.language_attr_name, default=self.default_language_name)
         return unescape_html_entities(language_name)
 
     def get_highlight_lines(self):

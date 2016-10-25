@@ -55,9 +55,7 @@ class QuoteTreeNode(TreeNode):
         The lookup order is: tag name (first), ``author_attr_name``.
         :return The quote author name, or an empty string.
         """
-        author_name = self.attrs.get(self.name, '')
-        if not author_name:
-            author_name = self.attrs.get(self.author_attr_name, '')
+        author_name = self.get_attribute_value('', self.author_attr_name)
         return unescape_html_entities(author_name)
 
     def get_quote_link(self):

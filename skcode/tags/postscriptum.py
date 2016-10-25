@@ -37,8 +37,7 @@ class PostScriptumTreeNode(TreeNode):
         The lookup order is: ``is_important_attr_name`` attribute (first), tag name value, ``False``.
         :return A boolean True if the Post scriptum is important, False if not.
         """
-        return self.is_important_attr_name in self.attrs \
-               or self.attrs.get(self.name, '').lower() == self.is_important_tagname_value
+        return self.has_attribute_switch_set(self.is_important_attr_name, self.is_important_tagname_value)
 
     def render_html(self, inner_html, **kwargs):
         """

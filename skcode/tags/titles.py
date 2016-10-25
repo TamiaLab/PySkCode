@@ -38,14 +38,9 @@ class TitleBaseTreeNode(TreeNode):
         The permalink slug can be set by setting the ``slug_id_attr_name`` attribute of the tag or simply
         by setting the tag name attribute.
         The lookup order is: tag name (first), ``acronym_title_attr_name``.
-
         :return The permalink slug for this title, or an empty string.
         """
-
-        # Get existing permalink if available
-        permalink_slug = self.attrs.get(self.name, '')
-        if not permalink_slug:
-            permalink_slug = self.attrs.get(self.slug_id_attr_name, '')
+        permalink_slug = self.get_attribute_value('', self.slug_id_attr_name)
         return slugify(permalink_slug)
 
     def render_html(self, inner_html, **kwargs):

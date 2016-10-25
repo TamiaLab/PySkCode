@@ -150,6 +150,32 @@ class TreeNode(object):
                 content += child_node.get_raw_content()
         return content
 
+    def get_attribute_value(self, *fields, default=''):
+        """
+        Get the attribute value by looking at each given field names.
+        Return the first non empty field value or the default value.
+        Use an empty string as field name to indicate the node name.
+        :param fields: The list of fields to look for value in lookup order.
+        :param default: The default value to be returned.
+        :return: The attribute value.
+        """
+        for field in fields:
+            value = self.attrs.get(field if field else self.name)
+            if value:
+                return value
+        return default
+
+    def has_attribute_switch_set(self, attr_name, name_attr_value=None):
+        """
+        Check if the given attribute switch is set or not.
+        The attribute switch is set of the attribute name is found in the attributes dictionary or
+        if the node named attribute has the given value.
+        :param attr_name: The attribute switch field name.
+        :param name_attr_value: The attribute switch node named attribute value.
+        :return: A bool ``True`` if the switch is set, ``False`` otherwise.
+        """
+        return attr_name in self.attrs or self.attrs.get(self.name, '').lower() == name_attr_value
+
     def search_in_tree(self, node_cls):
         """
         Walk down the tree and yield any node matching the given class.

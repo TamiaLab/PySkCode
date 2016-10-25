@@ -272,9 +272,7 @@ class GoToAnchorTreeNode(TreeNode):
 
         :return The target anchor ID of this link, or an empty string.
         """
-        user_anchor_id = self.attrs.get(self.name, '')
-        if not user_anchor_id:
-            user_anchor_id = self.attrs.get(self.anchor_id_attr_name, '')
+        user_anchor_id = self.get_attribute_value('', self.anchor_id_attr_name)
         return slugify(user_anchor_id)
 
     def render_html(self, inner_html, **kwargs):

@@ -144,9 +144,7 @@ class ListTreeNode(TreeNode):
         """
 
         # Get the list type
-        list_type = self.attrs.get(self.name, '')
-        if not list_type:
-            list_type = self.attrs.get(self.list_type_attr_name, self.default_list_type)
+        list_type = self.get_attribute_value('', self.list_type_attr_name, default=self.default_list_type)
 
         # Check for alias, then normalize
         if list_type in self.list_type_alias:

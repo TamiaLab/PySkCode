@@ -57,9 +57,7 @@ class DirectionTextTreeNode(TreeNode):
         """
 
         # Get the user input
-        user_text_direction = self.attrs.get(self.name, '')
-        if not user_text_direction:
-            user_text_direction = self.attrs.get(self.text_direction_attr_name, '')
+        user_text_direction = self.get_attribute_value('', self.text_direction_attr_name)
 
         # Remap the supplied value
         user_text_direction = user_text_direction.lower()
