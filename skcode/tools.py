@@ -22,8 +22,6 @@ def escape_attribute_value(value):
     """
     if "'" in value and '"' in value:
         return '"%s"' % value.replace('\\', '\\\\').replace('"', '\\"')
-    elif "'" in value:
-        return '"%s"' % value
     elif '"' in value:
         return "'%s'" % value
     else:
