@@ -79,14 +79,11 @@ def parse_skcode(text,
         token_type, tag_name, tag_attrs, token_source = token
 
         # Handle DATA block
-        if not cur_tree_node.parse_embedded:
+        if not cur_tree_node.parse_embedded and (token_type != TOKEN_CLOSE_TAG or tag_name != cur_tree_node.name):
 
-            # Wait for the closing tag
-            if token_type != TOKEN_CLOSE_TAG or tag_name != cur_tree_node.name:
-
-                # Append the raw source to the node until closing tag found
-                cur_tree_node.content += token_source
-                continue
+            # Append the raw source to the node until closing tag found
+            cur_tree_node.content += token_source
+            continue
 
         # The ``if`` below must be an ``if`` and not an ``elif`` because we need to parse
         # the closing tag of the DATA block when received.
