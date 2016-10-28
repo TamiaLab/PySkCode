@@ -264,7 +264,7 @@ def build_recognized_tags_dict(tag_class_list):
 
         # Sanity checks
         if type(tag_class) is not type:
-            raise ValueError('{} is an instance, not a class type.'.format(tag_class.__class__.__name__))
+            raise ValueError('{} is an instance, not a class type'.format(tag_class.__class__.__name__))
         if not tag_class.canonical_tag_name:
             raise ValueError('{} does not have a canonical name'.format(tag_class.__name__))
 
