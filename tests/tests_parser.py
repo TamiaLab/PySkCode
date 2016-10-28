@@ -5,17 +5,18 @@ SkCode tag parser test code.
 import string
 import unittest
 
-from skcode.parser import (WHITESPACE_CHARSET,
-                           IDENTIFIER_CHARSET,
-                           skip_whitespaces,
-                           skip_next_char_then_whitespaces,
-                           get_identifier,
-                           get_attribute_value,
-                           parse_tag)
+from skcode.parser import (
+    WHITESPACE_CHARSET,
+    IDENTIFIER_CHARSET,
+    skip_whitespaces,
+    skip_next_char_then_whitespaces,
+    get_identifier,
+    parse_tag
+)
 
 
 class TagParserTestCase(unittest.TestCase):
-    """ Tests suite for the tag parser module. """
+    """ Tests case for the tag parser module. """
 
     def test_charsets_constants(self):
         """ Test if the charset constants are valid. """
@@ -74,7 +75,7 @@ class TagParserTestCase(unittest.TestCase):
         self.assertEqual(offset, 1)
         self.assertEqual('y', ch)
 
-    def test_nb_char_to_skip_with_whitespaces_only(self):
+    def test_skip_next_char_then_whitespaces_with_whitespaces_only(self):
         """
         Test if the ``skip_next_char_then_whitespaces`` method raise a ``IndexError`` if the string end with whitespaces.
         """
