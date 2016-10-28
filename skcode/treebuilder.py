@@ -106,13 +106,13 @@ def parse_skcode(text,
             
         elif token_type == TOKEN_NEWLINE:
 
-            # Append to the current node
-            cur_tree_node.new_child(None, newline_node_cls)
-
             # Handle newline_closes option
             # Loop to handle the case when nested tag need to be closed at once
             while cur_tree_node.newline_closes and cur_tree_node.parent is not None:
                 cur_tree_node = cur_tree_node.parent
+
+            # Append to the current node
+            cur_tree_node.new_child(None, newline_node_cls)
             
         elif token_type == TOKEN_OPEN_TAG:
 
@@ -158,20 +158,26 @@ def parse_skcode(text,
             # Check if current node can be closed
             if cur_tree_node.parent is None or cur_tree_node.name != tag_name:
 
-                # Handle weak parent close option
-                if (cur_tree_node.parent is None
-                        or cur_tree_node.parent.name == tag_name) and cur_tree_node.weak_parent_close:
+                # Look for the parent to close
+                depth = 0
+                cursor = cur_tree_node
+                while cursor.parent is not None and (
+                            (cursor.weak_parent_close and cursor.parent.name != tag_name) or cursor.parent.name == tag_name):
+                    depth += 1
+                    cursor = cursor.parent
 
-                    # Close the current tree node
-                    cur_tree_node = cur_tree_node.parent
+                # Handle weak parent close option
+                if cursor.name == tag_name:
+
+                    # Close all traversal tree nodes
+                    cur_tree_node = cursor
 
                     # Also close the parent node
                     cur_tree_node.source_close_tag = token_source
                     cur_tree_node = cur_tree_node.parent
 
                     # Update nesting depth limit
-                    if cur_nesting_depth >= 2:
-                        cur_nesting_depth -= 2
+                    cur_nesting_depth -= depth
 
                 else:
 
