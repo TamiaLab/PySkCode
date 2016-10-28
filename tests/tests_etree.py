@@ -328,6 +328,38 @@ class TreeNodeTestCase(unittest.TestCase):
         expected_html = '[test]inner text[/test]'
         self.assertEqual(expected_html, tree_node.render_error_text('inner text'))
 
+    def test_default_render_error_text_implementation_open_tag(self):
+        """ Test the default ``render_error_text`` method implementation. """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('child', DummyTreeNode, error_message='msg',
+                                             source_open_tag='[test]', source_close_tag='', content='')
+        expected_html = '[test]inner text'
+        self.assertEqual(expected_html, tree_node.render_error_text('inner text'))
+
+    def test_default_render_error_text_implementation_close_tag(self):
+        """ Test the default ``render_error_text`` method implementation. """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('child', DummyTreeNode, error_message='msg',
+                                             source_open_tag='', source_close_tag='[/test]', content='')
+        expected_html = 'inner text[/test]'
+        self.assertEqual(expected_html, tree_node.render_error_text('inner text'))
+
+    def test_default_render_error_text_implementation_content(self):
+        """ Test the default ``render_error_text`` method implementation. """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('child', DummyTreeNode, error_message='msg',
+                                             source_open_tag='[test]', source_close_tag='[/test]', content='content')
+        expected_html = '[test]content[/test]'
+        self.assertEqual(expected_html, tree_node.render_error_text(''))
+
+    def test_default_render_error_text_implementation_no_source(self):
+        """ Test the default ``render_error_text`` method implementation. """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('child', DummyTreeNode, error_message='msg',
+                                             source_open_tag='', source_close_tag='', content='')
+        expected_html = ''
+        self.assertEqual(expected_html, tree_node.render_error_text(''))
+
 
 class RootTreeNodeTestCase(unittest.TestCase):
     """ Tests suite for the ``TreeNode`` class. """
