@@ -1,5 +1,5 @@
 """
-SkCode tag parser test code.
+SkCode tag tokenizer test code.
 """
 
 import unittest
@@ -19,52 +19,83 @@ class TokenizerTestCase(unittest.TestCase):
 
     PASS_TESTS = (
         # Raw text without tag
-        ('raw text', ((TOKEN_DATA, None, None, 'raw text'),)),
+        ('raw text', (
+            (TOKEN_DATA, None, None, 'raw text'),
+        )),
 
         # One valid opening tag
-        ('[test]', ((TOKEN_OPEN_TAG, 'test', {}, '[test]'),)),
+        ('[test]', (
+            (TOKEN_OPEN_TAG, 'test', {}, '[test]'),
+        )),
 
         # One valid closing tag
-        ('[/test]', ((TOKEN_CLOSE_TAG, 'test', {}, '[/test]'),)),
+        ('[/test]', (
+            (TOKEN_CLOSE_TAG, 'test', {}, '[/test]'),
+        )),
 
         # One valid self closing tag
-        ('[test/]', ((TOKEN_SELF_CLOSE_TAG, 'test', {}, '[test/]'),)),
+        ('[test/]', (
+            (TOKEN_SELF_CLOSE_TAG, 'test', {}, '[test/]'),
+        )),
 
         # One tag with raw text before
-        ('azerty[test]', ((TOKEN_DATA, None, None, 'azerty'),
-                          (TOKEN_OPEN_TAG, 'test', {}, '[test]'),)),
+        ('azerty[test]', (
+            (TOKEN_DATA, None, None, 'azerty'),
+            (TOKEN_OPEN_TAG, 'test', {}, '[test]'),
+        )),
 
         # One tag with raw text before and after
-        ('azerty[test]qwerty', ((TOKEN_DATA, None, None, 'azerty'),
-                                (TOKEN_OPEN_TAG, 'test', {}, '[test]'),
-                                (TOKEN_DATA, None, None, 'qwerty'),)),
+        ('azerty[test]qwerty', (
+            (TOKEN_DATA, None, None, 'azerty'),
+            (TOKEN_OPEN_TAG, 'test', {}, '[test]'),
+            (TOKEN_DATA, None, None, 'qwerty'),
+        )),
 
         # Two tags with raw text between
-        ('[foobar]azerty[test]', ((TOKEN_OPEN_TAG, 'foobar', {}, '[foobar]'),
-                                  (TOKEN_DATA, None, None, 'azerty'),
-                                  (TOKEN_OPEN_TAG, 'test', {}, '[test]'),)),
+        ('[foobar]azerty[test]', (
+            (TOKEN_OPEN_TAG, 'foobar', {}, '[foobar]'),
+            (TOKEN_DATA, None, None, 'azerty'),
+            (TOKEN_OPEN_TAG, 'test', {}, '[test]'),
+        )),
 
         # Two tags with raw text before, between and after
-        ('omgwtfbbq[foobar]azerty[test]qwerty', ((TOKEN_DATA, None, None, 'omgwtfbbq'),
-                                                 (TOKEN_OPEN_TAG, 'foobar', {}, '[foobar]'),
-                                                 (TOKEN_DATA, None, None, 'azerty'),
-                                                 (TOKEN_OPEN_TAG, 'test', {}, '[test]'),
-                                                 (TOKEN_DATA, None, None, 'qwerty'),)),
+        ('omgwtfbbq[foobar]azerty[test]qwerty', (
+            (TOKEN_DATA, None, None, 'omgwtfbbq'),
+            (TOKEN_OPEN_TAG, 'foobar', {}, '[foobar]'),
+            (TOKEN_DATA, None, None, 'azerty'),
+            (TOKEN_OPEN_TAG, 'test', {}, '[test]'),
+            (TOKEN_DATA, None, None, 'qwerty'),
+        )),
 
         # Test newline tokenizing
-        ('raw\ntext', ((TOKEN_DATA, None, None, 'raw'),
-                       (TOKEN_NEWLINE, None, None, '\n'),
-                       (TOKEN_DATA, None, None, 'text'),)),
-        ('raw\r\ntext', ((TOKEN_DATA, None, None, 'raw'),
-                         (TOKEN_NEWLINE, None, None, '\n'),
-                         (TOKEN_DATA, None, None, 'text'),)),
-        ('raw\rtext', ((TOKEN_DATA, None, None, 'raw'),
-                       (TOKEN_NEWLINE, None, None, '\n'),
-                       (TOKEN_DATA, None, None, 'text'),)),
+        ('raw\ntext', (
+            (TOKEN_DATA, None, None, 'raw'),
+            (TOKEN_NEWLINE, None, None, '\n'),
+            (TOKEN_DATA, None, None, 'text'),
+        )),
+        ('raw\r\ntext', (
+            (TOKEN_DATA, None, None, 'raw'),
+            (TOKEN_NEWLINE, None, None, '\n'),
+            (TOKEN_DATA, None, None, 'text'),
+        )),
+        ('raw\rtext', (
+            (TOKEN_DATA, None, None, 'raw'),
+            (TOKEN_NEWLINE, None, None, '\n'),
+            (TOKEN_DATA, None, None, 'text'),
+        )),
 
         # Test bad tag handling
-        ('[foobar[test]', ((TOKEN_DATA, None, None, '[foobar'),
-                           (TOKEN_OPEN_TAG, 'test', {}, '[test]'),)),
+        ('[foobar[test]', (
+            (TOKEN_DATA, None, None, '[foobar'),
+            (TOKEN_OPEN_TAG, 'test', {}, '[test]'),
+        )),
+        ('[foobar][test', (
+            (TOKEN_OPEN_TAG, 'foobar', {}, '[foobar]'),
+            (TOKEN_DATA, None, None, '[test'),
+        )),
+        ('[foobar[test', (
+            (TOKEN_DATA, None, None, '[foobar[test'),
+        )),
     )
 
     def test_functional(self):
