@@ -261,6 +261,26 @@ class TreeNode(object):
         """
         raise NotImplementedError('render_text() need to be implemented in subclass')
 
+    def render_error_text(self, inner_text, **kwargs):
+        """
+        Callback function for rendering text when the node is erroneous.
+        :param inner_text: The inner text of this tree node.
+        :param kwargs: Extra keyword arguments for rendering.
+        :return The rendered HTML of this node.
+        """
+        output_html = []
+        if self.source_open_tag:
+            output_html.append(self.source_open_tag)
+
+        inner_content = inner_text or self.get_raw_content()
+        if inner_content:
+            output_html.append(inner_content)
+
+        if self.source_close_tag:
+            output_html.append(self.source_close_tag)
+
+        return ''.join(output_html)
+
 
 class RootTreeNode(TreeNode):
     """

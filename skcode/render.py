@@ -91,4 +91,7 @@ def render_to_text(tree_node, **kwargs):
     inner_text = render_inner_text(tree_node, **kwargs)
 
     # Render the node
-    return tree_node.render_text(inner_text, **kwargs)
+    if tree_node.error_message:
+        return tree_node.render_error_text(inner_text, **kwargs)
+    else:
+        return tree_node.render_text(inner_text, **kwargs)

@@ -320,6 +320,14 @@ class TreeNodeTestCase(unittest.TestCase):
             tree_node.render_text('', custom_value='foobar')
         self.assertEqual('render_text() need to be implemented in subclass', str(e.exception))
 
+    def test_default_render_error_text_implementation(self):
+        """ Test the default ``render_error_text`` method implementation. """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('child', DummyTreeNode, error_message='msg',
+                                             source_open_tag='[test]', source_close_tag='[/test]', content='')
+        expected_html = '[test]inner text[/test]'
+        self.assertEqual(expected_html, tree_node.render_error_text('inner text'))
+
 
 class RootTreeNodeTestCase(unittest.TestCase):
     """ Tests suite for the ``TreeNode`` class. """
