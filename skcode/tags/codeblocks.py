@@ -2,6 +2,8 @@
 SkCode code block tag definitions code (require Pygments library).
 """
 
+from gettext import gettext as _
+
 from html import escape as escape_html
 from html import unescape as unescape_html_entities
 
@@ -116,8 +118,10 @@ class CodeBlockTreeNode(TreeNode):
                 line_num = int(line_num)
                 if line_num >= 0:
                     line_nums.append(line_num)
+                else:
+                    self.error_message = _('Line number cannot be negative')
             except ValueError:
-                continue
+                self.error_message = _('{} is not a number').format(line_num)
 
         # Return the list
         return line_nums
@@ -141,10 +145,10 @@ class CodeBlockTreeNode(TreeNode):
             if line_num >= 0:
                 return line_num
             else:
+                self.error_message = _('Line number cannot be negative')
                 return 1
-
         except ValueError:
-            # Handle error
+            self.error_message = _('{} is not a number').format(first_line_number)
             return 1
 
     def get_filename(self):
@@ -183,6 +187,21 @@ class CodeBlockTreeNode(TreeNode):
         while lines and not lines[-1].strip():
             lines.pop()
         return lines if splitlines else '\n'.join(lines)
+
+    def sanitize_node(self, breadcrumb):
+        """
+        Callback function for sanitizing and cleaning-up the given node.
+        :param breadcrumb: The breadcrumb of node instances from the root node to the current node (excluded).
+        """
+        super(CodeBlockTreeNode, self).sanitize_node(breadcrumb)
+        self.get_highlight_lines()
+        self.get_start_line_number()
+        try:
+            language_name = self.get_language_name()
+            if language_name:
+                get_lexer_by_name(language_name)
+        except ClassNotFound:
+            self.error_message = _('Unknown language')
 
     def render_html(self, inner_html, force_rel_nofollow=True, **kwargs):
         """

@@ -6,9 +6,11 @@ import unittest
 from unittest import mock
 
 from skcode.etree import RootTreeNode
-from skcode.tags import (CodeBlockTreeNode,
-                         DEFAULT_RECOGNIZED_TAGS_LIST,
-                         generate_fixed_code_block_type_cls)
+from skcode.tags import (
+    CodeBlockTreeNode,
+    DEFAULT_RECOGNIZED_TAGS_LIST,
+    generate_fixed_code_block_type_cls
+)
 from skcode.utility.relative_urls import setup_relative_urls_conversion
 
 
@@ -23,6 +25,7 @@ class CodeBlockTreeNodeTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(CodeBlockTreeNode.newline_closes)
         self.assertFalse(CodeBlockTreeNode.same_tag_closes)
+        self.assertFalse(CodeBlockTreeNode.weak_parent_close)
         self.assertFalse(CodeBlockTreeNode.standalone)
         self.assertFalse(CodeBlockTreeNode.parse_embedded)
         self.assertFalse(CodeBlockTreeNode.inline)
@@ -247,6 +250,42 @@ class CodeBlockTreeNodeTestCase(unittest.TestCase):
         tree_node = root_tree_node.new_child('code', CodeBlockTreeNode, attrs={})
         figure_id = tree_node.get_figure_id()
         self.assertEqual('', figure_id)
+
+    def test_sanitize_node_negative_line_numbers(self):
+        """ Test the ``sanitize_node`` method with negative line numbers. """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('code', CodeBlockTreeNode, attrs={})
+        tree_node.sanitize_node([])
+        self.assertEqual('', tree_node.error_message)
+        tree_node = root_tree_node.new_child('code', CodeBlockTreeNode, attrs={'hl_lines': '-1'})
+        tree_node.sanitize_node([])
+        self.assertEqual('Line number cannot be negative', tree_node.error_message)
+        tree_node = root_tree_node.new_child('code', CodeBlockTreeNode, attrs={'linenostart': '-1'})
+        tree_node.sanitize_node([])
+        self.assertEqual('Line number cannot be negative', tree_node.error_message)
+
+    def test_sanitize_node_erroneous_line_numbers(self):
+        """ Test the ``sanitize_node`` method with erroneous line numbers. """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('code', CodeBlockTreeNode, attrs={})
+        tree_node.sanitize_node([])
+        self.assertEqual('', tree_node.error_message)
+        tree_node = root_tree_node.new_child('code', CodeBlockTreeNode, attrs={'hl_lines': 'abc'})
+        tree_node.sanitize_node([])
+        self.assertEqual('abc is not a number', tree_node.error_message)
+        tree_node = root_tree_node.new_child('code', CodeBlockTreeNode, attrs={'linenostart': 'abc'})
+        tree_node.sanitize_node([])
+        self.assertEqual('abc is not a number', tree_node.error_message)
+
+    def test_sanitize_node_erroneous_language_name(self):
+        """ Test the ``sanitize_node`` method with erroneous language name. """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('code', CodeBlockTreeNode, attrs={})
+        tree_node.sanitize_node([])
+        self.assertEqual('', tree_node.error_message)
+        tree_node = root_tree_node.new_child('code', CodeBlockTreeNode, attrs={'code': 'foobar'})
+        tree_node.sanitize_node([])
+        self.assertEqual('Unknown language', tree_node.error_message)
 
     def test_render_html(self):
         """ Test the ``render_html`` method. """
