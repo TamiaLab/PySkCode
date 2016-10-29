@@ -3,10 +3,13 @@ SkCode medias tag definitions code.
 """
 
 import posixpath
+from gettext import gettext as _
 
-from urllib.parse import (urlsplit,
-                          parse_qs,
-                          quote_plus)
+from urllib.parse import (
+    urlsplit,
+    parse_qs,
+    quote_plus
+)
 
 from html import escape as escape_html
 from html import unescape as unescape_html_entities
@@ -43,7 +46,6 @@ class ImageTreeNode(TreeNode):
     def get_image_src_link(self):
         """
         Get the image source link URL.
-        :return The image source link URL (not sanitized).
         """
         src_link = self.get_raw_content().strip()
         relative_url_base = get_relative_url_base(self.root_tree_node)
@@ -61,24 +63,49 @@ class ImageTreeNode(TreeNode):
     def get_img_width(self):
         """
         Get the image width, or zero.
-        :return The image width, or zero.
         """
-        try:
-            width = int(self.attrs.get(self.width_attr_name, 0))
-            return width if width > 0 else 0
-        except ValueError:
+        width = self.attrs.get(self.width_attr_name, 0)
+        if not width:
             return 0
+        try:
+            width = int(width)
+            if width > 0:
+                return width
+            else:
+                self.error_message = _('Width must be positive')
+        except ValueError:
+            self.error_message = _('{} is not a number').format(width)
+            return 0
+        return 0
 
     def get_img_height(self):
         """
         Get the image height, or zero.
-        :return The image height, or zero.
         """
-        try:
-            height = int(self.attrs.get(self.height_attr_name, 0))
-            return height if height > 0 else 0
-        except ValueError:
+        height = self.attrs.get(self.height_attr_name, 0)
+        if not height:
             return 0
+        try:
+            height = int(height)
+            if height > 0:
+                return height
+            else:
+                self.error_message = _('Height must be positive')
+        except ValueError:
+            self.error_message = _('{} is not a number').format(height)
+            return 0
+        return 0
+
+    def sanitize_node(self, breadcrumb):
+        """
+        Callback function for sanitizing and cleaning-up the given node.
+        :param breadcrumb: The breadcrumb of node instances from the root node to the current node (excluded).
+        """
+        super(ImageTreeNode, self).sanitize_node(breadcrumb)
+        self.get_img_width()
+        self.get_img_height()
+        if not self.get_image_src_link():
+            self.error_message = _('Missing source URL')
 
     def render_html(self, inner_html, **kwargs):
         """
@@ -171,8 +198,7 @@ class YoutubeTreeNode(TreeNode):
 
     def get_youtube_video_id(self):
         """
-        Get the Youtube video ID.
-        :return The video ID, or an empty string.
+        Get the Youtube video ID, or an empty string.
         """
 
         # Get the URL
@@ -220,6 +246,15 @@ class YoutubeTreeNode(TreeNode):
 
             # Query args return a list of values
             return video_id.strip() if video_id else ''
+
+    def sanitize_node(self, breadcrumb):
+        """
+        Callback function for sanitizing and cleaning-up the given node.
+        :param breadcrumb: The breadcrumb of node instances from the root node to the current node (excluded).
+        """
+        super(YoutubeTreeNode, self).sanitize_node(breadcrumb)
+        if not self.get_youtube_video_id():
+            self.error_message = _('Missing video URL')
 
     def render_html(self, inner_html, **kwargs):
         """

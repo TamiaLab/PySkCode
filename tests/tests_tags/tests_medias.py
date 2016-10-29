@@ -157,6 +157,43 @@ class ImagesTagTestCase(unittest.TestCase):
         img_height = tree_node.get_img_height()
         self.assertEqual(img_height, 0)
 
+    def test_sanitize_node(self):
+        """ Test if the ``sanitize_node`` method mark the node as erroneous when title is missing """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('img', ImageTreeNode, attrs={'height': '120'},
+                                             content='http://example.com/image.jpg')
+        tree_node.sanitize_node([])
+        self.assertEqual('', tree_node.error_message)
+        tree_node = root_tree_node.new_child('img', ImageTreeNode, attrs={'width': '120'},
+                                             content='http://example.com/image.jpg')
+        tree_node.sanitize_node([])
+        self.assertEqual('', tree_node.error_message)
+
+        tree_node = root_tree_node.new_child('img', ImageTreeNode, attrs={'height': '-120'},
+                                             content='http://example.com/image.jpg')
+        tree_node.sanitize_node([])
+        self.assertEqual('Height must be positive', tree_node.error_message)
+        tree_node = root_tree_node.new_child('img', ImageTreeNode, attrs={'width': '-120'},
+                                             content='http://example.com/image.jpg')
+        tree_node.sanitize_node([])
+        self.assertEqual('Width must be positive', tree_node.error_message)
+
+        tree_node = root_tree_node.new_child('img', ImageTreeNode, attrs={'height': 'abc'},
+                                             content='http://example.com/image.jpg')
+        tree_node.sanitize_node([])
+        self.assertEqual('abc is not a number', tree_node.error_message)
+        tree_node = root_tree_node.new_child('img', ImageTreeNode, attrs={'width': 'abc'},
+                                             content='http://example.com/image.jpg')
+        tree_node.sanitize_node([])
+        self.assertEqual('abc is not a number', tree_node.error_message)
+
+        tree_node = root_tree_node.new_child('img', ImageTreeNode, attrs={}, content='http://example.com/image.jpg')
+        tree_node.sanitize_node([])
+        self.assertEqual('', tree_node.error_message)
+        tree_node = root_tree_node.new_child('img', ImageTreeNode, attrs={}, content='')
+        tree_node.sanitize_node([])
+        self.assertEqual('Missing source URL', tree_node.error_message)
+
     def test_render_html(self):
         """ Test the ``render_html`` method. """
         root_tree_node = RootTreeNode()
@@ -387,6 +424,17 @@ class YoutubeVideosTagTestCase(unittest.TestCase):
         tree_node = root_tree_node.new_child('youtube', YoutubeTreeNode, content='youtu.be/')
         video_id = tree_node.get_youtube_video_id()
         self.assertEqual('', video_id)
+
+    def test_sanitize_node(self):
+        """ Test if the ``sanitize_node`` method mark the node as erroneous when title is missing """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('youtube', YoutubeTreeNode,
+                                             content='https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+        tree_node.sanitize_node([])
+        self.assertEqual('', tree_node.error_message)
+        tree_node = root_tree_node.new_child('youtube', YoutubeTreeNode, content='')
+        tree_node.sanitize_node([])
+        self.assertEqual('Missing video URL', tree_node.error_message)
 
     def test_render_html(self):
         """ Test the ``render_html`` method. """
