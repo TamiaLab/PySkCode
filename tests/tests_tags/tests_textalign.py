@@ -29,6 +29,7 @@ class TextAlignTagsTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(CenterTextTreeNode.newline_closes)
         self.assertFalse(CenterTextTreeNode.same_tag_closes)
+        self.assertFalse(CenterTextTreeNode.weak_parent_close)
         self.assertFalse(CenterTextTreeNode.standalone)
         self.assertTrue(CenterTextTreeNode.parse_embedded)
         self.assertFalse(CenterTextTreeNode.inline)
@@ -43,11 +44,23 @@ class TextAlignTagsTestCase(unittest.TestCase):
         root_tree_node = RootTreeNode()
         tree_node = root_tree_node.new_child('center', CenterTextTreeNode)
         self.assertEqual('<p class="text-center">test</p>\n', tree_node.render_html('test'))
+        tree_node = root_tree_node.new_child('center', LeftTextTreeNode)
+        self.assertEqual('<p class="text-left">test</p>\n', tree_node.render_html('test'))
+        tree_node = root_tree_node.new_child('center', RightTextTreeNode)
+        self.assertEqual('<p class="text-right">test</p>\n', tree_node.render_html('test'))
+        tree_node = root_tree_node.new_child('center', JustifyTextTreeNode)
+        self.assertEqual('<p class="text-justify">test</p>\n', tree_node.render_html('test'))
 
     def test_render_text(self):
         """ Test the ``render_text`` method. """
         root_tree_node = RootTreeNode()
         tree_node = root_tree_node.new_child('center', CenterTextTreeNode)
+        self.assertEqual('test', tree_node.render_text('test'))
+        tree_node = root_tree_node.new_child('center', LeftTextTreeNode)
+        self.assertEqual('test', tree_node.render_text('test'))
+        tree_node = root_tree_node.new_child('center', RightTextTreeNode)
+        self.assertEqual('test', tree_node.render_text('test'))
+        tree_node = root_tree_node.new_child('center', JustifyTextTreeNode)
         self.assertEqual('test', tree_node.render_text('test'))
 
     def test_center_subclass(self):
