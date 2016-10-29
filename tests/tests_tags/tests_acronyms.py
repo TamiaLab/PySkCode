@@ -19,6 +19,7 @@ class AcronymTreeNodeTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(AcronymTreeNode.newline_closes)
         self.assertFalse(AcronymTreeNode.same_tag_closes)
+        self.assertFalse(AcronymTreeNode.weak_parent_close)
         self.assertFalse(AcronymTreeNode.standalone)
         self.assertTrue(AcronymTreeNode.parse_embedded)
         self.assertTrue(AcronymTreeNode.inline)
@@ -60,11 +61,20 @@ class AcronymTreeNodeTestCase(unittest.TestCase):
 
     def test_get_acronym_title_with_html_entities(self):
         """ Test the ``get_acronym_title`` method with a title containing HTML entities. """
-        
         root_tree_node = RootTreeNode()
         tree_node = root_tree_node.new_child('abbr', AcronymTreeNode, attrs={'title': '&lt;test&gt;'})
         title = tree_node.get_acronym_title()
         self.assertEqual('<test>', title)
+
+    def test_sanitize_node(self):
+        """ Test if the ``sanitize_node`` method mark the node as erroneous when title is missing """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('abbr', AcronymTreeNode, attrs={})
+        tree_node.sanitize_node([])
+        self.assertEqual('Missing acronym definition', tree_node.error_message)
+        tree_node = root_tree_node.new_child('abbr', AcronymTreeNode, attrs={'abbr': '', 'title': ''})
+        tree_node.sanitize_node([])
+        self.assertEqual('Missing acronym definition', tree_node.error_message)
 
     def test_html_rendering(self):
         """ Test HTML rendering. """

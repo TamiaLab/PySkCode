@@ -4,6 +4,8 @@ SkCode acronym tag definitions code.
 
 import string
 
+from gettext import gettext as _
+
 from html import escape as escape_html
 from html import unescape as unescape_html_entities
 
@@ -39,6 +41,15 @@ class AcronymTreeNode(TreeNode):
         abbr_title = self.get_attribute_value('', self.acronym_title_attr_name)
         return unescape_html_entities(abbr_title)
 
+    def sanitize_node(self, breadcrumb):
+        """
+        Callback function for sanitizing and cleaning-up the given node.
+        :param breadcrumb: The breadcrumb of node instances from the root node to the current node (excluded).
+        """
+        super(AcronymTreeNode, self).sanitize_node(breadcrumb)
+        if not self.get_acronym_title():
+            self.error_message = _('Missing acronym definition')
+
     def render_html(self, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
@@ -47,10 +58,9 @@ class AcronymTreeNode(TreeNode):
         :return The rendered HTML of this node.
         """
         abbr_title = self.get_acronym_title()
-        if abbr_title:
-            return self.html_render_template.format(title=escape_html(abbr_title), inner_html=inner_html)
-        else:
+        if not abbr_title:
             return inner_html
+        return self.html_render_template.format(title=escape_html(abbr_title), inner_html=inner_html)
 
     def render_text(self, inner_text, **kwargs):
         """
@@ -60,9 +70,7 @@ class AcronymTreeNode(TreeNode):
         :return The rendered text of this node.
         """
         abbr_title = self.get_acronym_title()
-        if abbr_title:
-            end_of_str = inner_text[-1] if inner_text[-1] in string.whitespace else ''
-            inner_text = inner_text.rstrip()
-            return self.text_render_template.format(title=abbr_title, inner_text=inner_text) + end_of_str
-        else:
+        if not abbr_title:
             return inner_text
+        end_of_str = inner_text[-1] if inner_text[-1] in string.whitespace else ''
+        return self.text_render_template.format(title=abbr_title, inner_text=inner_text.rstrip()) + end_of_str
