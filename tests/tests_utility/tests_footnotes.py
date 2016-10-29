@@ -80,19 +80,19 @@ class FootnotesUtilityTagTestCase(unittest.TestCase):
         footnotes = [a1, a2, a3, a4]
         self.assertEqual("""<div class="footnotes">
 <p class="footnotes-details">
-<a id="footnote-1" href="#footnote-backref-1"><sup>[1]</sup></a>
+<a id="footnote-footnote-1" href="#footnote-backref-footnote-1"><sup>[footnote-1]</sup></a>
 Line 1
 </p>
 <p class="footnotes-details">
-<a id="footnote-2" href="#footnote-backref-2"><sup>[2]</sup></a>
+<a id="footnote-footnote-2" href="#footnote-backref-footnote-2"><sup>[footnote-2]</sup></a>
 Line 2
 </p>
 <p class="footnotes-details">
-<a id="footnote-3" href="#footnote-backref-3"><sup>[3]</sup></a>
+<a id="footnote-footnote-3" href="#footnote-backref-footnote-3"><sup>[footnote-3]</sup></a>
 Line 3
 </p>
 <p class="footnotes-details">
-<a id="footnote-4" href="#footnote-backref-4"><sup>[4]</sup></a>
+<a id="footnote-footnote-4" href="#footnote-backref-footnote-4"><sup>[footnote-4]</sup></a>
 Line 4
 </p>
 </div>""", render_footnotes_html(footnotes))
@@ -113,19 +113,19 @@ Line 4
         footnotes = [a1, a2, a3, a4]
         self.assertEqual("""<div class="custom_div">
 <p class="custom_p">
-<a id="footnote-1" href="#footnote-backref-1"><sup>[1]</sup></a>
+<a id="footnote-footnote-1" href="#footnote-backref-footnote-1"><sup>[footnote-1]</sup></a>
 Line 1
 </p>
 <p class="custom_p">
-<a id="footnote-2" href="#footnote-backref-2"><sup>[2]</sup></a>
+<a id="footnote-footnote-2" href="#footnote-backref-footnote-2"><sup>[footnote-2]</sup></a>
 Line 2
 </p>
 <p class="custom_p">
-<a id="footnote-3" href="#footnote-backref-3"><sup>[3]</sup></a>
+<a id="footnote-footnote-3" href="#footnote-backref-footnote-3"><sup>[footnote-3]</sup></a>
 Line 3
 </p>
 <p class="custom_p">
-<a id="footnote-4" href="#footnote-backref-4"><sup>[4]</sup></a>
+<a id="footnote-footnote-4" href="#footnote-backref-footnote-4"><sup>[footnote-4]</sup></a>
 Line 4
 </p>
 </div>""", render_footnotes_html(footnotes,
@@ -149,4 +149,4 @@ Line 4
         a4 = document_tree.new_child('footnote', CustomFootnoteDeclarationTagOption)
         a4.new_child(None, TextTreeNode, content='Line 4')
         footnotes = [a1, a2, a3, a4]
-        self.assertEqual('[^1]: Line 1\n[^2]: Line 2\n[^3]: Line 3\n[^4]: Line 4\n\n', render_footnotes_text(footnotes))
+        self.assertEqual('[^footnote-1]: Line 1\n[^footnote-2]: Line 2\n[^footnote-3]: Line 3\n[^footnote-4]: Line 4\n\n', render_footnotes_text(footnotes))

@@ -2,6 +2,8 @@
 SkCode footnotes tag definitions code.
 """
 
+from gettext import gettext as _
+
 from html import escape as escape_html
 
 from ..etree import TreeNode
@@ -21,16 +23,19 @@ class FootnoteDeclarationTreeNode(TreeNode):
     footnote_id_attr_name = 'id'
 
     # Footnote ID format for HTML rendering
-    footnote_id_html_format = 'footnote-%s'
+    footnote_id_html_format = 'footnote-{}'
 
     # Footnote ID format for HTML rendering (back ref to declaration)
-    footnote_id_html_format_backref = 'footnote-backref-%s'
+    footnote_id_html_format_backref = 'footnote-backref-{}'
 
     # Cached footnote counter attribute name (for this node)
     cached_footnote_counter_attr_name = '_cached_footnote_counter'
 
     # Last footnote counter attribute name (for the root node)
     last_footnote_counter_attr_name = '_last_footnote_counter'
+
+    # Format string for the footnote counter
+    footnote_counter_format = 'footnote-{}'
 
     # HTML template for rendering
     html_render_template = '<a id="{backward_id}" href="#{forward_id}"><sup>[{footnote_id}]</sup></a>'
@@ -46,7 +51,7 @@ class FootnoteDeclarationTreeNode(TreeNode):
 
         # Get the ID from the node cache if exists
         if hasattr(self, self.cached_footnote_counter_attr_name):
-            return str(getattr(self, self.cached_footnote_counter_attr_name))
+            return self.footnote_counter_format.format(getattr(self, self.cached_footnote_counter_attr_name))
 
         # Get the current counter value
         counter = getattr(self.root_tree_node, self.last_footnote_counter_attr_name, 0)
@@ -59,21 +64,18 @@ class FootnoteDeclarationTreeNode(TreeNode):
         setattr(self, self.cached_footnote_counter_attr_name, counter)
 
         # Return the ID for this footnote
-        return str(counter)
+        return self.footnote_counter_format.format(counter)
 
-    def get_footnote_id(self, use_auto_generated_id=True):
+    def get_footnote_id(self):
         """
         Get the ID of this footnote.
         The ID can be set by setting the ``footnote_id_attr_name`` attribute of the tag or simply
-        by setting the tag name attribute. If not set at all, an auto-generated ID will be used if
-        ``use_auto_generated_id=True`` (default).
+        by setting the tag name attribute. If not set at all, an auto-generated ID will be used.
         The lookup order is: tag name (first), ``footnote_id_attr_name``, the auto generated ID.
-        :param use_auto_generated_id: Set to ``True`` to use an auto-generated ID if no user ID is available
-        (default ``True``).
         :return: The ID of this footnote.
         """
         footnote_id = self.get_attribute_value('', self.footnote_id_attr_name)
-        if not footnote_id and use_auto_generated_id:
+        if not footnote_id:
             footnote_id = self.get_footnote_id_from_counter()
         return slugify(footnote_id)
 
@@ -83,7 +85,7 @@ class FootnoteDeclarationTreeNode(TreeNode):
         :param footnote_id: The raw footnote ID.
         :return: The footnote reference ID.
         """
-        return escape_html(self.footnote_id_html_format % footnote_id)
+        return escape_html(self.footnote_id_html_format.format(footnote_id))
 
     def get_footnote_backref_id(self, footnote_id):
         """
@@ -91,7 +93,19 @@ class FootnoteDeclarationTreeNode(TreeNode):
         :param footnote_id: The raw footnote ID.
         :return: The footnote back-reference ID.
         """
-        return escape_html(self.footnote_id_html_format_backref % footnote_id)
+        return escape_html(self.footnote_id_html_format_backref.format(footnote_id))
+
+    def pre_process_node(self):
+        """
+        Callback function for pre-processing the given node. Allow registration of IDs, references, etc.
+        This function is called in a top-to-down visit order, starting from the root node and going down to each
+        leaf node.
+        """
+        footnote_id = self.get_footnote_id()
+        if footnote_id in self.root_tree_node.known_ids:
+            self.error_message = _('ID already used previously')
+        else:
+            self.root_tree_node.known_ids.add(footnote_id)
 
     def render_html(self, inner_html, **kwargs):
         """
@@ -100,11 +114,7 @@ class FootnoteDeclarationTreeNode(TreeNode):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-
-        # Get the footnote ID
         footnote_id = self.get_footnote_id()
-
-        # Render the footnote
         return self.html_render_template.format(
             backward_id=self.get_footnote_backref_id(footnote_id),
             forward_id=self.get_footnote_ref_id(footnote_id),
@@ -118,11 +128,7 @@ class FootnoteDeclarationTreeNode(TreeNode):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered text of this node.
         """
-
-        # Get the footnote ID
         footnote_id = self.get_footnote_id()
-
-        # Render the footnote
         return self.text_render_template.format(footnote_id=footnote_id)
 
 
@@ -136,7 +142,7 @@ class FootnoteReferenceTreeNode(TreeNode):
     alias_tag_names = ()
 
     # Footnote ID format for HTML rendering
-    footnote_id_html_format = 'footnote-%s'
+    footnote_id_html_format = 'footnote-{}'
 
     # HTML template for rendering
     html_render_template = '<a href="#{forward_id}"><sup>[{footnote_id}]</sup></a>'
@@ -147,7 +153,6 @@ class FootnoteReferenceTreeNode(TreeNode):
     def get_footnote_id(self):
         """
         Get the target ID of this footnote reference from the content of the node.
-
         :return: The target ID of this footnote reference.
         """
         return slugify(self.get_raw_content())
@@ -158,7 +163,19 @@ class FootnoteReferenceTreeNode(TreeNode):
         :param footnote_id: The raw footnote ID.
         :return: The footnote reference ID.
         """
-        return escape_html(self.footnote_id_html_format % footnote_id)
+        return escape_html(self.footnote_id_html_format.format(footnote_id))
+
+    def sanitize_node(self, breadcrumb):
+        """
+        Callback function for sanitizing and cleaning-up the given node.
+        :param breadcrumb: The breadcrumb of node instances from the root node to the current node (excluded).
+        """
+        super(FootnoteReferenceTreeNode, self).sanitize_node(breadcrumb)
+        footnote_id = self.get_footnote_id()
+        if not footnote_id:
+            self.error_message = _('Missing footnote ID')
+        elif footnote_id not in self.root_tree_node.known_ids:
+            self.error_message = _('Unknown footnote ID')
 
     def render_html(self, inner_html, **kwargs):
         """
@@ -167,8 +184,6 @@ class FootnoteReferenceTreeNode(TreeNode):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-
-        # Get the footnote ID
         footnote_id = self.get_footnote_id()
         return self.html_render_template.format(
             forward_id=self.get_footnote_ref_id(footnote_id),
@@ -181,7 +196,5 @@ class FootnoteReferenceTreeNode(TreeNode):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered text of this node.
         """
-
-        # Get the footnote ID
         footnote_id = self.get_footnote_id()
         return self.text_render_template.format(footnote_id=footnote_id) if footnote_id else inner_text
