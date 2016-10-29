@@ -2,6 +2,8 @@
 SkCode figures tag definitions code.
 """
 
+from gettext import gettext as _
+
 from ..etree import TreeNode
 from ..tools import slugify
 from ..render import render_inner_text
@@ -60,6 +62,38 @@ class FigureDeclarationTreeNode(TreeNode):
     # HTML template for the rendering
     render_html_template = '<figure class="{class_name}" id="{figure_id}">{inner_html}</figure>\n'
 
+    # Cached figure counter attribute name (for this node)
+    cached_figure_counter_attr_name = '_cached_figure_counter'
+
+    # Last figure counter attribute name (for the root node)
+    last_figure_counter_attr_name = '_last_figure_counter'
+
+    # Format string for the figure counter
+    figure_counter_format = 'figure-{}'
+
+    def get_figure_id_from_counter(self):
+        """
+        Get the figure ID from the counter stored in the root tree node or in the tree node cache.
+        :return: The figure ID retrieved from the root tree node counter.
+        """
+
+        # Get the ID from the node cache if exists
+        if hasattr(self, self.cached_figure_counter_attr_name):
+            return self.figure_counter_format.format(getattr(self, self.cached_figure_counter_attr_name))
+
+        # Get the current counter value
+        counter = getattr(self.root_tree_node, self.last_figure_counter_attr_name, 0)
+
+        # Increment and store the counter
+        counter += 1
+        setattr(self.root_tree_node, self.last_figure_counter_attr_name, counter)
+
+        # Store the ID in the node cache to avoid multiple ID generation
+        setattr(self, self.cached_figure_counter_attr_name, counter)
+
+        # Return the ID for this figure
+        return self.figure_counter_format.format(counter)
+
     def get_figure_id(self):
         """
         Get the ID of this figure.
@@ -69,17 +103,31 @@ class FigureDeclarationTreeNode(TreeNode):
         :return: The ID of this figure, or an empty string.
         """
         figure_id = self.get_attribute_value('', self.figure_id_attr_name)
+        if not figure_id:
+            figure_id = self.get_figure_id_from_counter()
         return slugify(figure_id)
 
     def get_figure_caption_node(self):
         """
         Return the first figure caption node found in direct children of the tree node.
-        :return: The first figure caption node instance found, or None.
+        :return: The first figure caption node instance found, or ``None``.
         """
         for child in self.children:
             if isinstance(child, self.figure_caption_class):
                 return child
         return None
+
+    def pre_process_node(self):
+        """
+        Callback function for pre-processing the given node. Allow registration of IDs, references, etc.
+        This function is called in a top-to-down visit order, starting from the root node and going down to each
+        leaf node.
+        """
+        figure_id = self.get_figure_id()
+        if figure_id in self.root_tree_node.known_ids:
+            self.error_message = _('ID already used previously')
+        else:
+            self.root_tree_node.known_ids.add(figure_id)
 
     def render_html(self, inner_html, **kwargs):
         """
@@ -88,11 +136,7 @@ class FigureDeclarationTreeNode(TreeNode):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-
-        # Get the figure ID
         figure_id = self.get_figure_id()
-
-        # Render the figure
         return self.render_html_template.format(class_name=self.figure_css_class_name,
                                                 figure_id=figure_id, inner_html=inner_html)
 

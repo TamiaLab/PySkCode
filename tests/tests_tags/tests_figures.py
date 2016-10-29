@@ -6,10 +6,12 @@ import unittest
 from unittest import mock
 
 from skcode.etree import RootTreeNode
-from skcode.tags import (TextTreeNode,
-                         FigureDeclarationTreeNode,
-                         FigureCaptionTreeNode,
-                         DEFAULT_RECOGNIZED_TAGS_LIST)
+from skcode.tags import (
+    TextTreeNode,
+    FigureDeclarationTreeNode,
+    FigureCaptionTreeNode,
+    DEFAULT_RECOGNIZED_TAGS_LIST
+)
 
 
 class CustomFigureDeclarationTreeNode(FigureDeclarationTreeNode):
@@ -35,6 +37,7 @@ class FigureCaptionTreeNodeTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(FigureCaptionTreeNode.newline_closes)
         self.assertFalse(FigureCaptionTreeNode.same_tag_closes)
+        self.assertFalse(FigureCaptionTreeNode.weak_parent_close)
         self.assertFalse(FigureCaptionTreeNode.standalone)
         self.assertTrue(FigureCaptionTreeNode.parse_embedded)
         self.assertFalse(FigureCaptionTreeNode.inline)
@@ -81,6 +84,7 @@ class FigureDeclarationTreeNodeTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(FigureDeclarationTreeNode.newline_closes)
         self.assertFalse(FigureDeclarationTreeNode.same_tag_closes)
+        self.assertFalse(FigureDeclarationTreeNode.weak_parent_close)
         self.assertFalse(FigureDeclarationTreeNode.standalone)
         self.assertTrue(FigureDeclarationTreeNode.parse_embedded)
         self.assertFalse(FigureDeclarationTreeNode.inline)
@@ -91,6 +95,37 @@ class FigureDeclarationTreeNodeTestCase(unittest.TestCase):
         self.assertEqual('id', FigureDeclarationTreeNode.figure_id_attr_name)
         self.assertEqual(FigureCaptionTreeNode, FigureDeclarationTreeNode.figure_caption_class)
         self.assertEqual('thumbnail', FigureDeclarationTreeNode.figure_css_class_name)
+        self.assertEqual('<figure class="{class_name}" id="{figure_id}">{inner_html}</figure>\n',
+                         FigureDeclarationTreeNode.render_html_template)
+        self.assertEqual('_cached_figure_counter', FigureDeclarationTreeNode.cached_figure_counter_attr_name)
+        self.assertEqual('_last_figure_counter', FigureDeclarationTreeNode.last_figure_counter_attr_name)
+        self.assertEqual('figure-{}', FigureDeclarationTreeNode.figure_counter_format)
+
+    def test_get_figure_id_from_counter_once(self):
+        """ Test the ``get_figure_id_from_counter`` method by calling it once. """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('figure', FigureDeclarationTreeNode)
+        self.assertEqual('figure-1', tree_node.get_figure_id_from_counter())
+
+    def test_get_figure_id_from_counter_multiple(self):
+        """ Test the ``get_figure_id_from_counter`` method by calling it multiple time. """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('figure', FigureDeclarationTreeNode)
+        self.assertEqual('figure-1', tree_node.get_figure_id_from_counter())
+        self.assertEqual('figure-1', tree_node.get_figure_id_from_counter())
+
+    def test_get_figure_id_from_counter_increment(self):
+        """ Test the ``get_figure_id_from_counter`` method by calling it multiple time with different figures. """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('figure', FigureDeclarationTreeNode)
+        self.assertEqual('figure-1', tree_node.get_figure_id_from_counter())
+        self.assertEqual('figure-1', tree_node.get_figure_id_from_counter())
+        tree_node_2 = root_tree_node.new_child('figure', FigureDeclarationTreeNode)
+        self.assertEqual('figure-2', tree_node_2.get_figure_id_from_counter())
+        self.assertEqual('figure-2', tree_node_2.get_figure_id_from_counter())
+        tree_node_3 = root_tree_node.new_child('figure', FigureDeclarationTreeNode)
+        self.assertEqual('figure-3', tree_node_3.get_figure_id_from_counter())
+        self.assertEqual('figure-3', tree_node_3.get_figure_id_from_counter())
 
     def test_get_figure_id_with_tagname_set(self):
         """ Test the ``get_figure_id`` method with the tag name attribute set. """
@@ -121,7 +156,7 @@ class FigureDeclarationTreeNodeTestCase(unittest.TestCase):
         root_tree_node = RootTreeNode()
         tree_node = root_tree_node.new_child('figure', FigureDeclarationTreeNode, attrs={})
         rendered_output = tree_node.get_figure_id()
-        expected_output = ''
+        expected_output = 'figure-1'
         self.assertEqual(expected_output, rendered_output)
 
     def test_get_figure_id_call_slugify(self):
@@ -145,12 +180,24 @@ class FigureDeclarationTreeNodeTestCase(unittest.TestCase):
         tree_node = root_tree_node.new_child('figure', FigureDeclarationTreeNode)
         self.assertEqual(None, tree_node.get_figure_caption_node())
 
+    def test_pre_process_node(self):
+        """ Test the ``pre_process_node`` method. """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('figure', FigureDeclarationTreeNode)
+        tree_node.pre_process_node()
+        self.assertEqual('', tree_node.error_message)
+        self.assertEqual({'figure-1'}, root_tree_node.known_ids)
+        tree_node = root_tree_node.new_child('figure', FigureDeclarationTreeNode, attrs={'id': 'figure-1'})
+        tree_node.pre_process_node()
+        self.assertEqual('ID already used previously', tree_node.error_message)
+        self.assertEqual({'figure-1'}, root_tree_node.known_ids)
+
     def test_html_rendering(self):
         """ Test HTML rendering. """
         root_tree_node = RootTreeNode()
         tree_node = root_tree_node.new_child('figure', FigureDeclarationTreeNode)
         rendered_output = tree_node.render_html('test')
-        expected_output = '<figure class="thumbnail" id="">test</figure>\n'
+        expected_output = '<figure class="thumbnail" id="figure-1">test</figure>\n'
         self.assertEqual(expected_output, rendered_output)
 
     def test_html_rendering_with_id(self):
@@ -166,7 +213,7 @@ class FigureDeclarationTreeNodeTestCase(unittest.TestCase):
         root_tree_node = RootTreeNode()
         tree_node = root_tree_node.new_child('figure', CustomFigureDeclarationTreeNode)
         rendered_output = tree_node.render_html('test')
-        expected_output = '<figure class="custom_css" id="">test</figure>\n'
+        expected_output = '<figure class="custom_css" id="figure-1">test</figure>\n'
         self.assertEqual(expected_output, rendered_output)
 
     def test_text_rendering(self):
