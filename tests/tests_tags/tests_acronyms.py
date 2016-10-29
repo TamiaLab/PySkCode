@@ -5,7 +5,10 @@ SkCode acronym tag definitions test code.
 import unittest
 
 from skcode.etree import RootTreeNode
-from skcode.tags import AcronymTreeNode, DEFAULT_RECOGNIZED_TAGS_LIST
+from skcode.tags import (
+    AcronymTreeNode,
+    DEFAULT_RECOGNIZED_TAGS_LIST
+)
 
 
 class AcronymTreeNodeTestCase(unittest.TestCase):
