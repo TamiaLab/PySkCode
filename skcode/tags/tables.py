@@ -2,6 +2,8 @@
 SkCode tables tag definitions code.
 """
 
+from gettext import gettext as _
+
 from ..etree import TreeNode
 
 
@@ -99,9 +101,14 @@ class TableCellTreeNode(TreeNode):
         # If set, turn the string into an int
         try:
             user_colspan = int(user_colspan)
-            return user_colspan if user_colspan > 1 else 1
+            if user_colspan > 1:
+                return user_colspan
+            else:
+                self.error_message = _('Column span must be greater than 1')
         except ValueError:
+            self.error_message = _('{} is not a number').format(user_colspan)
             return 1
+        return 1
 
     def get_cell_rowspan(self):
         """
@@ -119,14 +126,18 @@ class TableCellTreeNode(TreeNode):
         # If set, turn the string into an int
         try:
             user_rowspan = int(user_rowspan)
-            return user_rowspan if user_rowspan > 1 else 1
+            if user_rowspan > 1:
+                return user_rowspan
+            else:
+                self.error_message = _('Row span must be greater than 1')
         except ValueError:
+            self.error_message = _('{} is not a number').format(user_rowspan)
             return 1
+        return 1
 
     def get_html_extra_attrs(self):
         """
         Return any extra attributes for the HTML rendering.
-        :return Any extra attributes for the HTML rendering.
         """
 
         # Get the column span
@@ -140,6 +151,15 @@ class TableCellTreeNode(TreeNode):
 
         # Return the string
         return extra_attrs
+
+    def sanitize_node(self, breadcrumb):
+        """
+        Callback function for sanitizing and cleaning-up the given node.
+        :param breadcrumb: The breadcrumb of node instances from the root node to the current node (excluded).
+        """
+        super(TableCellTreeNode, self).sanitize_node(breadcrumb)
+        self.get_cell_colspan()
+        self.get_cell_rowspan()
 
     def render_html(self, inner_html, **kwargs):
         """

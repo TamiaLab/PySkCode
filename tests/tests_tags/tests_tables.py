@@ -31,6 +31,7 @@ class TablesTagTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(TableTreeNode.newline_closes)
         self.assertFalse(TableTreeNode.same_tag_closes)
+        self.assertFalse(TableTreeNode.weak_parent_close)
         self.assertFalse(TableTreeNode.standalone)
         self.assertTrue(TableTreeNode.parse_embedded)
         self.assertFalse(TableTreeNode.inline)
@@ -77,6 +78,7 @@ class TableRowsTagTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(TableRowTreeNode.newline_closes)
         self.assertFalse(TableRowTreeNode.same_tag_closes)
+        self.assertFalse(TableRowTreeNode.weak_parent_close)
         self.assertFalse(TableRowTreeNode.standalone)
         self.assertTrue(TableRowTreeNode.parse_embedded)
         self.assertFalse(TableRowTreeNode.inline)
@@ -114,6 +116,7 @@ class TableCellsTagTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(TableCellTreeNode.newline_closes)
         self.assertFalse(TableCellTreeNode.same_tag_closes)
+        self.assertFalse(TableCellTreeNode.weak_parent_close)
         self.assertFalse(TableCellTreeNode.standalone)
         self.assertTrue(TableCellTreeNode.parse_embedded)
         self.assertFalse(TableCellTreeNode.inline)
@@ -209,6 +212,30 @@ class TableCellsTagTestCase(unittest.TestCase):
         extra_attrs = tree_node.get_html_extra_attrs()
         self.assertEqual(' colspan="2" rowspan="3"', extra_attrs)
 
+    def test_sanitize_node(self):
+        """ Test the ``sanitize_node`` method. """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('td', TableCellTreeNode, attrs={'rowspan': '3'})
+        tree_node.sanitize_node([])
+        self.assertEqual('', tree_node.error_message)
+        tree_node = root_tree_node.new_child('td', TableCellTreeNode, attrs={'colspan': '3'})
+        tree_node.sanitize_node([])
+        self.assertEqual('', tree_node.error_message)
+
+        tree_node = root_tree_node.new_child('td', TableCellTreeNode, attrs={'rowspan': '-3'})
+        tree_node.sanitize_node([])
+        self.assertEqual('Row span must be greater than 1', tree_node.error_message)
+        tree_node = root_tree_node.new_child('td', TableCellTreeNode, attrs={'colspan': '-3'})
+        tree_node.sanitize_node([])
+        self.assertEqual('Column span must be greater than 1', tree_node.error_message)
+
+        tree_node = root_tree_node.new_child('td', TableCellTreeNode, attrs={'rowspan': 'abc'})
+        tree_node.sanitize_node([])
+        self.assertEqual('abc is not a number', tree_node.error_message)
+        tree_node = root_tree_node.new_child('td', TableCellTreeNode, attrs={'colspan': 'abc'})
+        tree_node.sanitize_node([])
+        self.assertEqual('abc is not a number', tree_node.error_message)
+
     def test_html_rendering(self):
         """ Test HTML rendering. """
         root_tree_node = RootTreeNode()
@@ -257,6 +284,7 @@ class TableHeaderCellsTagTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(TableHeaderCellTreeNode.newline_closes)
         self.assertFalse(TableHeaderCellTreeNode.same_tag_closes)
+        self.assertFalse(TableHeaderCellTreeNode.weak_parent_close)
         self.assertFalse(TableHeaderCellTreeNode.standalone)
         self.assertTrue(TableHeaderCellTreeNode.parse_embedded)
         self.assertFalse(TableHeaderCellTreeNode.inline)
