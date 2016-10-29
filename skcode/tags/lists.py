@@ -2,6 +2,8 @@
 SkCode list tag definitions code.
 """
 
+from gettext import gettext as _
+
 from ..etree import TreeNode
 
 
@@ -170,9 +172,20 @@ class ListTreeNode(TreeNode):
             first_number = int(first_number)
             if first_number > 0:
                 return first_number
+            else:
+                self.error_message = _('First line number cannot be negative')
         except ValueError:
+            self.error_message = _('{} is not a number').format(first_number)
             return 1
         return 1
+
+    def sanitize_node(self, breadcrumb):
+        """
+        Callback function for sanitizing and cleaning-up the given node.
+        :param breadcrumb: The breadcrumb of node instances from the root node to the current node (excluded).
+        """
+        super(ListTreeNode, self).sanitize_node(breadcrumb)
+        self.get_list_first_number()
 
     def render_html(self, inner_html, **kwargs):
         """

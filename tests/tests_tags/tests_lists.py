@@ -120,6 +120,7 @@ class ListsTagTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(ListTreeNode.newline_closes)
         self.assertFalse(ListTreeNode.same_tag_closes)
+        self.assertFalse(ListTreeNode.weak_parent_close)
         self.assertFalse(ListTreeNode.standalone)
         self.assertTrue(ListTreeNode.parse_embedded)
         self.assertFalse(ListTreeNode.inline)
@@ -127,7 +128,6 @@ class ListsTagTestCase(unittest.TestCase):
         self.assertEqual('list', ListTreeNode.canonical_tag_name)
         self.assertEqual((), ListTreeNode.alias_tag_names)
         self.assertFalse(ListTreeNode.make_paragraphs_here)
-
         self.assertEqual((
             UNORDERED_LIST_TYPE,
             NUMERIC_LIST_TYPE,
@@ -165,7 +165,6 @@ class ListsTagTestCase(unittest.TestCase):
             UPPER_ROMAN_LIST_TYPE: 'I',
             LOWER_ROMAN_LIST_TYPE: 'i',
         }, ListTreeNode.alias_list_type_lut)
-
         self.assertEqual('<ul>{inner_html}</ul>\n', ListTreeNode.html_render_template_ul)
         self.assertEqual('<ol type="{list_type}">{inner_html}</ol>\n', ListTreeNode.html_render_template_ol)
         self.assertEqual('<ol type="{list_type}" start="{list_start}">{inner_html}</ol>\n',
@@ -250,11 +249,26 @@ class ListsTagTestCase(unittest.TestCase):
 
     def test_get_list_first_number_with_no_value(self):
         """ Test the ``get_list_first_number`` method with no value set. """
-
         root_tree_node = RootTreeNode()
         tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'start': ''})
         output_result = tree_node.get_list_first_number()
         self.assertEqual(1, output_result)
+
+    def test_sanitize_node(self):
+        """ Test the ``sanitize_node`` method. """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'start': '3'})
+        output_result = tree_node.get_list_first_number()
+        self.assertEqual(3, output_result)
+        self.assertEqual('', tree_node.error_message)
+        tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'start': '-3'})
+        output_result = tree_node.get_list_first_number()
+        self.assertEqual(1, output_result)
+        self.assertEqual('First line number cannot be negative', tree_node.error_message)
+        tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'start': 'abcd'})
+        output_result = tree_node.get_list_first_number()
+        self.assertEqual(1, output_result)
+        self.assertEqual('abcd is not a number', tree_node.error_message)
 
     def test_render_html_unordered(self):
         """ Test the ``render_html`` method. """
@@ -304,6 +318,7 @@ class UnorderedListsTagTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(UnorderedListTreeNode.newline_closes)
         self.assertFalse(UnorderedListTreeNode.same_tag_closes)
+        self.assertFalse(UnorderedListTreeNode.weak_parent_close)
         self.assertFalse(UnorderedListTreeNode.standalone)
         self.assertTrue(UnorderedListTreeNode.parse_embedded)
         self.assertFalse(UnorderedListTreeNode.inline)
@@ -335,6 +350,7 @@ class OrderedListsTagTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(OrderedListTreeNode.newline_closes)
         self.assertFalse(OrderedListTreeNode.same_tag_closes)
+        self.assertFalse(OrderedListTreeNode.weak_parent_close)
         self.assertFalse(OrderedListTreeNode.standalone)
         self.assertTrue(OrderedListTreeNode.parse_embedded)
         self.assertFalse(OrderedListTreeNode.inline)
