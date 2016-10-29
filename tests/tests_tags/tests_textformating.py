@@ -24,6 +24,42 @@ from skcode.tags import (
 from skcode.tags.textformatting import InlineWrappingTreeNode
 
 
+class TestInlineWrappingTreeNode(InlineWrappingTreeNode):
+    """ Test class """
+
+    wrapping_format = 'foo{}bar'
+
+
+class InlineWrappingTreeNodeTestCase(unittest.TestCase):
+    """ Tests suite for the inline code tag module. """
+
+    def test_tag_constant_values(self):
+        """ Test tag constants. """
+        self.assertFalse(InlineWrappingTreeNode.newline_closes)
+        self.assertFalse(InlineWrappingTreeNode.same_tag_closes)
+        self.assertFalse(InlineWrappingTreeNode.weak_parent_close)
+        self.assertFalse(InlineWrappingTreeNode.standalone)
+        self.assertTrue(InlineWrappingTreeNode.parse_embedded)
+        self.assertTrue(InlineWrappingTreeNode.inline)
+        self.assertFalse(InlineWrappingTreeNode.close_inlines)
+        self.assertFalse(InlineWrappingTreeNode.make_paragraphs_here)
+        self.assertIsNone(InlineWrappingTreeNode.wrapping_format)
+
+    def test_render_html(self):
+        """ Test the ``render_html`` method. """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('test', TestInlineWrappingTreeNode, content='test')
+        output_result = tree_node.render_html('test')
+        self.assertEqual('footestbar', output_result)
+
+    def test_render_text(self):
+        """ Test the ``render_text`` method. """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('test', TestInlineWrappingTreeNode, content='test')
+        output_result = tree_node.render_text('test')
+        self.assertEqual('test', output_result)
+
+
 class BoldTextTagTestCase(unittest.TestCase):
     """ Tests suite for the bold text tag module. """
 
@@ -155,6 +191,7 @@ class InlineCodeTextTagTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(InlineCodeTextTreeNode.newline_closes)
         self.assertFalse(InlineCodeTextTreeNode.same_tag_closes)
+        self.assertFalse(InlineCodeTextTreeNode.weak_parent_close)
         self.assertFalse(InlineCodeTextTreeNode.standalone)
         self.assertFalse(InlineCodeTextTreeNode.parse_embedded)
         self.assertTrue(InlineCodeTextTreeNode.inline)
