@@ -138,22 +138,22 @@ class FixedTextColorTagTestCase(unittest.TestCase):
 
     def test_automatic_tag_name(self):
         """ Test the constructor with no custom tag name set. """
-        opts = generate_fixed_color_text_cls('customtype')
-        self.assertEqual('customtype', opts.color_value)
-        self.assertEqual('customtype', opts.canonical_tag_name)
-        self.assertEqual((), opts.alias_tag_names)
+        cls = generate_fixed_color_text_cls('customtype')
+        self.assertEqual('customtype', cls.color_value)
+        self.assertEqual('customtype', cls.canonical_tag_name)
+        self.assertEqual((), cls.alias_tag_names)
 
     def test_custom_tag_name(self):
         """ Test the constructor with a custom tag name set. """
-        opts = generate_fixed_color_text_cls('customtype', canonical_tag_name='foobar')
-        self.assertEqual('customtype', opts.color_value)
-        self.assertEqual('foobar', opts.canonical_tag_name)
-        self.assertEqual((), opts.alias_tag_names)
+        cls = generate_fixed_color_text_cls('customtype', canonical_tag_name='foobar')
+        self.assertEqual('customtype', cls.color_value)
+        self.assertEqual('foobar', cls.canonical_tag_name)
+        self.assertEqual((), cls.alias_tag_names)
 
     def test_get_color_value_method(self):
         """ Test the ``get_color_value`` method. """
-        opts = generate_fixed_color_text_cls('customtype')
+        cls = generate_fixed_color_text_cls('customtype')
         root_tree_node = RootTreeNode()
-        tree_node = root_tree_node.new_child('alert', opts, attrs={})
-        color_value = opts.get_color_value(tree_node)
+        tree_node = root_tree_node.new_child('alert', cls, attrs={})
+        color_value = tree_node.get_color_value()
         self.assertEqual('customtype', color_value)

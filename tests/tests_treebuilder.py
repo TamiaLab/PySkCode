@@ -145,7 +145,7 @@ class ParserTestCase(unittest.TestCase):
         self.assertEqual('', child_node.source_close_tag)
         self.assertEqual('', child_node.error_message)
 
-    def test_data_custom_text_opts(self):
+    def test_data_custom_text_cls(self):
         """ Test the tree builder with some raw text data and a custom text node class """
         document_tree = parse_skcode('Foobar', text_node_cls=CustomTextTreeNode)
         self.assertIsInstance(document_tree, RootTreeNode)

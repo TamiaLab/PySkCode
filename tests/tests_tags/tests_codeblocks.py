@@ -628,17 +628,17 @@ class FixedCodeBlocksTagTestCase(unittest.TestCase):
 
     def test_automatic_tag_name(self):
         """ Test the constructor with no custom tag name set. """
-        opts = generate_fixed_code_block_type_cls('customtype')
-        self.assertEqual('customtype', opts.language_name)
-        self.assertEqual('customtype', opts.canonical_tag_name)
-        self.assertEqual((), opts.alias_tag_names)
+        cls = generate_fixed_code_block_type_cls('customtype')
+        self.assertEqual('customtype', cls.language_name)
+        self.assertEqual('customtype', cls.canonical_tag_name)
+        self.assertEqual((), cls.alias_tag_names)
 
     def test_custom_tag_name(self):
         """ Test the constructor with a custom tag name set. """
-        opts = generate_fixed_code_block_type_cls('customtype', canonical_tag_name='foobar')
-        self.assertEqual('customtype', opts.language_name)
-        self.assertEqual('foobar', opts.canonical_tag_name)
-        self.assertEqual((), opts.alias_tag_names)
+        cls = generate_fixed_code_block_type_cls('customtype', canonical_tag_name='foobar')
+        self.assertEqual('customtype', cls.language_name)
+        self.assertEqual('foobar', cls.canonical_tag_name)
+        self.assertEqual((), cls.alias_tag_names)
 
     def test_get_language_name_method(self):
         """ Test if the ``get_language_name`` return the value set at constructor. """

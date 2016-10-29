@@ -354,22 +354,22 @@ class FixedAlertBoxTreeNodeTestCase(unittest.TestCase):
 
     def test_automatic_tag_name(self):
         """ Test the constructor with no custom tag name set. """
-        opts = generate_fixed_alert_type_cls('customtype')
-        self.assertEqual('customtype', opts.alert_type)
-        self.assertEqual('customtype', opts.canonical_tag_name)
-        self.assertEqual((), opts.alias_tag_names)
+        cls = generate_fixed_alert_type_cls('customtype')
+        self.assertEqual('customtype', cls.alert_type)
+        self.assertEqual('customtype', cls.canonical_tag_name)
+        self.assertEqual((), cls.alias_tag_names)
 
     def test_custom_tag_name(self):
         """ Test the constructor with a custom tag name set. """
-        opts = generate_fixed_alert_type_cls('customtype', canonical_tag_name='foobar')
-        self.assertEqual('customtype', opts.alert_type)
-        self.assertEqual('foobar', opts.canonical_tag_name)
-        self.assertEqual((), opts.alias_tag_names)
+        cls = generate_fixed_alert_type_cls('customtype', canonical_tag_name='foobar')
+        self.assertEqual('customtype', cls.alert_type)
+        self.assertEqual('foobar', cls.canonical_tag_name)
+        self.assertEqual((), cls.alias_tag_names)
 
     def test_get_alert_type_method(self):
         """ Test the ``get_alert_type`` method. """
-        opts = generate_fixed_alert_type_cls('customtype')
+        cls = generate_fixed_alert_type_cls('customtype')
         root_tree_node = RootTreeNode()
-        tree_node = root_tree_node.new_child('alert', opts, attrs={})
-        alert_type = opts.get_alert_type(tree_node)
+        tree_node = root_tree_node.new_child('alert', cls, attrs={})
+        alert_type = tree_node.get_alert_type()
         self.assertEqual('customtype', alert_type)
