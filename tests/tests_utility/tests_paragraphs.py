@@ -144,3 +144,14 @@ class ParagraphsUtilityTagTestCase(unittest.TestCase):
         self.assertEqual(root_tree_node.children[1], z)
         self.assertIsInstance(root_tree_node.children[2], ParagraphTreeNode)
         self.assertEqual([c, d], root_tree_node.children[2].children)
+
+    def test_make_paragraphs_erroneous_nodes(self):
+        """ Test the ``make_paragraphs`` paragraph utility. """
+        root_tree_node = RootTreeNode()
+        a = root_tree_node.new_child(None, TextTreeNode, content='Text 1')
+        b = root_tree_node.new_child(None, TextTreeNode, content='', error_message='Foobar')
+        c = root_tree_node.new_child(None, NewlineTreeNode)
+        make_paragraphs(root_tree_node)
+        self.assertEqual(len(root_tree_node.children), 1)
+        self.assertIsInstance(root_tree_node.children[0], ParagraphTreeNode)
+        self.assertEqual([a, b, c], root_tree_node.children[0].children)

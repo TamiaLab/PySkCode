@@ -62,7 +62,7 @@ def make_paragraphs(tree_node,
     for child_node in tree_node.children:
 
         # Ignore blank lines
-        if isinstance(child_node, text_node_cls) and not child_node.content.strip():
+        if isinstance(child_node, text_node_cls) and not child_node.content.strip() and not child_node.error_message:
             continue
 
         # Handle newlines
