@@ -5,10 +5,12 @@ SkCode definitions list tag definitions code.
 import unittest
 
 from skcode.etree import RootTreeNode
-from skcode.tags import (DefinitionListTreeNode,
-                         DefinitionListTermTreeNode,
-                         DefinitionListTermDefinitionTreeNode,
-                         DEFAULT_RECOGNIZED_TAGS_LIST)
+from skcode.tags import (
+    DefinitionListTreeNode,
+    DefinitionListTermTreeNode,
+    DefinitionListTermDefinitionTreeNode,
+    DEFAULT_RECOGNIZED_TAGS_LIST
+)
 
 
 class DefinitionListTreeNodeTestCase(unittest.TestCase):
@@ -22,6 +24,7 @@ class DefinitionListTreeNodeTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(DefinitionListTreeNode.newline_closes)
         self.assertFalse(DefinitionListTreeNode.same_tag_closes)
+        self.assertFalse(DefinitionListTreeNode.weak_parent_close)
         self.assertFalse(DefinitionListTreeNode.standalone)
         self.assertTrue(DefinitionListTreeNode.parse_embedded)
         self.assertFalse(DefinitionListTreeNode.inline)
@@ -59,6 +62,7 @@ class DefinitionListTermTreeNodeTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(DefinitionListTermTreeNode.newline_closes)
         self.assertFalse(DefinitionListTermTreeNode.same_tag_closes)
+        self.assertFalse(DefinitionListTermTreeNode.weak_parent_close)
         self.assertFalse(DefinitionListTermTreeNode.standalone)
         self.assertTrue(DefinitionListTermTreeNode.parse_embedded)
         self.assertFalse(DefinitionListTermTreeNode.inline)
@@ -105,6 +109,7 @@ class DefinitionListTermDefinitionTreeNodeTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(DefinitionListTermDefinitionTreeNode.newline_closes)
         self.assertFalse(DefinitionListTermDefinitionTreeNode.same_tag_closes)
+        self.assertFalse(DefinitionListTermDefinitionTreeNode.weak_parent_close)
         self.assertFalse(DefinitionListTermDefinitionTreeNode.standalone)
         self.assertTrue(DefinitionListTermDefinitionTreeNode.parse_embedded)
         self.assertFalse(DefinitionListTermDefinitionTreeNode.inline)
