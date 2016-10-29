@@ -392,6 +392,7 @@ class RootTreeNodeTestCase(unittest.TestCase):
     def test_node_creation(self):
         """ Test if the tree node constructor work as expected. """
         root_tree_node = RootTreeNode()
+        self.assertEqual(set(), root_tree_node.known_ids)
         self.assertEqual(root_tree_node.root_tree_node, root_tree_node)
         self.assertIsNone(root_tree_node.parent)
         self.assertIsNone(root_tree_node.name)

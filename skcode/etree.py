@@ -304,6 +304,7 @@ class RootTreeNode(TreeNode):
         :param attrs: The root node attributes dictionary (default to an empty dictionary).
         :param children: The root node children list (default to an empty list).
         """
+        self.known_ids = set()
         super(RootTreeNode, self).__init__(self, None, None, attrs=attrs, children=children)
 
     def render_html(self, inner_html, **kwargs):
