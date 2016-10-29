@@ -34,10 +34,10 @@ class TitleTreeNodeTestCase(unittest.TestCase):
     def test_constructor(self):
         """ Test if the constructor set the title level and HTML tag name correctly. """
         for level in range(1, 7):
-            opts = generate_title_cls(level)
-            self.assertEqual(opts.title_level, level)
-            self.assertEqual(opts.html_tagname, 'h%d' % level)
-            self.assertEqual('h%d' % level, opts.canonical_tag_name)
+            cls = generate_title_cls(level)
+            self.assertEqual(cls.title_level, level)
+            self.assertEqual(cls.html_tagname, 'h%d' % level)
+            self.assertEqual('h%d' % level, cls.canonical_tag_name)
 
     def test_get_permalink_slug_with_tagname_set(self):
         """ Test the ``get_permalink_slug`` when the tag name attribute is set. """
