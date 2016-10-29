@@ -22,6 +22,7 @@ class PostScriptumTreeNodeTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(PostScriptumTreeNode.newline_closes)
         self.assertFalse(PostScriptumTreeNode.same_tag_closes)
+        self.assertFalse(PostScriptumTreeNode.weak_parent_close)
         self.assertFalse(PostScriptumTreeNode.standalone)
         self.assertTrue(PostScriptumTreeNode.parse_embedded)
         self.assertFalse(PostScriptumTreeNode.inline)

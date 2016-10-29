@@ -22,6 +22,7 @@ class NotaBeneTreeNodeTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(NotaBeneTreeNode.newline_closes)
         self.assertFalse(NotaBeneTreeNode.same_tag_closes)
+        self.assertFalse(NotaBeneTreeNode.weak_parent_close)
         self.assertFalse(NotaBeneTreeNode.standalone)
         self.assertTrue(NotaBeneTreeNode.parse_embedded)
         self.assertFalse(NotaBeneTreeNode.inline)
