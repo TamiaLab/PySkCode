@@ -23,6 +23,7 @@ class TodoListTreeNodeTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(TodoListTreeNode.newline_closes)
         self.assertFalse(TodoListTreeNode.same_tag_closes)
+        self.assertFalse(TodoListTreeNode.weak_parent_close)
         self.assertFalse(TodoListTreeNode.standalone)
         self.assertTrue(TodoListTreeNode.parse_embedded)
         self.assertFalse(TodoListTreeNode.inline)
@@ -61,6 +62,7 @@ class TodoTaskTreeNodeTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(TodoTaskTreeNode.newline_closes)
         self.assertTrue(TodoTaskTreeNode.same_tag_closes)
+        self.assertTrue(TodoTaskTreeNode.weak_parent_close)
         self.assertFalse(TodoTaskTreeNode.standalone)
         self.assertTrue(TodoTaskTreeNode.parse_embedded)
         self.assertFalse(TodoTaskTreeNode.inline)

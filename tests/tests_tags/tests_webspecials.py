@@ -24,6 +24,7 @@ class HorizontalLineTreeNodeTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(HorizontalLineTreeNode.newline_closes)
         self.assertFalse(HorizontalLineTreeNode.same_tag_closes)
+        self.assertFalse(HorizontalLineTreeNode.weak_parent_close)
         self.assertTrue(HorizontalLineTreeNode.standalone)
         self.assertTrue(HorizontalLineTreeNode.parse_embedded)
         self.assertFalse(HorizontalLineTreeNode.inline)
@@ -56,6 +57,7 @@ class LineBreakTagTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(LineBreakTreeNode.newline_closes)
         self.assertFalse(LineBreakTreeNode.same_tag_closes)
+        self.assertFalse(LineBreakTreeNode.weak_parent_close)
         self.assertTrue(LineBreakTreeNode.standalone)
         self.assertTrue(LineBreakTreeNode.parse_embedded)
         self.assertTrue(LineBreakTreeNode.inline)
@@ -88,6 +90,7 @@ class CutHereTreeNodeTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(CutHereTreeNode.newline_closes)
         self.assertFalse(CutHereTreeNode.same_tag_closes)
+        self.assertFalse(CutHereTreeNode.weak_parent_close)
         self.assertTrue(CutHereTreeNode.standalone)
         self.assertTrue(CutHereTreeNode.parse_embedded)
         self.assertFalse(CutHereTreeNode.inline)

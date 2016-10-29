@@ -44,6 +44,7 @@ class TodoTaskTreeNode(TreeNode):
 
     make_paragraphs_here = True
     same_tag_closes = True
+    weak_parent_close = True
 
     # "Is done" attribute name (standalone attribute)
     is_done_attr_name = 'done'
