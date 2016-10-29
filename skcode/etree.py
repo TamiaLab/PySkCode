@@ -190,6 +190,13 @@ class TreeNode(object):
         for child in self.children:
             yield from child.search_in_tree(node_cls)
 
+    def pre_process_node(self):
+        """
+        Callback function for pre-processing the given node. Allow registration of IDs, references, etc.
+        This function is called in a top-to-down visit order, starting from the root node and going down to each
+        leaf node.
+        """
+
     def sanitize_node(self, breadcrumb):
         """
         Callback function for sanitizing and cleaning-up the given node.
@@ -212,13 +219,10 @@ class TreeNode(object):
 
     def post_process_node(self):
         """
-        Callback function for post-processing the given node.
+        Callback function for post-processing the given node. Allow generation of summary, etc.
         This function is called in a top-to-down visit order, starting from the root node and going down to each
         leaf node.
-        :return Returning a bool ``False`` disallow post processing of children nodes. Returning a bool ``True``
-        allow post processing of children nodes. Default return value is ``True``.
         """
-        return True
 
     def render_html(self, inner_html, **kwargs):
         """

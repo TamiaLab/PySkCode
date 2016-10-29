@@ -531,3 +531,44 @@ class ParserTestCase(unittest.TestCase):
         self.assertEqual('[test]', test_node.source_open_tag)
         self.assertEqual('', test_node.source_close_tag)
         self.assertEqual('Unclosed tag', test_node.error_message)
+
+    def test_pre_post_processing_sanitizing(self):
+        """ Test if the tree builder start the pre/post processing and sanitizing process """
+
+        class TestTreeNode(TreeNode):
+            """ Test tag options for tests """
+
+            canonical_tag_name = 'test'
+            pre_processed = False
+            sanitized = False
+            breadcrumb = None
+            post_processed = False
+
+            def pre_process_node(self):
+                self.pre_processed = True
+
+            def sanitize_node(self, breadcrumb):
+                self.sanitized = True
+                self.breadcrumb = breadcrumb
+
+            def post_process_node(self):
+                self.post_processed = True
+
+        known_tags = (
+            TestTreeNode,
+        )
+        document_tree = parse_skcode('[test][test]', recognized_tags=known_tags)
+        self.assertIsInstance(document_tree, RootTreeNode)
+        self.assertEqual(1, len(document_tree.children))
+        test_node = document_tree.children[0]
+        self.assertEqual(1, len(test_node.children))
+        self.assertTrue(test_node.pre_processed)
+        self.assertTrue(test_node.sanitized)
+        self.assertEqual([], test_node.breadcrumb)
+        self.assertTrue(test_node.post_processed)
+        sub_test_node = test_node.children[0]
+        self.assertEqual(0, len(sub_test_node.children))
+        self.assertTrue(sub_test_node.pre_processed)
+        self.assertTrue(sub_test_node.sanitized)
+        self.assertEqual([test_node], sub_test_node.breadcrumb)
+        self.assertTrue(sub_test_node.post_processed)

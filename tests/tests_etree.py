@@ -239,6 +239,12 @@ class TreeNodeTestCase(unittest.TestCase):
         nodes = list(document_tree.search_in_tree(DummyTreeNode))
         self.assertEqual([node1, node2, node3], nodes)
 
+    def test_default_pre_process_node_implementation(self):
+        """ Test the default ``pre_process_node`` method implementation. """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('child', DummyTreeNode)
+        self.assertIsNone(tree_node.pre_process_node())
+
     def test_default_sanitize_node_policy(self):
         """ Test the default ``sanitize_node`` method policy. """
         root_tree_node = RootTreeNode()
@@ -251,7 +257,7 @@ class TreeNodeTestCase(unittest.TestCase):
         """ Test the default ``post_process_node`` method implementation. """
         root_tree_node = RootTreeNode()
         tree_node = root_tree_node.new_child('child', DummyTreeNode)
-        self.assertTrue(tree_node.post_process_node())
+        self.assertIsNone(tree_node.post_process_node())
 
     def test_default_render_html_implementation(self):
         """ Test the default ``render_html`` method implementation. """

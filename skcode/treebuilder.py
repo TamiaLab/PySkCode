@@ -227,11 +227,26 @@ def parse_skcode(text,
             cur_tree_node = cur_tree_node.parent
 
     # Perform sanity check
+    pre_process_tree(root_tree_node)
     sanitize_tree(root_tree_node)
     post_process_tree(root_tree_node)
 
     # Return the resulting AST
     return root_tree_node
+
+
+def pre_process_tree(tree_node):
+    """
+    Recursive method for pre-processing the given tree node and children recursively.
+    :param tree_node: The tree node to be pre-processed.
+    """
+
+    # Pre-process the node
+    tree_node.pre_process_node()
+
+    # Go down the tree
+    for child_node in tree_node.children:
+        pre_process_tree(child_node)
 
 
 def sanitize_tree(tree_node, breadcrumb=None):
@@ -243,8 +258,9 @@ def sanitize_tree(tree_node, breadcrumb=None):
     breadcrumb = breadcrumb or []
 
     # Down to top visit order (depth-first algorithm) with breadcrumb
+    sub_breadcrumb = [] if tree_node.is_root else [tree_node]
     for child_node in tree_node.children:
-        sanitize_tree(child_node, breadcrumb + [child_node])
+        sanitize_tree(child_node, breadcrumb + sub_breadcrumb)
 
     # Sanitize the node
     tree_node.sanitize_node(breadcrumb)
@@ -257,8 +273,8 @@ def post_process_tree(tree_node):
     """
 
     # Post-process the node
-    if tree_node.post_process_node():
+    tree_node.post_process_node()
 
-        # Go down the tree
-        for child_node in tree_node.children:
-            post_process_tree(child_node)
+    # Go down the tree
+    for child_node in tree_node.children:
+        post_process_tree(child_node)
