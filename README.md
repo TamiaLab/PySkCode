@@ -3,16 +3,18 @@
 
 ### Overview
 
-This project is a BBCode to HTML / text rendering engine.
+This project is a pure python BBCode to HTML / text rendering engine.
 
 The code included in this project converts [BBCode](http://en.wikipedia.org/wiki/BBCode) into HTML ready for display, or plain text ready for mailing.
 
 The code is split into three parts:
-- the lexer / tokenizer / parser engine,
+- the parser / tokenizer / document builder engine,
 - the post-parsing related code (aka utilities), 
 - the rendering engine.
 
 The code is designed to be modular and easy to extend to match any possible use-case. 
+
+**Starting from version 3, this project is considered production ready and is heavily unit-tested.**
 
 ### Installation
 
@@ -30,7 +32,7 @@ No external dependencies are required, only Python stdlib import are used.
 
 ### Basic usage / Quickstart
 
-```
+```python
 from skcode import parse_skcode, render_to_html
 
 document = parse_skcode('[h1]Hello World![/h1]')
@@ -40,26 +42,27 @@ print(render_to_html(document))
 
 ### Advantages Over [Postmarkup](https://code.google.com/p/postmarkup/) or [dcwatson/bbcode](https://github.com/dcwatson/bbcode)
 
-- Powerful tag lexer with escape sequences support in quoted attribute value, unquoted value support and self closing tag support.
+- Powerful tag lexer with escape sequences support in quoted attribute value, also support unquoted value and self closing tags.
 - No regular expressions for low-level parsing, only pure (and readable) Python code.
-- Per tag options with at-instantiation modification possible, give you the power to choose how any tag should work, even internal one.
-- Class based tag implementation, a tag is nothing more than a class and a name. No callable and nested dict nightmare for tag options.
-- Nothing hard-coded, you can choose how any stage of the code should work for your application.
-- Made to be extensible and clean, all parts of the code does not form an horrible monolithic spaghetti monster like other BBCode parser.
+- Per tag options with easy subclassing possible, give you the power to choose how any tag should work, even internal one.
+- Class based implementation, a tag is nothing more than a single class. No callable and nested dict nightmare.
+- Nothing hard-coded, you can choose how any stage of the code should work with your application.
+- Made to be extensible and clean, no horrible monolithic spaghetti monster like other BBCode parser.
 - DOM-like parser, you can post-process the document tree and add your own sauce if necessary.
 - Useful toolkit of post-parsing utilities included, like auto-paragraph utility, summary extractor and more.
 - Sanitation of nested tag included out-the-box on per tag rules basis. **work in progress**
+- Error message support built-in, can be disabled at rendering, really useful for "preview mode".
 - Smileys and cosmetics replacement support, with some classic default rules per default.
 - User-proof settings by default. Import and play.
-- Can generate HTML, text (real text, not a html-striped version) or even cleaned BBCode
-- HTML work out-the-box with Bootstrap and Font-Awesome.
+- Can generate HTML, text (real text version, not a html-striped version) or both, you choose.
+- HTML and CSS made to work out-the-box with Bootstrap 3 and Font-Awesome 4.
 
 ### Implemented BBCode tags and syntax
 
 The ``DEFAULT_RECOGNIZED_TAGS`` setting include the following tag definitions.
 
 N.B. Some tags included by default require CSS to work. 
-If you're using Bootstrap and Font-Awesome for your CSS, you're already ready to go.
+If you're using Bootstrap 3 and Font-Awesome 4 for your CSS, you're already ready to go.
 
 #### Acronyms / Abbreviations
 
