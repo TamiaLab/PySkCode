@@ -26,6 +26,7 @@ class TextModifierTagsTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(LowerCaseTextTreeNode.newline_closes)
         self.assertFalse(LowerCaseTextTreeNode.same_tag_closes)
+        self.assertFalse(LowerCaseTextTreeNode.weak_parent_close)
         self.assertFalse(LowerCaseTextTreeNode.standalone)
         self.assertTrue(LowerCaseTextTreeNode.parse_embedded)
         self.assertTrue(LowerCaseTextTreeNode.inline)
