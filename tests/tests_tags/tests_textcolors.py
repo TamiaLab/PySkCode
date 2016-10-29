@@ -8,7 +8,8 @@ from skcode.etree import RootTreeNode
 from skcode.tags.textcolors import RGB_COLOR_RE
 from skcode.tags import (
     ColorTextTreeNode,
-    DEFAULT_RECOGNIZED_TAGS_LIST
+    DEFAULT_RECOGNIZED_TAGS_LIST,
+    generate_fixed_color_text_cls
 )
 
 
@@ -45,6 +46,7 @@ class TextColorTagsTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(ColorTextTreeNode.newline_closes)
         self.assertFalse(ColorTextTreeNode.same_tag_closes)
+        self.assertFalse(ColorTextTreeNode.weak_parent_close)
         self.assertFalse(ColorTextTreeNode.standalone)
         self.assertTrue(ColorTextTreeNode.parse_embedded)
         self.assertTrue(ColorTextTreeNode.inline)
@@ -119,3 +121,29 @@ class TextColorTagsTestCase(unittest.TestCase):
         output_result = tree_node.render_text('Hello World!')
         expected_result = 'Hello World!'
         self.assertEqual(expected_result, output_result)
+
+
+class FixedTextColorTagTestCase(unittest.TestCase):
+    """ Tests suite for the color tags module (fixed type color variants). """
+
+    def test_automatic_tag_name(self):
+        """ Test the constructor with no custom tag name set. """
+        opts = generate_fixed_color_text_cls('customtype')
+        self.assertEqual('customtype', opts.color_value)
+        self.assertEqual('customtype', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
+
+    def test_custom_tag_name(self):
+        """ Test the constructor with a custom tag name set. """
+        opts = generate_fixed_color_text_cls('customtype', canonical_tag_name='foobar')
+        self.assertEqual('customtype', opts.color_value)
+        self.assertEqual('foobar', opts.canonical_tag_name)
+        self.assertEqual((), opts.alias_tag_names)
+
+    def test_get_color_value_method(self):
+        """ Test the ``get_color_value`` method. """
+        opts = generate_fixed_color_text_cls('customtype')
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('alert', opts, attrs={})
+        color_value = opts.get_color_value(tree_node)
+        self.assertEqual('customtype', color_value)
