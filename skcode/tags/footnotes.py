@@ -137,6 +137,7 @@ class FootnoteReferenceTreeNode(TreeNode):
 
     inline = True
     close_inlines = False
+    parse_embedded = False
 
     canonical_tag_name = 'fnref'
     alias_tag_names = ()

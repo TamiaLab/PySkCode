@@ -132,6 +132,8 @@ class ImageTreeNode(TreeNode):
 class YoutubeTreeNode(TreeNode):
     """ Youtube video integration tree node class. """
 
+    parse_embedded = False
+
     canonical_tag_name = 'youtube'
     alias_tag_names = ()
 
