@@ -5,8 +5,10 @@ SkCode special internal tag definitions test code.
 import unittest
 
 from skcode.etree import RootTreeNode
-from skcode.tags import (NoParseTreeNode,
-                         DEFAULT_RECOGNIZED_TAGS_LIST)
+from skcode.tags import (
+    NoParseTreeNode,
+    DEFAULT_RECOGNIZED_TAGS_LIST
+)
 
 
 class NoParseTagTestCase(unittest.TestCase):
@@ -20,6 +22,7 @@ class NoParseTagTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(NoParseTreeNode.newline_closes)
         self.assertFalse(NoParseTreeNode.same_tag_closes)
+        self.assertFalse(NoParseTreeNode.weak_parent_close)
         self.assertFalse(NoParseTreeNode.standalone)
         self.assertFalse(NoParseTreeNode.parse_embedded)
         self.assertTrue(NoParseTreeNode.inline)
