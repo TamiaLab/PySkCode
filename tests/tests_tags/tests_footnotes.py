@@ -161,7 +161,7 @@ class FootnoteReferenceTagTestCase(unittest.TestCase):
         self.assertFalse(FootnoteReferenceTreeNode.same_tag_closes)
         self.assertFalse(FootnoteReferenceTreeNode.weak_parent_close)
         self.assertFalse(FootnoteReferenceTreeNode.standalone)
-        self.assertTrue(FootnoteReferenceTreeNode.parse_embedded)
+        self.assertFalse(FootnoteReferenceTreeNode.parse_embedded)
         self.assertTrue(FootnoteReferenceTreeNode.inline)
         self.assertFalse(FootnoteReferenceTreeNode.close_inlines)
         self.assertEqual('fnref', FootnoteReferenceTreeNode.canonical_tag_name)

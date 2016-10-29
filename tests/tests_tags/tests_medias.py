@@ -248,7 +248,7 @@ class YoutubeVideosTagTestCase(unittest.TestCase):
         self.assertFalse(YoutubeTreeNode.newline_closes)
         self.assertFalse(YoutubeTreeNode.same_tag_closes)
         self.assertFalse(YoutubeTreeNode.standalone)
-        self.assertTrue(YoutubeTreeNode.parse_embedded)
+        self.assertFalse(YoutubeTreeNode.parse_embedded)
         self.assertFalse(YoutubeTreeNode.inline)
         self.assertTrue(YoutubeTreeNode.close_inlines)
         self.assertEqual('youtube', YoutubeTreeNode.canonical_tag_name)
