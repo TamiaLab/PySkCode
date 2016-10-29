@@ -11,6 +11,12 @@ from skcode.tags import (
     CapitalizeTextTreeNode,
     DEFAULT_RECOGNIZED_TAGS_LIST
 )
+from skcode.tags.textmodifiers import TextModifierBaseTreeNode
+
+
+class CustomTextModifierTreeNode(TextModifierBaseTreeNode):
+    """ Test class """
+    text_modifier = 'foobar'
 
 
 class TextModifierTagsTestCase(unittest.TestCase):
@@ -71,3 +77,9 @@ class TextModifierTagsTestCase(unittest.TestCase):
         root_tree_node = RootTreeNode()
         tree_node = root_tree_node.new_child('capitalize', CapitalizeTextTreeNode)
         self.assertEqual('Test', tree_node.render_text('test'))
+
+    def test_default_render_text(self):
+        """ Test the default behavior of the ``render_text`` method """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('capitalize', CustomTextModifierTreeNode)
+        self.assertEqual('tEst', tree_node.render_text('tEst'))

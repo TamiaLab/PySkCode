@@ -258,16 +258,13 @@ class ListsTagTestCase(unittest.TestCase):
         """ Test the ``sanitize_node`` method. """
         root_tree_node = RootTreeNode()
         tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'start': '3'})
-        output_result = tree_node.get_list_first_number()
-        self.assertEqual(3, output_result)
+        tree_node.sanitize_node([])
         self.assertEqual('', tree_node.error_message)
         tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'start': '-3'})
-        output_result = tree_node.get_list_first_number()
-        self.assertEqual(1, output_result)
+        tree_node.sanitize_node([])
         self.assertEqual('First line number must be positive', tree_node.error_message)
         tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'start': 'abcd'})
-        output_result = tree_node.get_list_first_number()
-        self.assertEqual(1, output_result)
+        tree_node.sanitize_node([])
         self.assertEqual('abcd is not a number', tree_node.error_message)
 
     def test_render_html_unordered(self):
