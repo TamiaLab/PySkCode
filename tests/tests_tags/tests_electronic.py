@@ -5,8 +5,10 @@ SkCode electronic special tag definitions code.
 import unittest
 
 from skcode.etree import RootTreeNode
-from skcode.tags import (NotNotationTreeNode,
-                         DEFAULT_RECOGNIZED_TAGS_LIST)
+from skcode.tags import (
+    NotNotationTreeNode,
+    DEFAULT_RECOGNIZED_TAGS_LIST
+)
 
 
 class NotNotationTreeNodeTestCase(unittest.TestCase):
@@ -20,6 +22,7 @@ class NotNotationTreeNodeTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(NotNotationTreeNode.newline_closes)
         self.assertFalse(NotNotationTreeNode.same_tag_closes)
+        self.assertFalse(NotNotationTreeNode.weak_parent_close)
         self.assertFalse(NotNotationTreeNode.standalone)
         self.assertTrue(NotNotationTreeNode.parse_embedded)
         self.assertTrue(NotNotationTreeNode.inline)

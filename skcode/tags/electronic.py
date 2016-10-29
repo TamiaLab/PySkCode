@@ -36,12 +36,6 @@ class NotNotationTreeNode(TreeNode):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered text of this node.
         """
-        if inner_text:
-            beg_text = ' ' if inner_text[0] in string.whitespace else ''
-        else:
-            beg_text = ''
+        beg_text = ' ' if inner_text and inner_text[0] in string.whitespace else ''
         inner_text = inner_text.upper().lstrip()
-        if inner_text:
-            return beg_text + '/' + inner_text
-        else:
-            return inner_text
+        return beg_text + '/' + inner_text if inner_text else ''
