@@ -239,6 +239,26 @@ class TreeNodeTestCase(unittest.TestCase):
         nodes = list(document_tree.search_in_tree(DummyTreeNode))
         self.assertEqual([node1, node2, node3], nodes)
 
+    def test_has_errors_false(self):
+        """ Test the ``has_errors`` helper. """
+        document_tree = RootTreeNode()
+        document_tree.new_child('node', DummyTreeNode)
+        l1_tree_node = document_tree.new_child('test_l1', OtherDummyTreeNode)
+        l1_tree_node.new_child('node', DummyTreeNode)
+        l2_tree_node = l1_tree_node.new_child('test_l2', OtherDummyTreeNode)
+        l2_tree_node.new_child('node', DummyTreeNode)
+        self.assertFalse(document_tree.has_errors())
+
+    def test_has_errors_true(self):
+        """ Test the ``has_errors`` helper. """
+        document_tree = RootTreeNode()
+        document_tree.new_child('node', DummyTreeNode)
+        l1_tree_node = document_tree.new_child('test_l1', OtherDummyTreeNode)
+        l1_tree_node.new_child('node', DummyTreeNode)
+        l2_tree_node = l1_tree_node.new_child('test_l2', OtherDummyTreeNode, error_message='foobar')
+        l2_tree_node.new_child('node', DummyTreeNode)
+        self.assertTrue(document_tree.has_errors())
+
     def test_default_pre_process_node_implementation(self):
         """ Test the default ``pre_process_node`` method implementation. """
         root_tree_node = RootTreeNode()

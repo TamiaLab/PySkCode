@@ -190,6 +190,17 @@ class TreeNode(object):
         for child in self.children:
             yield from child.search_in_tree(node_cls)
 
+    def has_errors(self):
+        """
+        Walk down the tree and return ``True`` only if at least one node is erroneous.
+        """
+        if self.error_message:
+            return True
+        for child in self.children:
+            if child.has_errors():
+                return True
+        return False
+
     def pre_process_node(self):
         """
         Callback function for pre-processing the given node. Allow registration of IDs, references, etc.
