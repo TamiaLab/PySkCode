@@ -5,9 +5,11 @@ SkCode internal tag test code.
 import unittest
 
 from skcode.etree import RootTreeNode
-from skcode.tags import (TextTreeNode,
-                         NewlineTreeNode,
-                         HardNewlineTreeNode)
+from skcode.tags import (
+    TextTreeNode,
+    NewlineTreeNode,
+    HardNewlineTreeNode
+)
 
 
 class TextTagTestCase(unittest.TestCase):
@@ -17,6 +19,7 @@ class TextTagTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(TextTreeNode.newline_closes)
         self.assertFalse(TextTreeNode.same_tag_closes)
+        self.assertFalse(TextTreeNode.weak_parent_close)
         self.assertFalse(TextTreeNode.standalone)
         self.assertTrue(TextTreeNode.parse_embedded)
         self.assertTrue(TextTreeNode.inline)
@@ -75,6 +78,7 @@ class NewlineTagTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(NewlineTreeNode.newline_closes)
         self.assertFalse(NewlineTreeNode.same_tag_closes)
+        self.assertFalse(TextTreeNode.weak_parent_close)
         self.assertFalse(NewlineTreeNode.standalone)
         self.assertTrue(NewlineTreeNode.parse_embedded)
         self.assertTrue(NewlineTreeNode.inline)
@@ -103,6 +107,7 @@ class HardNewlineTagTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(HardNewlineTreeNode.newline_closes)
         self.assertFalse(HardNewlineTreeNode.same_tag_closes)
+        self.assertFalse(TextTreeNode.weak_parent_close)
         self.assertFalse(HardNewlineTreeNode.standalone)
         self.assertTrue(HardNewlineTreeNode.parse_embedded)
         self.assertTrue(HardNewlineTreeNode.inline)
