@@ -27,13 +27,15 @@ class AlertBoxTreeNode(TreeNode):
     alias_tag_names = ()
 
     # Accepted alert types list
-    accepted_types = (ALERT_TYPE_ERROR,
-                      ALERT_TYPE_DANGER,
-                      ALERT_TYPE_WARNING,
-                      ALERT_TYPE_INFO,
-                      ALERT_TYPE_SUCCESS,
-                      ALERT_TYPE_NOTE,
-                      ALERT_TYPE_QUESTION)
+    accepted_types = (
+        ALERT_TYPE_ERROR,
+        ALERT_TYPE_DANGER,
+        ALERT_TYPE_WARNING,
+        ALERT_TYPE_INFO,
+        ALERT_TYPE_SUCCESS,
+        ALERT_TYPE_NOTE,
+        ALERT_TYPE_QUESTION
+    )
 
     # Default alert type if not specified
     default_type = ALERT_TYPE_INFO

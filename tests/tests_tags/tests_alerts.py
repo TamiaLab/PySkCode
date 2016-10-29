@@ -5,16 +5,18 @@ SkCode alert box tag definitions test code.
 import unittest
 
 from skcode.etree import RootTreeNode
-from skcode.tags import (AlertBoxTreeNode,
-                         ALERT_TYPE_ERROR,
-                         ALERT_TYPE_DANGER,
-                         ALERT_TYPE_WARNING,
-                         ALERT_TYPE_INFO,
-                         ALERT_TYPE_SUCCESS,
-                         ALERT_TYPE_NOTE,
-                         ALERT_TYPE_QUESTION,
-                         DEFAULT_RECOGNIZED_TAGS_LIST,
-                         generate_fixed_alert_type_cls)
+from skcode.tags import (
+    AlertBoxTreeNode,
+    ALERT_TYPE_ERROR,
+    ALERT_TYPE_DANGER,
+    ALERT_TYPE_WARNING,
+    ALERT_TYPE_INFO,
+    ALERT_TYPE_SUCCESS,
+    ALERT_TYPE_NOTE,
+    ALERT_TYPE_QUESTION,
+    DEFAULT_RECOGNIZED_TAGS_LIST,
+    generate_fixed_alert_type_cls
+)
 
 
 class AlertBoxTreeNodeTestCase(unittest.TestCase):
@@ -38,6 +40,7 @@ class AlertBoxTreeNodeTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(AlertBoxTreeNode.newline_closes)
         self.assertFalse(AlertBoxTreeNode.same_tag_closes)
+        self.assertFalse(AlertBoxTreeNode.weak_parent_close)
         self.assertFalse(AlertBoxTreeNode.standalone)
         self.assertTrue(AlertBoxTreeNode.parse_embedded)
         self.assertFalse(AlertBoxTreeNode.inline)
@@ -45,13 +48,15 @@ class AlertBoxTreeNodeTestCase(unittest.TestCase):
         self.assertTrue(AlertBoxTreeNode.make_paragraphs_here)
         self.assertEqual('alert', AlertBoxTreeNode.canonical_tag_name)
         self.assertEqual((), AlertBoxTreeNode.alias_tag_names)
-        self.assertEqual((ALERT_TYPE_ERROR,
-                          ALERT_TYPE_DANGER,
-                          ALERT_TYPE_WARNING,
-                          ALERT_TYPE_INFO,
-                          ALERT_TYPE_SUCCESS,
-                          ALERT_TYPE_NOTE,
-                          ALERT_TYPE_QUESTION), AlertBoxTreeNode.accepted_types)
+        self.assertEqual((
+            ALERT_TYPE_ERROR,
+            ALERT_TYPE_DANGER,
+            ALERT_TYPE_WARNING,
+            ALERT_TYPE_INFO,
+            ALERT_TYPE_SUCCESS,
+            ALERT_TYPE_NOTE,
+            ALERT_TYPE_QUESTION
+        ), AlertBoxTreeNode.accepted_types)
         self.assertEqual(ALERT_TYPE_INFO, AlertBoxTreeNode.default_type)
         # String values of ``html_template``, ``html_template_without_title``, ``text_title_line_template``
         # and ``default_titles`` are NOT tested.
@@ -76,7 +81,6 @@ class AlertBoxTreeNodeTestCase(unittest.TestCase):
         self.assertIn(ALERT_TYPE_QUESTION, AlertBoxTreeNode.html_template)
         self.assertIn('{title}', AlertBoxTreeNode.html_template[ALERT_TYPE_QUESTION])
         self.assertIn('{inner_html}', AlertBoxTreeNode.html_template[ALERT_TYPE_QUESTION])
-
         self.assertIn(ALERT_TYPE_ERROR, AlertBoxTreeNode.html_template_without_title)
         self.assertNotIn('{title}', AlertBoxTreeNode.html_template_without_title[ALERT_TYPE_ERROR])
         self.assertIn('{inner_html}', AlertBoxTreeNode.html_template_without_title[ALERT_TYPE_ERROR])
@@ -98,7 +102,6 @@ class AlertBoxTreeNodeTestCase(unittest.TestCase):
         self.assertIn(ALERT_TYPE_QUESTION, AlertBoxTreeNode.html_template_without_title)
         self.assertNotIn('{title}', AlertBoxTreeNode.html_template_without_title[ALERT_TYPE_QUESTION])
         self.assertIn('{inner_html}', AlertBoxTreeNode.html_template_without_title[ALERT_TYPE_QUESTION])
-
         self.assertIn(ALERT_TYPE_ERROR, AlertBoxTreeNode.text_title_line_template)
         self.assertIn('{title}', AlertBoxTreeNode.text_title_line_template[ALERT_TYPE_ERROR])
         self.assertIn(ALERT_TYPE_DANGER, AlertBoxTreeNode.text_title_line_template)
