@@ -35,6 +35,7 @@ class DirectionTextTagTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(DirectionTextTreeNode.newline_closes)
         self.assertFalse(DirectionTextTreeNode.same_tag_closes)
+        self.assertFalse(DirectionTextTreeNode.weak_parent_close)
         self.assertFalse(DirectionTextTreeNode.standalone)
         self.assertTrue(DirectionTextTreeNode.parse_embedded)
         self.assertTrue(DirectionTextTreeNode.inline)
@@ -42,7 +43,6 @@ class DirectionTextTagTestCase(unittest.TestCase):
         self.assertEqual('bdo', DirectionTextTreeNode.canonical_tag_name)
         self.assertEqual((), DirectionTextTreeNode.alias_tag_names)
         self.assertFalse(DirectionTextTreeNode.make_paragraphs_here)
-
         self.assertEqual(TEXT_DIR_LEFT_TO_RIGHT, DirectionTextTreeNode.default_text_direction)
         self.assertEqual({
             'ltr': TEXT_DIR_LEFT_TO_RIGHT,
@@ -132,3 +132,13 @@ class DirectionTextTagTestCase(unittest.TestCase):
         output_result = tree_node.render_text('john doe')
         expected_result = 'eod nhoj'
         self.assertEqual(expected_result, output_result)
+
+    def test_get_text_direction_method(self):
+        """ Test the ``get_text_direction`` method. """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('rtl', RTLFixedDirectionTextTreeNode, attrs={})
+        color_value = tree_node.get_text_direction()
+        self.assertEqual(TEXT_DIR_RIGHT_TO_LEFT, color_value)
+        tree_node = root_tree_node.new_child('rtl', LTRFixedDirectionTextTreeNode, attrs={})
+        color_value = tree_node.get_text_direction()
+        self.assertEqual(TEXT_DIR_LEFT_TO_RIGHT, color_value)
