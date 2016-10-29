@@ -35,8 +35,8 @@ class TitleBaseTreeNode(TreeNode):
     def get_permalink_slug(self):
         """
         Return the permalink slug for this title.
-        The permalink slug can be set by setting the ``slug_id_attr_name`` attribute of the tag or simply
-        by setting the tag name attribute.
+        The permalink slug can be set by setting the ``slug_id_attr_name`` attribute
+        of the tag or simply by setting the tag name attribute.
         The lookup order is: tag name (first), ``acronym_title_attr_name``.
         :return The permalink slug for this title, or an empty string.
         """
@@ -50,8 +50,6 @@ class TitleBaseTreeNode(TreeNode):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-
-        # Add permalink if available
         permalink_slug = self.get_permalink_slug()
         if permalink_slug:
             return self.html_render_template.format(title_tagname=self.html_tagname,
@@ -68,8 +66,6 @@ class TitleBaseTreeNode(TreeNode):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered text of this node.
         """
-
-        # Add permalink if available
         permalink_slug = self.get_permalink_slug()
         if permalink_slug:
             return self.text_render_template.format(title_level='#' * self.title_level,

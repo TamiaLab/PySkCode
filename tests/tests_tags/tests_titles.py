@@ -106,3 +106,11 @@ class TitleTreeNodeTestCase(unittest.TestCase):
         output_result = tree_node.render_text('Hello World!')
         expected_result = '# Hello World!\n'
         self.assertEqual(expected_result, output_result)
+
+    def test_generator_cls(self):
+        """ Test the constructor function. """
+        cls = generate_title_cls(1)
+        self.assertEqual(1, cls.title_level)
+        self.assertEqual('h1', cls.html_tagname)
+        self.assertEqual('h1', cls.canonical_tag_name)
+        self.assertEqual((), cls.alias_tag_names)
