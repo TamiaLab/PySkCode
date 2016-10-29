@@ -98,8 +98,8 @@ class FigureDeclarationTreeNode(TreeNode):
         """
         Get the ID of this figure.
         The ID can be set by setting the ``figure_id_attr_name`` attribute of the tag or simply
-        by setting the tag name attribute.
-        The lookup order is: tag name (first), ``figure_id_attr_name``.
+        by setting the tag name attribute. If not set at all, an auto-generated ID will be used.
+        The lookup order is: tag name (first), ``figure_id_attr_name``, the auto generated ID.
         :return: The ID of this figure, or an empty string.
         """
         figure_id = self.get_attribute_value('', self.figure_id_attr_name)
