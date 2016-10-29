@@ -98,6 +98,16 @@ class TextColorTagsTestCase(unittest.TestCase):
         color = tree_node.get_color_value()
         self.assertEqual('', color)
 
+    def test_sanitize_node(self):
+        """ Test if the ``sanitize_node`` method mark the node as erroneous when title is missing """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('color', ColorTextTreeNode, attrs={'color': 'blue'})
+        tree_node.sanitize_node([])
+        self.assertEqual('', tree_node.error_message)
+        tree_node = root_tree_node.new_child('color', ColorTextTreeNode, attrs={'color': ''})
+        tree_node.sanitize_node([])
+        self.assertEqual('Missing color value', tree_node.error_message)
+
     def test_render_html(self):
         """ Test the ``render_html`` method with a valid color. """
         root_tree_node = RootTreeNode()

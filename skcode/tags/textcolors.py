@@ -3,6 +3,7 @@ SkCode coloured text tag definitions code.
 """
 
 import re
+from gettext import gettext as _
 
 from ..etree import TreeNode
 
@@ -50,6 +51,15 @@ class ColorTextTreeNode(TreeNode):
         else:
             return ''
 
+    def sanitize_node(self, breadcrumb):
+        """
+        Callback function for sanitizing and cleaning-up the given node.
+        :param breadcrumb: The breadcrumb of node instances from the root node to the current node (excluded).
+        """
+        super(ColorTextTreeNode, self).sanitize_node(breadcrumb)
+        if not self.get_color_value():
+            self.error_message = _('Missing color value')
+
     def render_html(self, inner_html, **kwargs):
         """
         Callback function for rendering HTML.
@@ -57,15 +67,9 @@ class ColorTextTreeNode(TreeNode):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-
-        # Get color value
         color = self.get_color_value()
-
-        # If no color -> direct output
         if not color:
             return inner_html
-
-        # Render the color
         return self.html_render_template.format(color_value=color, inner_html=inner_html)
 
     def render_text(self, inner_text, **kwargs):
