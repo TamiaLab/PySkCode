@@ -192,7 +192,7 @@ class ImagesTagTestCase(unittest.TestCase):
         self.assertEqual('', tree_node.error_message)
         tree_node = root_tree_node.new_child('img', ImageTreeNode, attrs={}, content='')
         tree_node.sanitize_node([])
-        self.assertEqual('Missing source URL', tree_node.error_message)
+        self.assertEqual('Missing or erroneous source URL', tree_node.error_message)
 
     def test_render_html(self):
         """ Test the ``render_html`` method. """
@@ -434,7 +434,7 @@ class YoutubeVideosTagTestCase(unittest.TestCase):
         self.assertEqual('', tree_node.error_message)
         tree_node = root_tree_node.new_child('youtube', YoutubeTreeNode, content='')
         tree_node.sanitize_node([])
-        self.assertEqual('Missing video URL', tree_node.error_message)
+        self.assertEqual('Missing or erroneous video URL', tree_node.error_message)
 
     def test_render_html(self):
         """ Test the ``render_html`` method. """

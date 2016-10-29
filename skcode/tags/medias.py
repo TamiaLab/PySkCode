@@ -105,7 +105,7 @@ class ImageTreeNode(TreeNode):
         self.get_img_width()
         self.get_img_height()
         if not self.get_image_src_link():
-            self.error_message = _('Missing source URL')
+            self.error_message = _('Missing or erroneous source URL')
 
     def render_html(self, inner_html, **kwargs):
         """
@@ -254,7 +254,7 @@ class YoutubeTreeNode(TreeNode):
         """
         super(YoutubeTreeNode, self).sanitize_node(breadcrumb)
         if not self.get_youtube_video_id():
-            self.error_message = _('Missing video URL')
+            self.error_message = _('Missing or erroneous video URL')
 
     def render_html(self, inner_html, **kwargs):
         """

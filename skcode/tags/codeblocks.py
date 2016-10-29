@@ -119,7 +119,7 @@ class CodeBlockTreeNode(TreeNode):
                 if line_num >= 0:
                     line_nums.append(line_num)
                 else:
-                    self.error_message = _('Line number cannot be negative')
+                    self.error_message = _('Line number must be positive')
             except ValueError:
                 self.error_message = _('{} is not a number').format(line_num)
 
@@ -145,7 +145,7 @@ class CodeBlockTreeNode(TreeNode):
             if line_num >= 0:
                 return line_num
             else:
-                self.error_message = _('Line number cannot be negative')
+                self.error_message = _('Line number must be positive')
                 return 1
         except ValueError:
             self.error_message = _('{} is not a number').format(first_line_number)

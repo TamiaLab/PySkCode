@@ -173,7 +173,7 @@ class ListTreeNode(TreeNode):
             if first_number > 0:
                 return first_number
             else:
-                self.error_message = _('First line number cannot be negative')
+                self.error_message = _('First line number must be positive')
         except ValueError:
             self.error_message = _('{} is not a number').format(first_number)
             return 1

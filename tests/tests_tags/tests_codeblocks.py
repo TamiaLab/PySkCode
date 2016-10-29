@@ -259,10 +259,10 @@ class CodeBlockTreeNodeTestCase(unittest.TestCase):
         self.assertEqual('', tree_node.error_message)
         tree_node = root_tree_node.new_child('code', CodeBlockTreeNode, attrs={'hl_lines': '-1'})
         tree_node.sanitize_node([])
-        self.assertEqual('Line number cannot be negative', tree_node.error_message)
+        self.assertEqual('Line number must be positive', tree_node.error_message)
         tree_node = root_tree_node.new_child('code', CodeBlockTreeNode, attrs={'linenostart': '-1'})
         tree_node.sanitize_node([])
-        self.assertEqual('Line number cannot be negative', tree_node.error_message)
+        self.assertEqual('Line number must be positive', tree_node.error_message)
 
     def test_sanitize_node_erroneous_line_numbers(self):
         """ Test the ``sanitize_node`` method with erroneous line numbers. """

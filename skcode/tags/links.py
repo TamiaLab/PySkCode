@@ -67,7 +67,7 @@ class UrlLinkTreeNode(TreeNode):
         """
         super(UrlLinkTreeNode, self).sanitize_node(breadcrumb)
         if not self.get_target_link():
-            self.error_message = _('Missing target URL')
+            self.error_message = _('Missing or erroneous target URL')
 
     def render_html(self, inner_html, force_rel_nofollow=True, **kwargs):
         """
@@ -158,7 +158,7 @@ class EmailLinkTreeNode(TreeNode):
         """
         super(EmailLinkTreeNode, self).sanitize_node(breadcrumb)
         if not self.get_email_address():
-            self.error_message = _('Missing target email address')
+            self.error_message = _('Missing or erroneous target email address')
 
     def render_html(self, inner_html, force_rel_nofollow=True, **kwargs):
         """

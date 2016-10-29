@@ -264,7 +264,7 @@ class ListsTagTestCase(unittest.TestCase):
         tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'start': '-3'})
         output_result = tree_node.get_list_first_number()
         self.assertEqual(1, output_result)
-        self.assertEqual('First line number cannot be negative', tree_node.error_message)
+        self.assertEqual('First line number must be positive', tree_node.error_message)
         tree_node = root_tree_node.new_child('list', ListTreeNode, attrs={'start': 'abcd'})
         output_result = tree_node.get_list_first_number()
         self.assertEqual(1, output_result)
