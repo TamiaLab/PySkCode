@@ -2,12 +2,13 @@
 SkCode links tag definitions code.
 """
 
+from gettext import gettext as _
+
 from html import escape as escape_html
 from html import unescape as unescape_html_entities
 
 from ..etree import TreeNode
-from ..tools import (sanitize_url,
-                     slugify)
+from ..tools import sanitize_url, slugify
 from ..utility.relative_urls import get_relative_url_base
 
 
@@ -32,41 +33,41 @@ class UrlLinkTreeNode(TreeNode):
     def is_url_inside_tag_content(self):
         """
         Return ``True`` if the target URL is in the tag content (not in attributes).
-
-        :return ``True`` if the target URL is in the tag content, not in attributes.
         """
         return self.name not in self.attrs
 
     def get_nofollow_flag(self):
         """
         Return ``True`` if the "nofollow" flag is set.
-
-        :return ``True`` if the "nofollow" flag is set.
         """
         return self.nofollow_attr_name in self.attrs
 
     def get_target_link(self):
         """
         Return the target link URL.
-
-        :return The target link URL.
         """
         if self.is_url_inside_tag_content():
             target_url = self.get_raw_content().strip()
         else:
             target_url = self.attrs.get(self.name, '')
         relative_url_base = get_relative_url_base(self.root_tree_node)
-        return sanitize_url(target_url,
-                            absolute_base_url=relative_url_base)
+        return sanitize_url(target_url, absolute_base_url=relative_url_base)
 
     def get_title_link(self):
         """
-        Return the title of this link.
-
-        :return The title of this link, or an empty string.
+        Return the title of this link, or an empty string.
         """
         link_title = self.attrs.get(self.title_attr_name, '')
         return unescape_html_entities(link_title)
+
+    def sanitize_node(self, breadcrumb):
+        """
+        Callback function for sanitizing and cleaning-up the given node.
+        :param breadcrumb: The breadcrumb of node instances from the root node to the current node (excluded).
+        """
+        super(UrlLinkTreeNode, self).sanitize_node(breadcrumb)
+        if not self.get_target_link():
+            self.error_message = _('Missing target URL')
 
     def render_html(self, inner_html, force_rel_nofollow=True, **kwargs):
         """
@@ -90,14 +91,13 @@ class UrlLinkTreeNode(TreeNode):
         target_url = self.get_target_link()
 
         # Render the link
-        if target_url:
-            if self.is_url_inside_tag_content():
-                inner_html = target_url
-            return self.html_render_template.format(src_link=target_url,
-                                                    extra_args=extra_attrs,
-                                                    inner_html=inner_html)
-        else:
+        if not target_url:
             return inner_html
+        if self.is_url_inside_tag_content():
+            inner_html = target_url
+        return self.html_render_template.format(src_link=target_url,
+                                                extra_args=extra_attrs,
+                                                inner_html=inner_html)
 
     def render_text(self, inner_text, **kwargs):
         """
@@ -111,13 +111,12 @@ class UrlLinkTreeNode(TreeNode):
         target_url = self.get_target_link()
 
         # Render the link
-        if target_url:
-            if self.is_url_inside_tag_content():
-                return target_url
-            else:
-                return '{} ({})'.format(inner_text, target_url)
-        else:
+        if not target_url:
             return inner_text
+        if self.is_url_inside_tag_content():
+            return target_url
+        else:
+            return '{} ({})'.format(inner_text, target_url)
 
 
 class EmailLinkTreeNode(TreeNode):
@@ -135,16 +134,12 @@ class EmailLinkTreeNode(TreeNode):
     def is_email_inside_tag_content(self):
         """
         Return ``True`` if the target email address is in the tag content (not in attributes).
-
-        :return ``True`` if the target email address is in the tag content, not in attributes.
         """
         return self.name not in self.attrs
 
     def get_email_address(self):
         """
         Return the target email address.
-
-        :return The target email address.
         """
         if self.is_email_inside_tag_content():
             email_address = self.get_raw_content().strip()
@@ -155,6 +150,15 @@ class EmailLinkTreeNode(TreeNode):
                             allowed_schemes=('mailto', ),
                             force_remove_scheme=True,
                             fix_non_local_urls=False)
+
+    def sanitize_node(self, breadcrumb):
+        """
+        Callback function for sanitizing and cleaning-up the given node.
+        :param breadcrumb: The breadcrumb of node instances from the root node to the current node (excluded).
+        """
+        super(EmailLinkTreeNode, self).sanitize_node(breadcrumb)
+        if not self.get_email_address():
+            self.error_message = _('Missing target email address')
 
     def render_html(self, inner_html, force_rel_nofollow=True, **kwargs):
         """
@@ -173,14 +177,13 @@ class EmailLinkTreeNode(TreeNode):
         extra_html = ' rel="nofollow"' if force_rel_nofollow else ''
 
         # Render the email link
-        if email_address:
-            if self.is_email_inside_tag_content():
-                inner_html = email_address
-            return self.html_render_template.format(email_address=email_address,
-                                                    extra_args=extra_html,
-                                                    inner_html=inner_html)
-        else:
+        if not email_address:
             return inner_html
+        if self.is_email_inside_tag_content():
+            inner_html = email_address
+        return self.html_render_template.format(email_address=email_address,
+                                                extra_args=extra_html,
+                                                inner_html=inner_html)
 
     def render_text(self, inner_text, **kwargs):
         """
@@ -194,13 +197,12 @@ class EmailLinkTreeNode(TreeNode):
         email_address = self.get_email_address()
 
         # Render the email link
-        if email_address:
-            if self.is_email_inside_tag_content():
-                return '<{}>'.format(email_address)
-            else:
-                return '{} (<{}>)'.format(inner_text, email_address)
-        else:
+        if not email_address:
             return inner_text
+        if self.is_email_inside_tag_content():
+            return '<{}>'.format(email_address)
+        else:
+            return '{} (<{}>)'.format(inner_text, email_address)
 
 
 class AnchorTreeNode(TreeNode):
@@ -217,11 +219,23 @@ class AnchorTreeNode(TreeNode):
 
     def get_anchor_id(self):
         """
-        Get the ID of this anchor from the content of the node.
-
-        :return The ID of this anchor, or an empty string.
+        Get the ID of this anchor from the content of the node, or an empty string.
         """
         return slugify(self.get_raw_content())
+
+    def pre_process_node(self):
+        """
+        Callback function for pre-processing the given node. Allow registration of IDs, references, etc.
+        This function is called in a top-to-down visit order, starting from the root node and going down to each
+        leaf node.
+        """
+        anchor_id = self.get_anchor_id()
+        if not anchor_id:
+            self.error_message = _('Missing anchor ID')
+        elif anchor_id in self.root_tree_node.known_ids:
+            self.error_message = _('ID already used previously')
+        else:
+            self.root_tree_node.known_ids.add(anchor_id)
 
     def render_html(self, inner_html, **kwargs):
         """
@@ -230,8 +244,6 @@ class AnchorTreeNode(TreeNode):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-
-        # Get the anchor ID
         anchor_id = self.get_anchor_id()
         return self.html_render_template.format(anchor_id=anchor_id) if anchor_id else inner_html
 
@@ -242,8 +254,6 @@ class AnchorTreeNode(TreeNode):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered text of this node.
         """
-
-        # Get the anchor ID
         anchor_id = self.get_anchor_id()
         return '[#{}]'.format(anchor_id) if anchor_id else inner_text
 
@@ -266,14 +276,25 @@ class GoToAnchorTreeNode(TreeNode):
     def get_anchor_id(self):
         """
         Get the target anchor ID of this link.
-        The target anchor ID can be set by setting the ``anchor_id_attr_name`` attribute of the tag or simply
-        by setting the tag name attribute.
+        The target anchor ID can be set by setting the ``anchor_id_attr_name`` attribute
+        of the tag or simply by setting the tag name attribute.
         The lookup order is: tag name (first), ``anchor_id_attr_name``.
-
         :return The target anchor ID of this link, or an empty string.
         """
         user_anchor_id = self.get_attribute_value('', self.anchor_id_attr_name)
         return slugify(user_anchor_id)
+
+    def sanitize_node(self, breadcrumb):
+        """
+        Callback function for sanitizing and cleaning-up the given node.
+        :param breadcrumb: The breadcrumb of node instances from the root node to the current node (excluded).
+        """
+        super(GoToAnchorTreeNode, self).sanitize_node(breadcrumb)
+        anchor_id = self.get_anchor_id()
+        if not anchor_id:
+            self.error_message = _('Missing anchor ID')
+        elif anchor_id not in self.root_tree_node.known_ids:
+            self.error_message = _('Unknown anchor ID')
 
     def render_html(self, inner_html, **kwargs):
         """
@@ -282,8 +303,6 @@ class GoToAnchorTreeNode(TreeNode):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered HTML of this node.
         """
-
-        # Get the anchor ID
         anchor_id = self.get_anchor_id()
         return self.html_render_template.format(anchor_id=anchor_id,
                                                 inner_html=inner_html) if anchor_id else inner_html
@@ -295,8 +314,6 @@ class GoToAnchorTreeNode(TreeNode):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered text of this node.
         """
-
-        # Get the anchor ID
         anchor_id = self.get_anchor_id()
         return '{inner_text} (#{anchor_id})'.format(inner_text=inner_text,
                                                     anchor_id=anchor_id) if anchor_id else inner_text

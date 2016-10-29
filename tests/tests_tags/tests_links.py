@@ -6,11 +6,13 @@ import unittest
 from unittest import mock
 
 from skcode.etree import RootTreeNode
-from skcode.tags import (UrlLinkTreeNode,
-                         EmailLinkTreeNode,
-                         AnchorTreeNode,
-                         GoToAnchorTreeNode,
-                         DEFAULT_RECOGNIZED_TAGS_LIST)
+from skcode.tags import (
+    UrlLinkTreeNode,
+    EmailLinkTreeNode,
+    AnchorTreeNode,
+    GoToAnchorTreeNode,
+    DEFAULT_RECOGNIZED_TAGS_LIST
+)
 from skcode.utility.relative_urls import setup_relative_urls_conversion
 
 
@@ -25,6 +27,7 @@ class UrlLinksTagTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(UrlLinkTreeNode.newline_closes)
         self.assertFalse(UrlLinkTreeNode.same_tag_closes)
+        self.assertFalse(UrlLinkTreeNode.weak_parent_close)
         self.assertFalse(UrlLinkTreeNode.standalone)
         self.assertTrue(UrlLinkTreeNode.parse_embedded)
         self.assertTrue(UrlLinkTreeNode.inline)
@@ -104,8 +107,7 @@ class UrlLinksTagTestCase(unittest.TestCase):
         tree_node = root_tree_node.new_child('url', UrlLinkTreeNode, attrs={'url': 'http://example.com/'})
         with unittest.mock.patch('skcode.tags.links.sanitize_url') as mock_sanitize_url:
             tree_node.get_target_link()
-        mock_sanitize_url.assert_called_once_with('http://example.com/',
-                                                  absolute_base_url='')
+        mock_sanitize_url.assert_called_once_with('http://example.com/', absolute_base_url='')
 
     def test_get_target_link_call_sanitize_url_with_relative_url_conversion(self):
         """ Test if the ``get_target_link`` call the ``sanitize_url`` method on the url. """
@@ -132,6 +134,16 @@ class UrlLinksTagTestCase(unittest.TestCase):
                                              attrs={'url': 'http://example.com/', 'title': '&lt;test&gt;'})
         title = tree_node.get_title_link()
         self.assertEqual('<test>', title)
+
+    def test_sanitize_node(self):
+        """ Test if the ``sanitize_node`` method mark the node as erroneous when title is missing """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('url', UrlLinkTreeNode, attrs={})
+        tree_node.sanitize_node([])
+        self.assertEqual('Missing target URL', tree_node.error_message)
+        tree_node = root_tree_node.new_child('url', UrlLinkTreeNode, attrs={'url': 'http://example.com'})
+        tree_node.sanitize_node([])
+        self.assertEqual('', tree_node.error_message)
 
     def test_render_html(self):
         """ Test the ``render_html`` method. """
@@ -245,6 +257,7 @@ class EmailLinksTagTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(EmailLinkTreeNode.newline_closes)
         self.assertFalse(EmailLinkTreeNode.same_tag_closes)
+        self.assertFalse(EmailLinkTreeNode.weak_parent_close)
         self.assertFalse(EmailLinkTreeNode.standalone)
         self.assertTrue(EmailLinkTreeNode.parse_embedded)
         self.assertTrue(EmailLinkTreeNode.inline)
@@ -313,6 +326,16 @@ class EmailLinksTagTestCase(unittest.TestCase):
                                                   allowed_schemes=('mailto', ),
                                                   force_remove_scheme=True,
                                                   fix_non_local_urls=False)
+
+    def test_sanitize_node(self):
+        """ Test if the ``sanitize_node`` method mark the node as erroneous when title is missing """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('email', EmailLinkTreeNode, attrs={})
+        tree_node.sanitize_node([])
+        self.assertEqual('Missing target email address', tree_node.error_message)
+        tree_node = root_tree_node.new_child('email', EmailLinkTreeNode, attrs={'email': 'john.doe@example.com'})
+        tree_node.sanitize_node([])
+        self.assertEqual('', tree_node.error_message)
 
     def test_render_html(self):
         """ Test the ``render_html`` method. """
@@ -390,6 +413,7 @@ class AnchorsTagTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(AnchorTreeNode.newline_closes)
         self.assertFalse(AnchorTreeNode.same_tag_closes)
+        self.assertFalse(AnchorTreeNode.weak_parent_close)
         self.assertFalse(AnchorTreeNode.standalone)
         self.assertTrue(AnchorTreeNode.parse_embedded)
         self.assertTrue(AnchorTreeNode.inline)
@@ -413,6 +437,21 @@ class AnchorsTagTestCase(unittest.TestCase):
         with unittest.mock.patch('skcode.tags.links.slugify') as mock_slugify:
             tree_node.get_anchor_id()
         mock_slugify.assert_called_once_with('test')
+
+    def test_pre_process_node(self):
+        """ Test if the ``pre_process_node`` method mark the node as erroneous when anchor ID is missing """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('anchor', AnchorTreeNode, content='')
+        tree_node.pre_process_node()
+        self.assertEqual('Missing anchor ID', tree_node.error_message)
+        tree_node = root_tree_node.new_child('anchor', AnchorTreeNode, content='test')
+        tree_node.pre_process_node()
+        self.assertEqual('', tree_node.error_message)
+        self.assertEqual({'test'}, root_tree_node.known_ids)
+        tree_node = root_tree_node.new_child('anchor', AnchorTreeNode, content='test')
+        tree_node.pre_process_node()
+        self.assertEqual('ID already used previously', tree_node.error_message)
+        self.assertEqual({'test'}, root_tree_node.known_ids)
 
     def test_render_html(self):
         """ Test the ``render_html`` method. """
@@ -458,6 +497,7 @@ class AnchorReferencesTagTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(GoToAnchorTreeNode.newline_closes)
         self.assertFalse(GoToAnchorTreeNode.same_tag_closes)
+        self.assertFalse(GoToAnchorTreeNode.weak_parent_close)
         self.assertFalse(GoToAnchorTreeNode.standalone)
         self.assertTrue(GoToAnchorTreeNode.parse_embedded)
         self.assertTrue(GoToAnchorTreeNode.inline)
@@ -503,6 +543,21 @@ class AnchorReferencesTagTestCase(unittest.TestCase):
         with unittest.mock.patch('skcode.tags.links.slugify') as mock_slugify:
             tree_node.get_anchor_id()
         mock_slugify.assert_called_once_with('test')
+
+    def test_sanitize_node(self):
+        """ Test if the ``sanitize_node`` method mark the node as erroneous when title is missing """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('goto', GoToAnchorTreeNode, attrs={'id': ''})
+        tree_node.sanitize_node([])
+        self.assertEqual('Missing anchor ID', tree_node.error_message)
+        self.assertEqual(set(), root_tree_node.known_ids)
+        tree_node = root_tree_node.new_child('goto', GoToAnchorTreeNode, attrs={'id': 'test'})
+        tree_node.sanitize_node([])
+        self.assertEqual('Unknown anchor ID', tree_node.error_message)
+        root_tree_node.known_ids.add('test')
+        tree_node = root_tree_node.new_child('goto', GoToAnchorTreeNode, attrs={'id': 'test'})
+        tree_node.sanitize_node([])
+        self.assertEqual('', tree_node.error_message)
 
     def test_render_html(self):
         """ Test the ``render_html`` method. """
