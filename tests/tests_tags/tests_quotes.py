@@ -26,6 +26,7 @@ class QuotesTagTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(QuoteTreeNode.newline_closes)
         self.assertFalse(QuoteTreeNode.same_tag_closes)
+        self.assertFalse(QuoteTreeNode.weak_parent_close)
         self.assertFalse(QuoteTreeNode.standalone)
         self.assertTrue(QuoteTreeNode.parse_embedded)
         self.assertFalse(QuoteTreeNode.inline)

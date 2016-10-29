@@ -27,6 +27,7 @@ class SpoilerTagTestCase(unittest.TestCase):
         """ Test tag constants. """
         self.assertFalse(SpoilerTreeNode.newline_closes)
         self.assertFalse(SpoilerTreeNode.same_tag_closes)
+        self.assertFalse(SpoilerTreeNode.weak_parent_close)
         self.assertFalse(SpoilerTreeNode.standalone)
         self.assertTrue(SpoilerTreeNode.parse_embedded)
         self.assertFalse(SpoilerTreeNode.inline)
