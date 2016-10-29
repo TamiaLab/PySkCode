@@ -49,10 +49,9 @@ class DirectionTextTreeNode(TreeNode):
     def get_text_direction(self):
         """
         Get the text direction.
-        The text direction can be set by setting the ``text_direction_attr_name`` attribute of the tag or simply
-        by setting the tag name attribute.
+        The text direction can be set by setting the ``text_direction_attr_name`` attribute
+        of the tag or simply by setting the tag name attribute.
         The lookup order is: tag name (first), ``text_direction_attr_name``.
-
         :return The text direction of this block of text, or the default one.
         """
 
