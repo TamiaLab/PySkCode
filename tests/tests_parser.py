@@ -9,7 +9,6 @@ from skcode.parser import (
     WHITESPACE_CHARSET,
     IDENTIFIER_CHARSET,
     skip_whitespaces,
-    skip_next_char_then_whitespaces,
     get_identifier,
     parse_tag
 )
@@ -25,102 +24,57 @@ class TagParserTestCase(unittest.TestCase):
 
     def test_skip_whitespaces(self):
         """ Test the ``skip_whitespaces`` method with some whitespaces """
-        offset, ch = skip_whitespaces('   abcd   ', 0, ' ')
+        offset = skip_whitespaces('   abcd   ', 0)
         self.assertEqual(offset, 3)
-        self.assertEqual('a', ch)
 
     def test_skip_whitespaces_without_spaces(self):
         """ Test the ``skip_whitespaces`` method without any whitespaces """
-        offset, ch = skip_whitespaces('abcd   ', 0, 'a')
+        offset = skip_whitespaces('abcd   ', 0)
         self.assertEqual(offset, 0)
-        self.assertEqual('a', ch)
 
     def test_skip_whitespaces_with_whitespaces_only(self):
         """
         Test if the ``skip_whitespaces`` method raise a ``IndexError`` if the string end with whitespaces.
         """
         with self.assertRaises(IndexError):
-            skip_whitespaces("  ", 0, ' ')
-
-    def test_skip_next_char_then_whitespaces_with_whitespaces(self):
-        """
-        Test if the ``skip_next_char_then_whitespaces`` method skip whitespaces at the beginning of the string.
-        """
-        offset, ch = skip_next_char_then_whitespaces("     abcdef", 0)
-        self.assertEqual(offset, 5)
-        self.assertEqual('a', ch)
-
-    def test_skip_next_char_then_whitespaces_without_whitespaces(self):
-        """
-        Test if the ``skip_next_char_then_whitespaces`` method work with a string starting without whitespaces.
-        """
-        offset, ch = skip_next_char_then_whitespaces("abcdef", 0)
-        self.assertEqual(offset, 1)
-        self.assertEqual('b', ch)
-
-    def test_skip_next_char_then_whitespaces_with_offset(self):
-        """
-        Test if the ``skip_next_char_then_whitespaces`` method skip whitespaces at beginning of the string starting
-        at the given offset.
-        """
-        offset, ch = skip_next_char_then_whitespaces("xy   abcdef", 2)
-        self.assertEqual(offset, 5)
-        self.assertEqual('a', ch)
-
-    def test_skip_next_char_then_whitespaces_with_default_nb_char_to_skip(self):
-        """
-        Test if the ``skip_next_char_then_whitespaces`` method skip any char at beginning of the string if not specified.
-        """
-        offset, ch = skip_next_char_then_whitespaces("xy   abcdef", 0)
-        self.assertEqual(offset, 1)
-        self.assertEqual('y', ch)
-
-    def test_skip_next_char_then_whitespaces_with_whitespaces_only(self):
-        """
-        Test if the ``skip_next_char_then_whitespaces`` method raise a ``IndexError`` if the string end with whitespaces.
-        """
-        with self.assertRaises(IndexError):
-            skip_next_char_then_whitespaces("  ", 0)
+            skip_whitespaces("  ", 0)
 
     def test_get_identifier_with_valid_name(self):
         """
         Test if the ``get_identifier`` method with a valid identifier string.
         """
-        identifier, offset, ch = get_identifier('_abcdefghijklmnopqrstuvwxyz'
-                                                'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-                                                '0123456789 ', 0, '_')
+        identifier, offset = get_identifier('_abcdefghijklmnopqrstuvwxyz'
+                                            'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+                                            '0123456789 ', 0)
         self.assertEqual('_abcdefghijklmnopqrstuvwxyz'
                          'abcdefghijklmnopqrstuvwxyz'
                          '0123456789', identifier)
         self.assertEqual(offset, 63)
-        self.assertEqual(' ', ch)
 
     def test_get_identifier_with_whitespaces(self):
         """
         Test if the ``get_identifier`` method with some whitespaces.
         """
-        identifier, offset, ch = get_identifier('_abcdefghijklmnopqrstuvwxyz '
-                                                'ABCDEFGHIJKLMNOPQRSTUVWXYZ '
-                                                '0123456789 ', 0, '_')
+        identifier, offset = get_identifier('_abcdefghijklmnopqrstuvwxyz '
+                                            'ABCDEFGHIJKLMNOPQRSTUVWXYZ '
+                                            '0123456789 ', 0)
         self.assertEqual('_abcdefghijklmnopqrstuvwxyz', identifier)
         self.assertEqual(offset, 27)
-        self.assertEqual(' ', ch)
 
     def test_get_identifier_with_uppercase(self):
         """
         Test if the ``get_identifier`` method with some uppercase char.
         """
-        identifier, offset, ch = get_identifier('_ABCDEFGHIJKlmnopqrstuvwxyz ', 0, '_')
+        identifier, offset = get_identifier('_ABCDEFGHIJKlmnopqrstuvwxyz ', 0)
         self.assertEqual('_abcdefghijklmnopqrstuvwxyz', identifier)
         self.assertEqual(offset, 27)
-        self.assertEqual(' ', ch)
 
     def test_get_identifier_no_ending_whitespace(self):
         """
         Test if the ``get_identifier`` method with no ending whitespaces.
         """
         with self.assertRaises(IndexError):
-            get_identifier('test', 0, 't')
+            get_identifier('test', 0)
 
     # --- Functional tests
     PASS_TESTS = (
