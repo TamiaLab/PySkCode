@@ -42,6 +42,14 @@ class TreeNodeTestCase(unittest.TestCase):
         self.assertFalse(TreeNode.make_paragraphs_here)
         self.assertFalse(TreeNode.is_root)
 
+    def test_constants_overload_at_init(self):
+        """ Test constants overload with init kwargs """
+        root_tree_node = RootTreeNode()
+        tree_node = root_tree_node.new_child('test', DummyTreeNode)
+        self.assertEqual('test', tree_node.canonical_tag_name)
+        tree_node = root_tree_node.new_child('test', DummyTreeNode, canonical_tag_name='foobar')
+        self.assertEqual('foobar', tree_node.canonical_tag_name)
+
     def test_assertions_constructor(self):
         """ Test assertions at constructor """
         root_tree_node = RootTreeNode()
