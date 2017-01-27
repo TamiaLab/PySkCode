@@ -76,7 +76,7 @@ class TreeNode(object):
                  root_tree_node, parent, name,
                  attrs=None, content='', children=None,
                  source_open_tag='', source_close_tag='',
-                 error_message=''):
+                 error_message='', **kwargs):
         """
         Create a new tree node instance.
         :param root_tree_node: The root tree node instance (mandatory). Use to store document-level data.
@@ -107,6 +107,10 @@ class TreeNode(object):
         self.source_open_tag = source_open_tag
         self.source_close_tag = source_close_tag
         self.error_message = error_message
+
+        # Allow class constants overload at object creation
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
         # Rebase children parent and root tree node
         for child in self.children:
@@ -309,14 +313,14 @@ class RootTreeNode(TreeNode):
 
     is_root = True
 
-    def __init__(self, attrs=None, children=None):
+    def __init__(self, attrs=None, children=None, **kwargs):
         """
         Create a new root tree node.
         :param attrs: The root node attributes dictionary (default to an empty dictionary).
         :param children: The root node children list (default to an empty list).
         """
         self.known_ids = set()
-        super(RootTreeNode, self).__init__(self, None, None, attrs=attrs, children=children)
+        super(RootTreeNode, self).__init__(self, None, None, attrs=attrs, children=children, **kwargs)
 
     def render_html(self, inner_html, **kwargs):
         """
