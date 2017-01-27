@@ -318,15 +318,15 @@ class ListElementTreeNode(TreeNode):
         if parent_list_type == UNORDERED_LIST_TYPE:
             return '-'
         elif parent_list_type == NUMERIC_LIST_TYPE:
-            return '%d.' % element_num
+            return '{:d}.'.format(element_num)
         elif parent_list_type == UPPERCASE_LIST_TYPE:
-            return '%s.' % int_to_alphabet_numerals(element_num)
+            return '{}.'.format(int_to_alphabet_numerals(element_num))
         elif parent_list_type == LOWERCASE_LIST_TYPE:
-            return '%s.' % int_to_alphabet_numerals(element_num).lower()
+            return '{}.'.format(int_to_alphabet_numerals(element_num).lower())
         elif parent_list_type == UPPER_ROMAN_LIST_TYPE:
-            return '%s.' % int_to_roman_numerals(element_num)
+            return '{}.'.format(int_to_roman_numerals(element_num))
         elif parent_list_type == LOWER_ROMAN_LIST_TYPE:
-            return '%s.' % int_to_roman_numerals(element_num).lower()
+            return '{}.'.format(int_to_roman_numerals(element_num).lower())
 
     def render_html(self, inner_html, **kwargs):
         """
@@ -351,10 +351,10 @@ class ListElementTreeNode(TreeNode):
         for line in inner_text.strip().splitlines():
             if is_first_line:
                 is_first_line = False
-                lines.append('%s %s' % (bullet, line))
+                lines.append('{bullet} {line}'.format(bullet=bullet, line=line))
             else:
-                lines.append('%s %s' % (indent, line))
+                lines.append('{indent} {line}'.format(indent=indent, line=line))
         if is_first_line:
-            lines.append('%s' % bullet)
+            lines.append(bullet)
         lines.append('')
         return '\n'.join(lines)

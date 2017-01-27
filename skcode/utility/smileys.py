@@ -261,7 +261,8 @@ def setup_smileys_replacement(document_tree, base_url, emoticons_map=DEFAULT_EMO
     assert base_url, "Base URL is mandatory."
 
     # Craft the emoticons regex
-    emoticons_regex = r'(^|\s+)(?P<emoticon>%s)(\s+|$)' % '|'.join([re.escape(escape_html(e)) for e, _ in emoticons_map])
+    emoticon_rules = '|'.join([re.escape(escape_html(e)) for e, _ in emoticons_map])
+    emoticons_regex = r'(^|\s+)(?P<emoticon>{rules})(\s+|$)'.format(rules=emoticon_rules)
     emoticons_regex = re.compile(emoticons_regex)
 
     # Turn emoticons map into a dictionary

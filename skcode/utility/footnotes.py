@@ -90,7 +90,7 @@ def render_footnotes_text(footnotes):
         footnote_text = render_inner_text(footnote_node)
 
         # Craft the footnote declaration
-        footnote_declaration_text = '[^%s]: ' % footnote_id
+        footnote_declaration_text = '[^{id}]: '.format(id=footnote_id)
 
         # Add the footnote text to the output
         text_output.append(footnote_declaration_text + footnote_text.strip())

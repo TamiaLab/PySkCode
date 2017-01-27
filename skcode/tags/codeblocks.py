@@ -289,19 +289,20 @@ class CodeBlockTreeNode(TreeNode):
         lines = []
         for num, line in enumerate(self.get_cleaned_content(splitlines=True), start=get_start_line_number):
             line = line.replace('\t', ' ' * self.tab_size)
-            line_prefix = '%d>' % num if num in hl_lines else '%d.' % num
-            lines.append('%s %s' % (line_prefix.ljust(4), line))
+            line_prefix = '{:d}>'.format(num) if num in hl_lines else '{:d}.'.format(num)
+            lines.append('{prefix} {line}'.format(prefix=line_prefix.ljust(4), line=line))
 
         # Add the caption
-        figure_extra = ' [#%s]' % figure_id if figure_id else ''
+        figure_extra = ' [#{id}]'.format(id=figure_id) if figure_id else ''
         if src_filename and src_link_url:
-            caption = 'Source : %s (%s)%s' % (src_filename, src_link_url, figure_extra)
+            caption = 'Source : {filename} ({link}){extra}'.format(filename=src_filename,
+                                                                   link=src_link_url, extra=figure_extra)
             lines.append(caption)
         elif src_filename:
-            caption = 'Source : %s%s' % (src_filename, figure_extra)
+            caption = 'Source : {filename}{extra}'.format(filename=src_filename, extra=figure_extra)
             lines.append(caption)
         elif src_link_url:
-            caption = 'Source : %s%s' % (src_link_url, figure_extra)
+            caption = 'Source : {link}{extra}'.format(link=src_link_url, extra=figure_extra)
             lines.append(caption)
 
         # Finish the job

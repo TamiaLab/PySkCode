@@ -142,12 +142,12 @@ class TableCellTreeNode(TreeNode):
 
         # Get the column span
         colspan = self.get_cell_colspan()
-        extra_attrs = ' colspan="%d"' % colspan if colspan != 1 else ''
+        extra_attrs = ' colspan="{:d}"'.format(colspan) if colspan != 1 else ''
 
         # Get the row span
         rowspan = self.get_cell_rowspan()
         if rowspan != 1:
-            extra_attrs += ' rowspan="%d"' % rowspan
+            extra_attrs += ' rowspan="{:d}"'.format(rowspan)
 
         # Return the string
         return extra_attrs

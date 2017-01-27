@@ -21,11 +21,11 @@ def escape_attribute_value(value):
     :return The attribute value escaped, with surrounding quotes if required.
     """
     if "'" in value and '"' in value:
-        return '"%s"' % value.replace('\\', '\\\\').replace('"', '\\"')
+        return '"{}"'.format(value.replace('\\', '\\\\').replace('"', '\\"'))
     elif '"' in value:
-        return "'%s'" % value
+        return "'{}'".format(value)
     else:
-        return '"%s"' % value
+        return '"{}"'.format(value)
 
 
 def sanitize_url(url, default_scheme='http',

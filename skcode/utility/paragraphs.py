@@ -31,7 +31,7 @@ class ParagraphTreeNode(TreeNode):
         :param kwargs: Extra keyword arguments for rendering.
         :return The rendered text of this node.
         """
-        return '%s\n\n' % inner_text.strip()
+        return inner_text.strip() + '\n\n'
 
 
 def make_paragraphs(tree_node,
