@@ -40,7 +40,7 @@ def parse_skcode(text: str,
     Return the resulting document tree (DOM-like parser).
     :param text: The input text to be parsed.
     :param recognized_tags: A list containing all valid tag classes.
-    :type recognized_tags: list[TreeNode]
+    :type recognized_tags: iterable[TreeNode]
     :param opening_tag_ch: The opening tag char (must be one char long exactly, default '[').
     :param closing_tag_ch: The closing tag char (must be one char long exactly, default ']').
     :param allow_tagvalue_attr: Set to ``True`` to allow the BBCode ``tagname=tagvalue`` syntax shortcut
