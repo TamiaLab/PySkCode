@@ -2,14 +2,18 @@
 SkCode AST tree builder code.
 """
 
+from collections import defaultdict
 from gettext import gettext as _
 
-from .etree import RootTreeNode
+from .etree import (
+    RootTreeNode,
+    TreeNode
+)
 from .tags import (
     DEFAULT_RECOGNIZED_TAGS_LIST,
     build_recognized_tags_dict,
-    TextTreeNode,
-    NewlineTreeNode
+    NewlineTreeNode,
+    TextTreeNode
 )
 from .tokenizer import (
     tokenize_tag,
@@ -21,7 +25,7 @@ from .tokenizer import (
 )
 
 
-def parse_skcode(text,
+def parse_skcode(text: str,
                  recognized_tags=DEFAULT_RECOGNIZED_TAGS_LIST,
                  opening_tag_ch='[', closing_tag_ch=']',
                  allow_tagvalue_attr=True, allow_self_closing_tags=True,
@@ -29,12 +33,14 @@ def parse_skcode(text,
                  text_node_cls=TextTreeNode,
                  newline_node_cls=NewlineTreeNode,
                  mark_unclosed_tags_as_erroneous=False,
-                 max_nesting_depth=16):
+                 max_nesting_depth=16,
+                 cls_options_overload=None):
     """
     Parse the given text as a BBCode formatted document.
     Return the resulting document tree (DOM-like parser).
     :param text: The input text to be parsed.
     :param recognized_tags: A list containing all valid tag classes.
+    :type recognized_tags: list[TreeNode]
     :param opening_tag_ch: The opening tag char (must be one char long exactly, default '[').
     :param closing_tag_ch: The closing tag char (must be one char long exactly, default ']').
     :param allow_tagvalue_attr: Set to ``True`` to allow the BBCode ``tagname=tagvalue`` syntax shortcut
@@ -47,6 +53,10 @@ def parse_skcode(text,
     (default is ``False``).
     :param max_nesting_depth: The maximum nesting depth (default to 16). Set to zero to disable (not recommended
     because a Denial-Of-Service is possible if nesting depth is not limited).
+    :param cls_options_overload: Dictionary of dictionaries mapped by node class type ``{class: {key : value}}``
+    to be used to overload node options settings on a per node class basis.
+    This allow simple tweak of a default class behaviour at runtime.
+    :type cls_options_overload: dict[TreeNode, dict[str, Any]]
     :return The resulting document tree at the end of the parsing stage.
     """
     assert opening_tag_ch, "The opening tag character is mandatory."
@@ -60,6 +70,11 @@ def parse_skcode(text,
 
     # Build the known tag names dictionary
     recognized_tags = build_recognized_tags_dict(recognized_tags)
+
+    # Build the overload options dictionary
+    extra_cls_kwargs = defaultdict(dict)
+    if cls_options_overload:
+        extra_cls_kwargs.update(cls_options_overload)
 
     # Initialize the parser
     root_tree_node = cur_tree_node = root_node_cls()
@@ -100,8 +115,7 @@ def parse_skcode(text,
         elif token_type == TOKEN_DATA:
             
             # Append to the current node
-            cur_tree_node.new_child(None,
-                                    text_node_cls,
+            cur_tree_node.new_child(None, text_node_cls,
                                     content=token_source)
             
         elif token_type == TOKEN_NEWLINE:
@@ -144,7 +158,8 @@ def parse_skcode(text,
             # Create a new child node
             new_node = cur_tree_node.new_child(tag_name, tag_cls,
                                                attrs=tag_attrs,
-                                               source_open_tag=token_source)
+                                               source_open_tag=token_source,
+                                               **extra_cls_kwargs[text_node_cls])
 
             # Jump to the new child node if not standalone
             if not tag_cls.standalone:
@@ -214,7 +229,8 @@ def parse_skcode(text,
                 # Create a new child node
                 cur_tree_node.new_child(tag_name, tag_cls,
                                         attrs=tag_attrs,
-                                        source_open_tag=token_source)
+                                        source_open_tag=token_source,
+                                        **extra_cls_kwargs[text_node_cls])
 
     # Close all remaining weak nodes
     while cur_tree_node != root_tree_node and cur_tree_node.parent is not None and cur_tree_node.weak_parent_close:
@@ -235,7 +251,7 @@ def parse_skcode(text,
     return root_tree_node
 
 
-def pre_process_tree(tree_node):
+def pre_process_tree(tree_node: TreeNode):
     """
     Recursive method for pre-processing the given tree node and children recursively.
     :param tree_node: The tree node to be pre-processed.
@@ -249,11 +265,12 @@ def pre_process_tree(tree_node):
         pre_process_tree(child_node)
 
 
-def sanitize_tree(tree_node, breadcrumb=None):
+def sanitize_tree(tree_node: TreeNode, breadcrumb=None):
     """
     Recursive method for sanitizing the given tree node and children recursively.
     :param tree_node: The tree node to be sanitized.
     :param breadcrumb: The current breadcrumb of parent nodes (default to an empty list).
+    :type breadcrumb: list or None
     """
     breadcrumb = breadcrumb or []
 
@@ -266,7 +283,7 @@ def sanitize_tree(tree_node, breadcrumb=None):
     tree_node.sanitize_node(breadcrumb)
 
 
-def post_process_tree(tree_node):
+def post_process_tree(tree_node: TreeNode):
     """
     Recursive method for post-processing the given tree node and children recursively.
     :param tree_node: The tree node to be post-processed.
