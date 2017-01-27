@@ -159,7 +159,7 @@ def parse_skcode(text: str,
             new_node = cur_tree_node.new_child(tag_name, tag_cls,
                                                attrs=tag_attrs,
                                                source_open_tag=token_source,
-                                               **extra_cls_kwargs[text_node_cls])
+                                               **extra_cls_kwargs[tag_cls])
 
             # Jump to the new child node if not standalone
             if not tag_cls.standalone:
@@ -230,7 +230,7 @@ def parse_skcode(text: str,
                 cur_tree_node.new_child(tag_name, tag_cls,
                                         attrs=tag_attrs,
                                         source_open_tag=token_source,
-                                        **extra_cls_kwargs[text_node_cls])
+                                        **extra_cls_kwargs[tag_cls])
 
     # Close all remaining weak nodes
     while cur_tree_node != root_tree_node and cur_tree_node.parent is not None and cur_tree_node.weak_parent_close:

@@ -530,6 +530,50 @@ class ParserTestCase(unittest.TestCase):
         self.assertEqual('', test_node.source_close_tag)
         self.assertEqual('Unclosed tag', test_node.error_message)
 
+    def test_cls_options_overload_normal_tag(self):
+        """ Test if the tree builder handle class options overload on normal tag """
+        known_tags = (
+            get_dummy_node(standalone=False, foo='bar'),
+        )
+        document_tree = parse_skcode('[test][/test]',
+                                     recognized_tags=known_tags,
+                                     cls_options_overload={
+                                         known_tags[0]: {
+                                             'foo': 'baz',
+                                         },
+                                     })
+        self.assertIsInstance(document_tree, RootTreeNode)
+        self.assertEqual(1, len(document_tree.children))
+        child_node = document_tree.children[0]
+        self.assertIsInstance(child_node, DummyTreeNode)
+        self.assertEqual(0, len(child_node.children))
+        self.assertEqual('[test]', child_node.source_open_tag)
+        self.assertEqual('[/test]', child_node.source_close_tag)
+        self.assertEqual('', child_node.error_message)
+        self.assertEqual('baz', child_node.foo)
+
+    def test_cls_options_overload_self_closing_tag(self):
+        """ Test if the tree builder handle class options overload on self closing tag """
+        known_tags = (
+            get_dummy_node(standalone=True, foo='bar'),
+        )
+        document_tree = parse_skcode('[test/]',
+                                     recognized_tags=known_tags,
+                                     cls_options_overload={
+                                         known_tags[0]: {
+                                             'foo': 'baz',
+                                         },
+                                     })
+        self.assertIsInstance(document_tree, RootTreeNode)
+        self.assertEqual(1, len(document_tree.children))
+        child_node = document_tree.children[0]
+        self.assertIsInstance(child_node, DummyTreeNode)
+        self.assertEqual(0, len(child_node.children))
+        self.assertEqual('[test/]', child_node.source_open_tag)
+        self.assertEqual('', child_node.source_close_tag)
+        self.assertEqual('', child_node.error_message)
+        self.assertEqual('baz', child_node.foo)
+
     def test_pre_post_processing_sanitizing(self):
         """ Test if the tree builder start the pre/post processing and sanitizing process """
 
