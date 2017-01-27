@@ -13,7 +13,7 @@ TOKEN_CLOSE_TAG = 3
 TOKEN_SELF_CLOSE_TAG = 4
 
 
-def tokenize_newline(data):
+def tokenize_newline(data: str):
     """
     Given a string that does not contain any tags, this function will
     yield a list of ``TOKEN_NEWLINE`` and ``TOKEN_DATA`` tokens in such way
@@ -32,7 +32,7 @@ def tokenize_newline(data):
         yield TOKEN_DATA, None, None, last_line
 
 
-def tokenize_tag(text,
+def tokenize_tag(text: str,
                  opening_tag_ch='[', closing_tag_ch=']',
                  allow_tagvalue_attr=True, allow_self_closing_tags=True):
     """
