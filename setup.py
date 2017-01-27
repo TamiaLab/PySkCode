@@ -28,7 +28,7 @@ setup(
     scripts=['skterm.py'],
     include_package_data=True,
     license='GPLv3',
-    description='SkCode - BBcode parser implementation for Python 3.4',
+    description='SkCode - BBcode parser implementation for Python 3',
     long_description=README,
     url='https://github.com/TamiaLab/PySkCode',
     classifiers=[
@@ -39,6 +39,8 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Topic :: Text Processing :: Markup',
         'Topic :: Text Processing :: Markup :: HTML',
     ],
