@@ -37,7 +37,7 @@ class ParagraphTreeNode(TreeNode):
 def make_paragraphs(tree_node,
                     paragraph_node_cls=ParagraphTreeNode,
                     text_node_cls=TextTreeNode,
-                    newline_node_cls=NewlineTreeNode,):
+                    newline_node_cls=NewlineTreeNode):
     """
     Group all inline nodes into paragraphs according to each node options.
     :param tree_node: Tree node to be processed.
@@ -49,7 +49,7 @@ def make_paragraphs(tree_node,
 
     # Process all children first
     for child_node in tree_node.children:
-        make_paragraphs(child_node, paragraph_node_cls)
+        make_paragraphs(child_node, paragraph_node_cls, text_node_cls, newline_node_cls)
 
     # Process only block node with make_paragraphs_here option set
     if tree_node.inline or not tree_node.make_paragraphs_here:
