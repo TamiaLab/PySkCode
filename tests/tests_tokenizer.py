@@ -96,6 +96,19 @@ class TokenizerTestCase(unittest.TestCase):
         ('[foobar[test', (
             (TOKEN_DATA, None, None, '[foobar[test'),
         )),
+
+        # Test empty lines
+        ('text\n', (
+            (TOKEN_DATA, None, None, 'text'),
+            (TOKEN_NEWLINE, None, None, '\n'),
+        )),
+        ('\ntext', (
+            (TOKEN_NEWLINE, None, None, '\n'),
+            (TOKEN_DATA, None, None, 'text'),
+        )),
+        ('\n', (
+            (TOKEN_NEWLINE, None, None, '\n'),
+        )),
     )
 
     def test_functional(self):
