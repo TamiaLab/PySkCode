@@ -8,8 +8,6 @@ from skcode import parse_skcode
 from skcode.tags import TextTreeNode, NewlineTreeNode
 from skcode.etree import TreeNode, RootTreeNode
 
-from skcode.etree import debug_print_ast
-
 
 class CustomTextTreeNode(TextTreeNode):
     """ Custom text tree node """
