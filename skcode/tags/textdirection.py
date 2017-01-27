@@ -97,7 +97,7 @@ class LTRFixedDirectionTextTreeNode(DirectionTextTreeNode):
     alias_tag_names = ()
 
     # Text direction
-    text_direction= TEXT_DIR_LEFT_TO_RIGHT
+    text_direction = TEXT_DIR_LEFT_TO_RIGHT
 
     def get_text_direction(self):
         """
